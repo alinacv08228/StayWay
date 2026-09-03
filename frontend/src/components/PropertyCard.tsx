@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { Property } from "../types/types";
+import { useSettings } from "../context/SettingsContext";
+import { currencyInfo } from "../data/currency";
+import { getTranslation } from "../data/translations";
 
 type PropertyCardProps = {
     property: Property;
@@ -8,6 +13,19 @@ type PropertyCardProps = {
 export default function PropertyCard({
                                          property,
                                      }: PropertyCardProps) {
+    const {
+        language,
+        currency,
+    } = useSettings();
+
+    const selectedCurrency =
+        currencyInfo[currency] ??
+        currencyInfo["Euro"];
+
+    const convertedPrice =
+        property.pricePerNight *
+        selectedCurrency.rate;
+
     return (
         <Link
             href={`/stays/${property.id}`}
@@ -30,7 +48,15 @@ export default function PropertyCard({
                 </p>
 
                 <p className="property-price">
-                    €{property.pricePerNight} / night
+                    {selectedCurrency.symbol}
+                    {Math.round(
+                        convertedPrice
+                    ).toLocaleString()}
+                    {" / "}
+                    {getTranslation(
+                        language,
+                        "perNight"
+                    )}
                 </p>
             </div>
         </Link>
