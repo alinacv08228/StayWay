@@ -3,21 +3,37 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
+    Building2,
+    DoorOpen,
+    User,
+    CalendarDays,
+    Users,
+    Tag,
+    Circle,
+} from "lucide-react";
+import {
     bookings as mockBookings,
     properties,
     users,
+    rooms,
 } from "../../data/mockData";
 
 type Booking = {
     id: number;
     userId: number;
     propertyId: number;
+    roomId?: number;
     checkIn: string;
     checkOut: string;
     guests: number;
     totalPrice: number;
     status: string;
 };
+
+function formatDate(date: string) {
+    const [year, month, day] = date.split("-");
+    return `${day}.${month}.${year}`;
+}
 
 export default function BookingsPage() {
     const [userBookings, setUserBookings] = useState<Booking[]>([]);
@@ -80,18 +96,20 @@ export default function BookingsPage() {
     return (
         <main>
             <section className="section">
-                <div className="container">
+                <div className="container bookings-page">
 
-                    <h1>My Bookings</h1>
+                    <h1 className="page-title bookings-title-animation">
+                        My Bookings
+                    </h1>
 
                     {userBookings.length === 0 ? (
-                        <p>
+                        <p className="bookings-description-animation">
                             You don't have any bookings yet.
                         </p>
                     ) : (
                         <div className="bookings-list">
 
-                            {userBookings.map((booking) => {
+                            {userBookings.map((booking, index) => {
                                 const user = users.find(
                                     (item) =>
                                         item.id === booking.userId
@@ -102,10 +120,19 @@ export default function BookingsPage() {
                                         item.id === booking.propertyId
                                 );
 
+                                const room = rooms.find(
+                                    (item) =>
+                                        item.id === booking.roomId &&
+                                        item.propertyId === booking.propertyId
+                                );
+
                                 return (
                                     <div
                                         className="booking-card"
                                         key={booking.id}
+                                        style={{
+                                            animationDelay: `${index * 0.12}s`,
+                                        }}
                                     >
                                         <div className="booking-content">
 
@@ -113,47 +140,102 @@ export default function BookingsPage() {
                                                 {property?.name}
                                             </h2>
 
-                                            <p>
-                                                <strong>
-                                                    User:
-                                                </strong>{" "}
-                                                {user?.name}
-                                            </p>
+                                            <div className="booking-info">
 
-                                            <p>
-                                                <strong>
-                                                    Check-in:
-                                                </strong>{" "}
-                                                {booking.checkIn}
-                                            </p>
+                                                <div className="booking-info-row">
+                                                    <Building2 className="booking-info-icon" />
 
-                                            <p>
-                                                <strong>
-                                                    Check-out:
-                                                </strong>{" "}
-                                                {booking.checkOut}
-                                            </p>
+                                                    <div>
+                                                        <strong>Property:</strong>
+                                                        <span>
+                                                            {property?.name}
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                                            <p>
-                                                <strong>
-                                                    Guests:
-                                                </strong>{" "}
-                                                {booking.guests}
-                                            </p>
+                                                <div className="booking-info-row">
+                                                    <DoorOpen className="booking-info-icon" />
 
-                                            <p>
-                                                <strong>
-                                                    Total:
-                                                </strong>{" "}
-                                                €{booking.totalPrice}
-                                            </p>
+                                                    <div>
+                                                        <strong>Room:</strong>
+                                                        <span>
+                                                            {room?.name ?? "Room not specified"}
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                                            <p>
-                                                <strong>
-                                                    Status:
-                                                </strong>{" "}
-                                                {booking.status}
-                                            </p>
+                                                <div className="booking-info-row">
+                                                    <User className="booking-info-icon" />
+
+                                                    <div>
+                                                        <strong>User:</strong>
+                                                        <span>
+                                                            {user?.name}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="booking-info-row">
+                                                    <CalendarDays className="booking-info-icon" />
+
+                                                    <div>
+                                                        <strong>Check-in:</strong>
+                                                        <span>
+                                                            {formatDate(
+                                                                booking.checkIn
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="booking-info-row">
+                                                    <CalendarDays className="booking-info-icon" />
+
+                                                    <div>
+                                                        <strong>Check-out:</strong>
+                                                        <span>
+                                                            {formatDate(
+                                                                booking.checkOut
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="booking-info-row">
+                                                    <Users className="booking-info-icon" />
+
+                                                    <div>
+                                                        <strong>Guests:</strong>
+                                                        <span>
+                                                            {booking.guests}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="booking-info-row">
+                                                    <Tag className="booking-info-icon" />
+
+                                                    <div>
+                                                        <strong>Total:</strong>
+                                                        <span>
+                                                            €{booking.totalPrice}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="booking-info-row">
+                                                    <Circle className="booking-info-icon status-icon" />
+
+                                                    <div>
+                                                        <strong>Status:</strong>
+
+                                                        <span className="booking-status">
+                                                            {booking.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
 
                                             <div className="booking-actions">
 

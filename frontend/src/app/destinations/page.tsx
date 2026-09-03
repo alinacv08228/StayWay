@@ -7,15 +7,17 @@ export default function DestinationsPage() {
             <section className="section">
                 <div className="container">
 
-                    <p className="admin-label">
-                        EXPLORE
-                    </p>
+                    <div className="destinations-page-header">
+                        <p className="admin-label">
+                            EXPLORE
+                        </p>
 
-                    <h1>Popular destinations</h1>
+                        <h1 className="page-title">Popular destinations</h1>
 
-                    <p className="admin-description">
-                        Explore beautiful destinations and find your next place to stay.
-                    </p>
+                        <p className="admin-description">
+                            Explore beautiful destinations and find your next place to stay.
+                        </p>
+                    </div>
 
                     <div className="destination-grid">
                         {destinations.map((destination) => (

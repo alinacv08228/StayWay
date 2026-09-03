@@ -3,16 +3,23 @@
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { properties } from "../../../data/mockData";
+import { properties, rooms } from "../../../data/mockData";
 
 function NewBookingForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
     const propertyId = Number(searchParams.get("propertyId"));
+    const roomId = Number(searchParams.get("roomId"));
 
     const property = properties.find(
         (item) => item.id === propertyId
+    );
+
+    const selectedRoom = rooms.find(
+        (room) =>
+            room.id === roomId &&
+            room.propertyId === propertyId
     );
 
     const [checkIn, setCheckIn] = useState("");
@@ -31,6 +38,10 @@ function NewBookingForm() {
             </main>
         );
     }
+
+    const pricePerNight =
+        selectedRoom?.pricePerNight ??
+        property.pricePerNight;
 
     const calculateNights = () => {
         if (!checkIn || !checkOut) {
@@ -51,7 +62,7 @@ function NewBookingForm() {
     const nights = calculateNights();
 
     const totalPrice =
-        nights * property.pricePerNight;
+        nights * pricePerNight;
 
     const handleBooking = () => {
         setError("");
@@ -70,15 +81,26 @@ function NewBookingForm() {
             return;
         }
 
+        if (
+            selectedRoom &&
+            guests > selectedRoom.guests
+        ) {
+            setError(
+                `This room can accommodate up to ${selectedRoom.guests} guests.`
+            );
+            return;
+        }
+
         const newBooking = {
             id: Date.now(),
             userId: 1,
             propertyId: property.id,
+            roomId: selectedRoom?.id,
             checkIn,
             checkOut,
             guests,
             totalPrice,
-            status: "confirmed",
+            status: "confirmed" as const,
         };
 
         const savedBookings =
@@ -118,6 +140,27 @@ function NewBookingForm() {
 
                             <p>{property.address}</p>
 
+                            {selectedRoom && (
+                                <div className="selected-room-info">
+
+                                    <strong>
+                                        {selectedRoom.name}
+                                    </strong>
+
+                                    <p>
+                                        {selectedRoom.size}
+                                        {" · "}
+                                        {selectedRoom.bed}
+                                    </p>
+
+                                    <p>
+                                        €{selectedRoom.pricePerNight}
+                                        {" / night"}
+                                    </p>
+
+                                </div>
+                            )}
+
                             <label>
                                 Check-in
 
@@ -125,7 +168,9 @@ function NewBookingForm() {
                                     type="date"
                                     value={checkIn}
                                     onChange={(e) =>
-                                        setCheckIn(e.target.value)
+                                        setCheckIn(
+                                            e.target.value
+                                        )
                                     }
                                 />
                             </label>
@@ -137,7 +182,9 @@ function NewBookingForm() {
                                     type="date"
                                     value={checkOut}
                                     onChange={(e) =>
-                                        setCheckOut(e.target.value)
+                                        setCheckOut(
+                                            e.target.value
+                                        )
                                     }
                                 />
                             </label>
@@ -149,7 +196,9 @@ function NewBookingForm() {
                                     value={guests}
                                     onChange={(e) =>
                                         setGuests(
-                                            Number(e.target.value)
+                                            Number(
+                                                e.target.value
+                                            )
                                         )
                                     }
                                 >
@@ -194,6 +243,7 @@ function NewBookingForm() {
 
                         </div>
 
+
                         {/* REZUMAT */}
                         <div className="booking-summary">
 
@@ -202,12 +252,32 @@ function NewBookingForm() {
                                 alt={property.name}
                             />
 
-                            <h2>{property.name}</h2>
-
-                            <p>{property.address}</p>
+                            <h2>
+                                {property.name}
+                            </h2>
 
                             <p>
-                                €{property.pricePerNight} / night
+                                {property.address}
+                            </p>
+
+                            {selectedRoom && (
+                                <div className="booking-room-summary">
+
+                                    <strong>
+                                        {selectedRoom.name}
+                                    </strong>
+
+                                    <p>
+                                        {selectedRoom.size}
+                                        {" · "}
+                                        {selectedRoom.bed}
+                                    </p>
+
+                                </div>
+                            )}
+
+                            <p>
+                                €{pricePerNight} / night
                             </p>
 
                             {nights > 0 && (
@@ -218,6 +288,11 @@ function NewBookingForm() {
                                         {nights === 1
                                             ? "night"
                                             : "nights"}
+                                    </p>
+
+                                    <p>
+                                        €{pricePerNight} ×{" "}
+                                        {nights}
                                     </p>
 
                                     <strong>
