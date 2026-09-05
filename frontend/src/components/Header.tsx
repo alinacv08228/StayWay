@@ -13,14 +13,21 @@ export default function Header() {
     const [isLanguageModalOpen, setIsLanguageModalOpen] =
         useState(false);
 
-    const { language, theme, setTheme } = useSettings();
-    const { currentUser, logout } = useUser();
+    const { language, theme, setTheme } =
+        useSettings();
+
+    const { currentUser, logout } =
+        useUser();
 
     const router = useRouter();
     const pathname = usePathname();
 
     const handleLogout = () => {
         logout();
+
+        // After logout, go directly to the login page.
+        // Protected pages such as /bookings or /admin
+        // must not be opened after the user logs out.
         router.push("/login");
     };
 
@@ -45,9 +52,17 @@ export default function Header() {
         <header className="header">
             <div className="header-inner">
 
-                <Link href="/" className="logo">
-                    <span className="logo-icon">✦</span>
-                    <span className="logo-text">StayWay</span>
+                <Link
+                    href="/"
+                    className="logo"
+                >
+                    <span className="logo-icon">
+                        ✦
+                    </span>
+
+                    <span className="logo-text">
+                        StayWay
+                    </span>
                 </Link>
 
                 <nav className="nav">
@@ -66,7 +81,9 @@ export default function Header() {
                     <Link
                         href="/destinations"
                         className={`nav-link ${
-                            isActive("/destinations")
+                            isActive(
+                                "/destinations"
+                            )
                                 ? "active"
                                 : ""
                         }`}
@@ -107,24 +124,27 @@ export default function Header() {
                         Help & Support
                     </Link>
 
-                    {currentUser?.role === "admin" && (
-                        <Link
-                            href="/admin"
-                            className={`nav-link ${
-                                isActive("/admin")
-                                    ? "active"
-                                    : ""
-                            }`}
-                        >
-                            {t("admin")}
-                        </Link>
-                    )}
+                    {currentUser?.role ===
+                        "admin" && (
+                            <Link
+                                href="/admin"
+                                className={`nav-link ${
+                                    isActive("/admin")
+                                        ? "active"
+                                        : ""
+                                }`}
+                            >
+                                {t("admin")}
+                            </Link>
+                        )}
 
                     {currentUser ? (
                         <button
                             type="button"
                             className="nav-link nav-button"
-                            onClick={handleLogout}
+                            onClick={
+                                handleLogout
+                            }
                         >
                             Logout
                         </button>
@@ -166,7 +186,9 @@ export default function Header() {
                         type="button"
                         className="nav-link nav-icon-button"
                         onClick={() =>
-                            setIsLanguageModalOpen(true)
+                            setIsLanguageModalOpen(
+                                true
+                            )
                         }
                         aria-label="Choose language and currency"
                     >
@@ -176,9 +198,13 @@ export default function Header() {
                 </nav>
 
                 <LanguageCurrencyModal
-                    isOpen={isLanguageModalOpen}
+                    isOpen={
+                        isLanguageModalOpen
+                    }
                     onClose={() =>
-                        setIsLanguageModalOpen(false)
+                        setIsLanguageModalOpen(
+                            false
+                        )
                     }
                 />
 

@@ -1,5 +1,6 @@
 import {
     Booking,
+    Country,
     Destination,
     Property,
     Review,
@@ -22,237 +23,48 @@ export const users: User[] = [
     },
 ];
 
-export const destinations: Destination[] = [
-    // =========================
-    // FRANCE
-    // =========================
+export const countries: Country[] = [
+    {
+        id: 1,
+        name: "France",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 2,
+        name: "Italy",
+        image: "/Rome.jpg",
+    },
+    {
+        id: 3,
+        name: "Spain",
+        image: "/Barcelona.jpg",
+    },
+];
 
+export const destinations: Destination[] = [
     {
         id: 1,
         name: "Paris",
         country: "France",
         image: "/Paris.jpg",
+        countryImage: "/Paris.jpg",
     },
-    {
-        id: 4,
-        name: "Nice",
-        country: "France",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 5,
-        name: "Lyon",
-        country: "France",
-        image: "/Paris.jpg",
-    },
-
-    // =========================
-    // ITALY
-    // =========================
-
     {
         id: 2,
         name: "Rome",
         country: "Italy",
         image: "/Rome.jpg",
+        countryImage: "/Rome.jpg",
     },
-    {
-        id: 6,
-        name: "Milan",
-        country: "Italy",
-        image: "/Rome.jpg",
-    },
-    {
-        id: 7,
-        name: "Florence",
-        country: "Italy",
-        image: "/Rome.jpg",
-    },
-
-    // =========================
-    // SPAIN
-    // =========================
-
     {
         id: 3,
         name: "Barcelona",
         country: "Spain",
         image: "/Barcelona.jpg",
-    },
-    {
-        id: 8,
-        name: "Madrid",
-        country: "Spain",
-        image: "/Barcelona.jpg",
-    },
-    {
-        id: 9,
-        name: "Seville",
-        country: "Spain",
-        image: "/Barcelona.jpg",
-    },
-
-    // =========================
-    // GERMANY
-    // =========================
-
-    {
-        id: 10,
-        name: "Berlin",
-        country: "Germany",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 11,
-        name: "Munich",
-        country: "Germany",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 12,
-        name: "Hamburg",
-        country: "Germany",
-        image: "/Paris.jpg",
-    },
-
-    // =========================
-    // PORTUGAL
-    // =========================
-
-    {
-        id: 13,
-        name: "Lisbon",
-        country: "Portugal",
-        image: "/Barcelona.jpg",
-    },
-    {
-        id: 14,
-        name: "Porto",
-        country: "Portugal",
-        image: "/Barcelona.jpg",
-    },
-    {
-        id: 15,
-        name: "Faro",
-        country: "Portugal",
-        image: "/Barcelona.jpg",
-    },
-
-    // =========================
-    // GREECE
-    // =========================
-
-    {
-        id: 16,
-        name: "Athens",
-        country: "Greece",
-        image: "/Rome.jpg",
-    },
-    {
-        id: 17,
-        name: "Thessaloniki",
-        country: "Greece",
-        image: "/Rome.jpg",
-    },
-    {
-        id: 18,
-        name: "Heraklion",
-        country: "Greece",
-        image: "/Rome.jpg",
-    },
-
-    // =========================
-    // AUSTRIA
-    // =========================
-
-    {
-        id: 19,
-        name: "Vienna",
-        country: "Austria",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 20,
-        name: "Salzburg",
-        country: "Austria",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 21,
-        name: "Innsbruck",
-        country: "Austria",
-        image: "/Paris.jpg",
-    },
-
-    // =========================
-    // NETHERLANDS
-    // =========================
-
-    {
-        id: 22,
-        name: "Amsterdam",
-        country: "Netherlands",
-        image: "/Barcelona.jpg",
-    },
-    {
-        id: 23,
-        name: "Rotterdam",
-        country: "Netherlands",
-        image: "/Barcelona.jpg",
-    },
-    {
-        id: 24,
-        name: "Utrecht",
-        country: "Netherlands",
-        image: "/Barcelona.jpg",
-    },
-
-    // =========================
-    // CZECH REPUBLIC
-    // =========================
-
-    {
-        id: 25,
-        name: "Prague",
-        country: "Czech Republic",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 26,
-        name: "Brno",
-        country: "Czech Republic",
-        image: "/Paris.jpg",
-    },
-    {
-        id: 27,
-        name: "Ostrava",
-        country: "Czech Republic",
-        image: "/Paris.jpg",
-    },
-
-    // =========================
-    // HUNGARY
-    // =========================
-
-    {
-        id: 28,
-        name: "Budapest",
-        country: "Hungary",
-        image: "/Rome.jpg",
-    },
-    {
-        id: 29,
-        name: "Debrecen",
-        country: "Hungary",
-        image: "/Rome.jpg",
-    },
-    {
-        id: 30,
-        name: "Szeged",
-        country: "Hungary",
-        image: "/Rome.jpg",
+        countryImage: "/Barcelona.jpg",
     },
 ];
+
 
 export const properties: Property[] = [
     // ==================================================
@@ -1453,29 +1265,346 @@ export const rooms: Room[] = [
 ];
 
 export const reviews: Review[] = [
+    // ==================================================
+    // HÔTEL BALZAC - PARIS
+    // ==================================================
+
     {
         id: 1,
-        propertyId: 4,
-        author: "Sophie",
+        propertyId: 1,
+        userId: 101,
+        userName: "Sophie",
         rating: 5,
         comment:
-            "Excellent location and very comfortable room. Perfect for exploring Rome.",
+            "Beautiful hotel with elegant Parisian interiors. The room was comfortable, clean and very well maintained.",
+        createdAt: "2026-08-18",
+        isMock: true,
     },
     {
         id: 2,
-        propertyId: 4,
-        author: "Daniel",
+        propertyId: 1,
+        userId: 102,
+        userName: "Daniel",
         rating: 4.5,
         comment:
-            "Beautiful hotel with friendly staff and excellent service.",
+            "A lovely stay in Paris. The location was excellent and the staff were very welcoming and helpful.",
+        createdAt: "2026-08-27",
+        isMock: true,
     },
     {
         id: 3,
-        propertyId: 4,
-        author: "Emma",
+        propertyId: 1,
+        userId: 103,
+        userName: "Emma",
+        rating: 5,
+        comment:
+            "The room was beautiful and the atmosphere was wonderful. I would definitely stay here again.",
+        createdAt: "2026-09-02",
+        isMock: true,
+    },
+
+    // ==================================================
+    // HYATT PARIS MADELEINE
+    // ==================================================
+
+    {
+        id: 4,
+        propertyId: 2,
+        userId: 104,
+        userName: "Olivia",
+        rating: 5,
+        comment:
+            "Fantastic hotel in a great part of Paris. The room was spacious, elegant and extremely comfortable.",
+        createdAt: "2026-08-11",
+        isMock: true,
+    },
+    {
+        id: 5,
+        propertyId: 2,
+        userId: 105,
+        userName: "James",
         rating: 4.5,
         comment:
-            "Very clean and comfortable. Great location in Rome.",
+            "Very pleasant experience. The hotel has a beautiful atmosphere and the service was excellent.",
+        createdAt: "2026-08-23",
+        isMock: true,
+    },
+    {
+        id: 6,
+        propertyId: 2,
+        userId: 106,
+        userName: "Charlotte",
+        rating: 5,
+        comment:
+            "Wonderful stay from beginning to end. The room was clean, quiet and beautifully decorated.",
+        createdAt: "2026-09-01",
+        isMock: true,
+    },
+
+    // ==================================================
+    // PULLMAN PARIS TOUR EIFFEL
+    // ==================================================
+
+    {
+        id: 7,
+        propertyId: 3,
+        userId: 107,
+        userName: "Lucas",
+        rating: 5,
+        comment:
+            "Amazing location and beautiful views of Paris. The room was modern, clean and very comfortable.",
+        createdAt: "2026-08-15",
+        isMock: true,
+    },
+    {
+        id: 8,
+        propertyId: 3,
+        userId: 108,
+        userName: "Amelia",
+        rating: 4.5,
+        comment:
+            "Excellent hotel for a trip to Paris. The Eiffel Tower view was absolutely beautiful.",
+        createdAt: "2026-08-29",
+        isMock: true,
+    },
+    {
+        id: 9,
+        propertyId: 3,
+        userId: 109,
+        userName: "William",
+        rating: 5,
+        comment:
+            "One of the best stays I have had in Paris. Great room, great location and excellent service.",
+        createdAt: "2026-09-03",
+        isMock: true,
+    },
+
+    // ==================================================
+    // HOTEL ARTEMIDE - ROME
+    // ==================================================
+
+    {
+        id: 10,
+        propertyId: 4,
+        userId: 110,
+        userName: "Sophie",
+        rating: 5,
+        comment:
+            "Excellent location and very comfortable room. Perfect for exploring Rome.",
+        createdAt: "2026-08-12",
+        isMock: true,
+    },
+    {
+        id: 11,
+        propertyId: 4,
+        userId: 111,
+        userName: "Daniel",
+        rating: 4.5,
+        comment:
+            "Beautiful hotel with friendly staff and excellent service. Everything was clean and comfortable.",
+        createdAt: "2026-08-24",
+        isMock: true,
+    },
+    {
+        id: 12,
+        propertyId: 4,
+        userId: 112,
+        userName: "Emma",
+        rating: 4.5,
+        comment:
+            "Very clean and comfortable. Great location in the center of Rome and easy to reach many attractions.",
+        createdAt: "2026-09-01",
+        isMock: true,
+    },
+
+    // ==================================================
+    // ROME MARRIOTT GRAND HOTEL FLORA
+    // ==================================================
+
+    {
+        id: 13,
+        propertyId: 5,
+        userId: 113,
+        userName: "Michael",
+        rating: 5,
+        comment:
+            "Beautiful hotel with a fantastic location. The room was elegant, spacious and very comfortable.",
+        createdAt: "2026-08-09",
+        isMock: true,
+    },
+    {
+        id: 14,
+        propertyId: 5,
+        userId: 114,
+        userName: "Isabella",
+        rating: 4.5,
+        comment:
+            "A wonderful experience in Rome. The staff were kind and the hotel had a very relaxing atmosphere.",
+        createdAt: "2026-08-21",
+        isMock: true,
+    },
+    {
+        id: 15,
+        propertyId: 5,
+        userId: 115,
+        userName: "Thomas",
+        rating: 5,
+        comment:
+            "The room was excellent and the service was professional. I really enjoyed my stay here.",
+        createdAt: "2026-08-30",
+        isMock: true,
+    },
+
+    // ==================================================
+    // PALAZZO MANFREDI - ROME
+    // ==================================================
+
+    {
+        id: 16,
+        propertyId: 6,
+        userId: 116,
+        userName: "Alice",
+        rating: 5,
+        comment:
+            "Fantastic location close to the Colosseum. The room was beautiful and the whole experience was excellent.",
+        createdAt: "2026-08-14",
+        isMock: true,
+    },
+    {
+        id: 17,
+        propertyId: 6,
+        userId: 117,
+        userName: "George",
+        rating: 4.5,
+        comment:
+            "Very elegant hotel with excellent service. The views and location made our stay really special.",
+        createdAt: "2026-08-26",
+        isMock: true,
+    },
+    {
+        id: 18,
+        propertyId: 6,
+        userId: 118,
+        userName: "Sophia",
+        rating: 5,
+        comment:
+            "A wonderful hotel for a romantic trip to Rome. Everything was clean, comfortable and beautifully presented.",
+        createdAt: "2026-09-02",
+        isMock: true,
+    },
+
+    // ==================================================
+    // HOTEL ARTS BARCELONA
+    // ==================================================
+
+    {
+        id: 19,
+        propertyId: 7,
+        userId: 119,
+        userName: "Liam",
+        rating: 5,
+        comment:
+            "Amazing hotel with spectacular views of Barcelona and the sea. The room was excellent.",
+        createdAt: "2026-08-10",
+        isMock: true,
+    },
+    {
+        id: 20,
+        propertyId: 7,
+        userId: 120,
+        userName: "Mia",
+        rating: 4.5,
+        comment:
+            "Beautiful modern hotel with fantastic views. The staff were friendly and very professional.",
+        createdAt: "2026-08-22",
+        isMock: true,
+    },
+    {
+        id: 21,
+        propertyId: 7,
+        userId: 121,
+        userName: "Noah",
+        rating: 5,
+        comment:
+            "One of my favorite stays in Barcelona. Spacious room, beautiful views and excellent service.",
+        createdAt: "2026-09-04",
+        isMock: true,
+    },
+
+    // ==================================================
+    // W BARCELONA
+    // ==================================================
+
+    {
+        id: 22,
+        propertyId: 8,
+        userId: 122,
+        userName: "Emily",
+        rating: 5,
+        comment:
+            "Fantastic hotel right by the sea. The room was stylish, comfortable and had an incredible view.",
+        createdAt: "2026-08-13",
+        isMock: true,
+    },
+    {
+        id: 23,
+        propertyId: 8,
+        userId: 123,
+        userName: "Oliver",
+        rating: 4.5,
+        comment:
+            "Great atmosphere and amazing views. The hotel was clean and the service was excellent.",
+        createdAt: "2026-08-25",
+        isMock: true,
+    },
+    {
+        id: 24,
+        propertyId: 8,
+        userId: 124,
+        userName: "Ella",
+        rating: 5,
+        comment:
+            "Absolutely loved our stay. The room was beautiful and the Mediterranean view was unforgettable.",
+        createdAt: "2026-09-03",
+        isMock: true,
+    },
+
+    // ==================================================
+    // MAJESTIC HOTEL & SPA BARCELONA
+    // ==================================================
+
+    {
+        id: 25,
+        propertyId: 9,
+        userId: 125,
+        userName: "Benjamin",
+        rating: 5,
+        comment:
+            "Excellent hotel in a perfect Barcelona location. The room was elegant and very comfortable.",
+        createdAt: "2026-08-08",
+        isMock: true,
+    },
+    {
+        id: 26,
+        propertyId: 9,
+        userId: 126,
+        userName: "Grace",
+        rating: 4.5,
+        comment:
+            "Beautiful property with wonderful service. The room was spacious and very clean.",
+        createdAt: "2026-08-20",
+        isMock: true,
+    },
+    {
+        id: 27,
+        propertyId: 9,
+        userId: 127,
+        userName: "Henry",
+        rating: 5,
+        comment:
+            "A fantastic experience in Barcelona. Great location, beautiful room and excellent facilities.",
+        createdAt: "2026-08-31",
+        isMock: true,
     },
 ];
 
@@ -1484,6 +1613,7 @@ export const bookings: Booking[] = [
         id: 1,
         userId: 1,
         propertyId: 4,
+        roomId: 14,
         checkIn: "2026-09-10",
         checkOut: "2026-09-14",
         guests: 2,

@@ -3,18 +3,28 @@ import { Property } from "../types/types";
 
 const STORAGE_KEY = "stayway_properties";
 
+function getInitialProperties(): Property[] {
+    return mockProperties.filter(
+        (property) =>
+            property.destinationId === 1 ||
+            property.destinationId === 2 ||
+            property.destinationId === 3
+    );
+}
+
 export function getProperties(): Property[] {
+    // Pe server nu există localStorage.
+    // Folosim datele mock până când codul ajunge în browser.
+    if (typeof window === "undefined") {
+        return getInitialProperties();
+    }
+
     const savedProperties =
         localStorage.getItem(STORAGE_KEY);
 
     if (!savedProperties) {
         const initialProperties =
-            mockProperties.filter(
-                (property) =>
-                    property.destinationId === 1 ||
-                    property.destinationId === 2 ||
-                    property.destinationId === 3
-            );
+            getInitialProperties();
 
         localStorage.setItem(
             STORAGE_KEY,
@@ -30,12 +40,7 @@ export function getProperties(): Property[] {
         localStorage.removeItem(STORAGE_KEY);
 
         const initialProperties =
-            mockProperties.filter(
-                (property) =>
-                    property.destinationId === 1 ||
-                    property.destinationId === 2 ||
-                    property.destinationId === 3
-            );
+            getInitialProperties();
 
         localStorage.setItem(
             STORAGE_KEY,
@@ -76,10 +81,7 @@ export function createProperty(
         newProperty,
     ];
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(updatedProperties)
-    );
+    saveProperties(updatedProperties);
 
     return newProperty;
 }
@@ -119,10 +121,7 @@ export function updateProperty(
                     : property
         );
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(updatedProperties)
-    );
+    saveProperties(updatedProperties);
 
     return updatedProperty;
 }
@@ -154,12 +153,41 @@ export function deleteProperty(
                 property.id !== id
         );
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(updatedProperties)
-    );
+    saveProperties(updatedProperties);
 
     return true;
+}
+
+
+/* =========================================================
+   SAVE
+   ========================================================= */
+
+export function saveProperties(
+    propertiesList: Property[]
+): void {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(propertiesList)
+    );
+}
+
+
+/* =========================================================
+   GET BY ID
+   ========================================================= */
+
+export function getPropertyById(
+    id: number
+): Property | undefined {
+    return getProperties().find(
+        (property) =>
+            property.id === id
+    );
 }
 
 

@@ -9,10 +9,6 @@ import {
 } from "react";
 import { useSearchParams } from "next/navigation";
 
-import {
-    destinations,
-} from "../../data/mockData";
-
 import PropertyCard from "../../components/PropertyCard";
 
 import { useSettings } from "../../context/SettingsContext";
@@ -29,6 +25,10 @@ import {
     getProperties,
 } from "../../services/propertyService";
 
+import {
+    getDestinations,
+} from "../../services/destinationService";
+
 import { Property } from "../../types/types";
 
 function StaysContent() {
@@ -39,6 +39,17 @@ function StaysContent() {
     const selectedCurrencyInfo =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
+
+    // =========================================
+    // DESTINATIONS
+    // =========================================
+
+    const [availableDestinations, setAvailableDestinations] =
+        useState(() => getDestinations());
+
+    // =========================================
+    // SEARCH PARAMS
+    // =========================================
 
     const destinationName =
         searchParams.get("destination");
@@ -99,10 +110,16 @@ function StaysContent() {
             : undefined;
 
     const selectedDestination =
-        destinations.find(
+        availableDestinations.find(
             (destination) =>
-                destination.name.toLowerCase() ===
-                destinationInEnglish?.toLowerCase()
+                destination.name
+                    .trim()
+                    .toLowerCase() ===
+                (
+                    destinationInEnglish ??
+                    normalizedDestination ??
+                    ""
+                ).toLowerCase()
         );
 
     // =========================================
@@ -120,9 +137,20 @@ function StaysContent() {
 
     useEffect(() => {
         try {
-            const loadedProperties = getProperties();
+            const loadedProperties =
+                getProperties();
 
-            setProperties(loadedProperties);
+            const loadedDestinations =
+                getDestinations();
+
+            setProperties(
+                loadedProperties
+            );
+
+            setAvailableDestinations(
+                loadedDestinations
+            );
+
             setHasError(false);
         } catch {
             setHasError(true);
@@ -139,9 +167,11 @@ function StaysContent() {
         useState<Property[]>([]);
 
     useEffect(() => {
-        setAllProperties(getProperties());
+        setAllProperties(
+            getProperties()
+        );
     }, []);
-    
+
     const [selectedCountry, setSelectedCountry] =
         useState(
             selectedDestination?.country ??
@@ -151,7 +181,8 @@ function StaysContent() {
 
     const [selectedCity, setSelectedCity] =
         useState(
-            selectedDestination?.name ?? ""
+            selectedDestination?.name ??
+            ""
         );
 
     const [minPrice, setMinPrice] =
@@ -170,216 +201,243 @@ function StaysContent() {
     // COUNTRIES
     // =========================================
 
-    const visibleDestinations = useMemo(() => {
-        return destinations.filter((destination) =>
-            allProperties.some(
-                (property) =>
-                    property.destinationId === destination.id
-            )
-        );
-    }, [allProperties]);
+    const visibleDestinations =
+        useMemo(() => {
+            return availableDestinations.filter(
+                (destination) =>
+                    allProperties.some(
+                        (property) =>
+                            property.destinationId ===
+                            destination.id
+                    )
+            );
+        }, [
+            availableDestinations,
+            allProperties,
+        ]);
 
-    const countries = useMemo(() => {
-        return Array.from(
-            new Set(
-                visibleDestinations.map(
-                    (destination) =>
-                        destination.country
+    const countries =
+        useMemo(() => {
+            return Array.from(
+                new Set(
+                    visibleDestinations.map(
+                        (destination) =>
+                            destination.country
+                    )
                 )
-            )
-        ).sort();
-    }, [visibleDestinations]);
+            ).sort();
+        }, [
+            visibleDestinations,
+        ]);
 
     // =========================================
     // CITIES
     // =========================================
 
-    const availableCities = useMemo(() => {
-        return visibleDestinations
-            .filter((destination) =>
-                selectedCountry
-                    ? destination.country ===
-                    selectedCountry
-                    : true
-            )
-            .map(
-                (destination) =>
-                    destination.name
-            )
-            .sort();
-    }, [
-        visibleDestinations,
-        selectedCountry,
-    ]);
+    const availableCities =
+        useMemo(() => {
+            return visibleDestinations
+                .filter(
+                    (destination) =>
+                        selectedCountry
+                            ? destination.country ===
+                            selectedCountry
+                            : true
+                )
+                .map(
+                    (destination) =>
+                        destination.name
+                )
+                .sort();
+        }, [
+            visibleDestinations,
+            selectedCountry,
+        ]);
 
     // =========================================
     // FILTER + SORT
     // =========================================
 
-    const filteredProperties = useMemo(() => {
-        let result = [...allProperties];
+    const filteredProperties =
+        useMemo(() => {
+            let result = [
+                ...allProperties,
+            ];
 
-        // SearchBar destination
-        if (selectedDestination) {
-            result = result.filter(
-                (property) =>
-                    property.destinationId ===
-                    selectedDestination.id
-            );
-        }
+            // SearchBar destination
+            if (selectedDestination) {
+                result =
+                    result.filter(
+                        (property) =>
+                            property.destinationId ===
+                            selectedDestination.id
+                    );
+            }
 
-        // Country
-        if (selectedCountry) {
-            const countryDestinationIds =
-                destinations
-                    .filter(
+            // Country
+            if (selectedCountry) {
+                const countryDestinationIds =
+                    availableDestinations
+                        .filter(
+                            (destination) =>
+                                destination.country ===
+                                selectedCountry
+                        )
+                        .map(
+                            (destination) =>
+                                destination.id
+                        );
+
+                result =
+                    result.filter(
+                        (property) =>
+                            countryDestinationIds.includes(
+                                property.destinationId
+                            )
+                    );
+            }
+
+            // City
+            if (selectedCity) {
+                const cityDestination =
+                    availableDestinations.find(
                         (destination) =>
-                            destination.country ===
-                            selectedCountry
-                    )
-                    .map(
-                        (destination) =>
-                            destination.id
+                            destination.name ===
+                            selectedCity
                     );
 
-            result = result.filter(
-                (property) =>
-                    countryDestinationIds.includes(
-                        property.destinationId
-                    )
-            );
-        }
+                if (cityDestination) {
+                    result =
+                        result.filter(
+                            (property) =>
+                                property.destinationId ===
+                                cityDestination.id
+                        );
+                }
+            }
 
-        // City
-        if (selectedCity) {
-            const cityDestination =
-                destinations.find(
-                    (destination) =>
-                        destination.name ===
-                        selectedCity
-                );
+            // Minimum price
+            if (minPrice) {
+                result =
+                    result.filter(
+                        (property) =>
+                            property.pricePerNight >=
+                            Number(minPrice) /
+                            selectedCurrencyInfo.rate
+                    );
+            }
 
-            if (cityDestination) {
-                result = result.filter(
-                    (property) =>
-                        property.destinationId ===
-                        cityDestination.id
+            // Maximum price
+            if (maxPrice) {
+                result =
+                    result.filter(
+                        (property) =>
+                            property.pricePerNight <=
+                            Number(maxPrice) /
+                            selectedCurrencyInfo.rate
+                    );
+            }
+
+            // Rating
+            if (minRating !== "0") {
+                result =
+                    result.filter(
+                        (property) =>
+                            property.rating >=
+                            Number(minRating)
+                    );
+            }
+
+            // Sort
+            if (sortBy === "price-low") {
+                result.sort(
+                    (a, b) =>
+                        a.pricePerNight -
+                        b.pricePerNight
                 );
             }
-        }
 
-        // Minimum price
-        if (minPrice) {
-            result = result.filter(
-                (property) =>
-                    property.pricePerNight >=
-                    Number(minPrice) /
-                    selectedCurrencyInfo.rate
-            );
-        }
+            if (sortBy === "price-high") {
+                result.sort(
+                    (a, b) =>
+                        b.pricePerNight -
+                        a.pricePerNight
+                );
+            }
 
-        // Maximum price
-        if (maxPrice) {
-            result = result.filter(
-                (property) =>
-                    property.pricePerNight <=
-                    Number(maxPrice) /
-                    selectedCurrencyInfo.rate
-            );
-        }
+            if (sortBy === "rating-high") {
+                result.sort(
+                    (a, b) =>
+                        b.rating -
+                        a.rating
+                );
+            }
 
-        // Rating
-        if (minRating !== "0") {
-            result = result.filter(
-                (property) =>
-                    property.rating >=
-                    Number(minRating)
-            );
-        }
+            if (sortBy === "rating-low") {
+                result.sort(
+                    (a, b) =>
+                        a.rating -
+                        b.rating
+                );
+            }
 
-        // Sort
-        if (sortBy === "price-low") {
-            result.sort(
-                (a, b) =>
-                    a.pricePerNight -
-                    b.pricePerNight
-            );
-        }
-
-        if (sortBy === "price-high") {
-            result.sort(
-                (a, b) =>
-                    b.pricePerNight -
-                    a.pricePerNight
-            );
-        }
-
-        if (sortBy === "rating-high") {
-            result.sort(
-                (a, b) =>
-                    b.rating -
-                    a.rating
-            );
-        }
-
-        if (sortBy === "rating-low") {
-            result.sort(
-                (a, b) =>
-                    a.rating -
-                    b.rating
-            );
-        }
-
-        return result;
-    }, [
-        allProperties,
-        selectedDestination,
-        selectedCountry,
-        selectedCity,
-        minPrice,
-        maxPrice,
-        minRating,
-        sortBy,
-        selectedCurrencyInfo.rate,
-    ]);
+            return result;
+        }, [
+            allProperties,
+            availableDestinations,
+            selectedDestination,
+            selectedCountry,
+            selectedCity,
+            minPrice,
+            maxPrice,
+            minRating,
+            sortBy,
+            selectedCurrencyInfo.rate,
+        ]);
 
     // =========================================
     // RESET
     // =========================================
 
-    const handleResetFilters = useCallback(() => {
-        setSelectedCountry("");
-        setSelectedCity("");
-        setMinPrice("");
-        setMaxPrice("");
-        setMinRating("0");
-        setSortBy("default");
-    }, []);
+    const handleResetFilters =
+        useCallback(() => {
+            setSelectedCountry("");
+            setSelectedCity("");
+            setMinPrice("");
+            setMaxPrice("");
+            setMinRating("0");
+            setSortBy("default");
+        }, []);
 
     // =========================================
     // COUNTRY CHANGE
     // =========================================
 
-    const handleCountryChange = useCallback(
-        (value: string) => {
-            setSelectedCountry(value);
+    const handleCountryChange =
+        useCallback(
+            (value: string) => {
+                setSelectedCountry(value);
 
-            if (!value) {
-                setSelectedCity("");
-                return;
-            }
+                if (!value) {
+                    setSelectedCity("");
+                    return;
+                }
 
-            const firstCity =
-                destinations.find(
-                    (destination) =>
-                        destination.country ===
-                        value
-                )?.name ?? "";
+                const firstCity =
+                    availableDestinations.find(
+                        (destination) =>
+                            destination.country ===
+                            value
+                    )?.name ?? "";
 
-            setSelectedCity(firstCity);
-        },
-        []
-    );
+                setSelectedCity(
+                    firstCity
+                );
+            },
+            [
+                availableDestinations,
+            ]
+        );
 
     // =========================================
     // LOADING
@@ -490,7 +548,9 @@ function StaysContent() {
 
                             <select
                                 id="country"
-                                value={selectedCountry}
+                                value={
+                                    selectedCountry
+                                }
                                 onChange={(event) =>
                                     handleCountryChange(
                                         event.target.value
@@ -507,8 +567,12 @@ function StaysContent() {
                                 {countries.map(
                                     (country) => (
                                         <option
-                                            key={country}
-                                            value={country}
+                                            key={
+                                                country
+                                            }
+                                            value={
+                                                country
+                                            }
                                         >
                                             {country}
                                         </option>
@@ -529,7 +593,9 @@ function StaysContent() {
 
                             <select
                                 id="city"
-                                value={selectedCity}
+                                value={
+                                    selectedCity
+                                }
                                 onChange={(event) =>
                                     setSelectedCity(
                                         event.target.value
@@ -546,8 +612,12 @@ function StaysContent() {
                                 {availableCities.map(
                                     (city) => (
                                         <option
-                                            key={city}
-                                            value={city}
+                                            key={
+                                                city
+                                            }
+                                            value={
+                                                city
+                                            }
                                         >
                                             {city}
                                         </option>
@@ -571,7 +641,9 @@ function StaysContent() {
                                 type="number"
                                 min="0"
                                 placeholder={`${selectedCurrencyInfo.symbol}0`}
-                                value={minPrice}
+                                value={
+                                    minPrice
+                                }
                                 onChange={(event) =>
                                     setMinPrice(
                                         event.target.value
@@ -595,7 +667,9 @@ function StaysContent() {
                                 type="number"
                                 min="0"
                                 placeholder={`${selectedCurrencyInfo.symbol}1000`}
-                                value={maxPrice}
+                                value={
+                                    maxPrice
+                                }
                                 onChange={(event) =>
                                     setMaxPrice(
                                         event.target.value
@@ -616,7 +690,9 @@ function StaysContent() {
 
                             <select
                                 id="rating"
-                                value={minRating}
+                                value={
+                                    minRating
+                                }
                                 onChange={(event) =>
                                     setMinRating(
                                         event.target.value
@@ -660,7 +736,9 @@ function StaysContent() {
 
                             <select
                                 id="sort"
-                                value={sortBy}
+                                value={
+                                    sortBy
+                                }
                                 onChange={(event) =>
                                     setSortBy(
                                         event.target.value
@@ -723,14 +801,20 @@ function StaysContent() {
                     {/* RESULTS */}
 
                     <p className="stays-results-count">
-                        {filteredProperties.length}{" "}
-                        {filteredProperties.length === 1
-                            ? "stay"
-                            : "stays"}{" "}
+                        {
+                            filteredProperties.length
+                        }{" "}
+                        {
+                            filteredProperties.length ===
+                            1
+                                ? "stay"
+                                : "stays"
+                        }{" "}
                         found
                     </p>
 
-                    {filteredProperties.length > 0 ? (
+                    {filteredProperties.length >
+                    0 ? (
                         <div className="property-grid">
                             {filteredProperties.map(
                                 (
@@ -741,7 +825,8 @@ function StaysContent() {
                                         className="stay-card-animation"
                                         style={{
                                             animationDelay: `${
-                                                index * 0.08
+                                                index *
+                                                0.08
                                             }s`,
                                         }}
                                         key={
@@ -790,7 +875,11 @@ function StaysContent() {
 
 export default function StaysPage() {
     return (
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense
+            fallback={
+                <p>Loading...</p>
+            }
+        >
             <StaysContent />
         </Suspense>
     );

@@ -22,6 +22,7 @@ export type TranslationKey =
     | "loading"
     | "noBookings"
     | "confirmed"
+    | "cancelled"
     | "cancelQuestion"
     | "roomNotSpecified";
 
@@ -54,6 +55,7 @@ const english: TranslationDictionary = {
     loading: "Loading bookings...",
     noBookings: "You don't have any bookings yet.",
     confirmed: "confirmed",
+    cancelled: "cancelled",
     cancelQuestion: "Are you sure you want to cancel this booking?",
     roomNotSpecified: "Room not specified",
 };
@@ -82,6 +84,7 @@ const romanian: TranslationDictionary = {
     loading: "Se încarcă rezervările...",
     noBookings: "Nu ai încă nicio rezervare.",
     confirmed: "confirmată",
+    cancelled: "anulată",
     cancelQuestion: "Sigur vrei să anulezi această rezervare?",
     roomNotSpecified: "Camera nu este specificată",
 };
@@ -111,7 +114,9 @@ const russian: TranslationDictionary = {
     loading: "Загрузка бронирований...",
     noBookings: "У вас пока нет бронирований.",
     confirmed: "подтверждено",
-    cancelQuestion: "Вы уверены, что хотите отменить это бронирование?",
+    cancelled: "отменено",
+    cancelQuestion:
+        "Вы уверены, что хотите отменить это бронирование?",
     roomNotSpecified: "Номер не указан",
 };
 
@@ -140,7 +145,9 @@ const ukrainian: TranslationDictionary = {
     loading: "Завантаження бронювань...",
     noBookings: "У вас поки немає бронювань.",
     confirmed: "підтверджено",
-    cancelQuestion: "Ви впевнені, що хочете скасувати це бронювання?",
+    cancelled: "скасовано",
+    cancelQuestion:
+        "Ви впевнені, що хочете скасувати це бронювання?",
     roomNotSpecified: "Номер не вказано",
 };
 
@@ -170,7 +177,9 @@ const french: TranslationDictionary = {
     noBookings:
         "Vous n'avez encore aucune réservation.",
     confirmed: "confirmée",
-    cancelQuestion: "Êtes-vous sûr de vouloir annuler cette réservation ?",
+    cancelled: "annulée",
+    cancelQuestion:
+        "Êtes-vous sûr de vouloir annuler cette réservation ?",
     roomNotSpecified: "Chambre non spécifiée",
 };
 
@@ -200,7 +209,9 @@ const spanish: TranslationDictionary = {
     noBookings:
         "Todavía no tienes ninguna reserva.",
     confirmed: "confirmada",
-    cancelQuestion: "¿Estás seguro de que quieres cancelar esta reserva?",
+    cancelled: "cancelada",
+    cancelQuestion:
+        "¿Estás seguro de que quieres cancelar esta reserva?",
     roomNotSpecified:
         "Habitación no especificada",
 };
@@ -231,7 +242,9 @@ const german: TranslationDictionary = {
     noBookings:
         "Du hast noch keine Buchungen.",
     confirmed: "bestätigt",
-    cancelQuestion: "Möchtest du diese Buchung wirklich stornieren?",
+    cancelled: "storniert",
+    cancelQuestion:
+        "Möchtest du diese Buchung wirklich stornieren?",
     roomNotSpecified: "Zimmer nicht angegeben",
 };
 
@@ -262,7 +275,9 @@ const italian: TranslationDictionary = {
     noBookings:
         "Non hai ancora prenotazioni.",
     confirmed: "confermata",
-    cancelQuestion: "Sei sicuro di voler annullare questa prenotazione?",
+    cancelled: "annullata",
+    cancelQuestion:
+        "Sei sicuro di voler annullare questa prenotazione?",
     roomNotSpecified:
         "Camera non specificata",
 };
@@ -293,7 +308,9 @@ const portuguese: TranslationDictionary = {
     noBookings:
         "Ainda não tens nenhuma reserva.",
     confirmed: "confirmada",
-    cancelQuestion: "Tem a certeza de que pretende cancelar esta reserva?",
+    cancelled: "cancelada",
+    cancelQuestion:
+        "Tem a certeza de que pretende cancelar esta reserva?",
     roomNotSpecified:
         "Quarto não especificado",
 };
@@ -324,7 +341,9 @@ const dutch: TranslationDictionary = {
     noBookings:
         "Je hebt nog geen reserveringen.",
     confirmed: "bevestigd",
-    cancelQuestion: "Weet je zeker dat je deze reservering wilt annuleren?",
+    cancelled: "geannuleerd",
+    cancelQuestion:
+        "Weet je zeker dat je deze reservering wilt annuleren?",
     roomNotSpecified:
         "Kamer niet gespecificeerd",
 };
@@ -355,7 +374,9 @@ const norwegian: TranslationDictionary = {
     noBookings:
         "Du har ingen bestillinger ennå.",
     confirmed: "bekreftet",
-    cancelQuestion: "Er du sikker på at du vil avbestille denne bestillingen?",
+    cancelled: "kansellert",
+    cancelQuestion:
+        "Er du sikker på at du vil avbestille denne bestillingen?",
     roomNotSpecified:
         "Rom ikke spesifisert",
 };
@@ -386,7 +407,9 @@ const swedish: TranslationDictionary = {
     noBookings:
         "Du har inga bokningar ännu.",
     confirmed: "bekräftad",
-    cancelQuestion: "Är du säker på att du vill avboka den här bokningen?",
+    cancelled: "avbokad",
+    cancelQuestion:
+        "Är du säker på att du vill avboka den här bokningen?",
     roomNotSpecified:
         "Rum ej specificerat",
 };
@@ -417,7 +440,9 @@ const danish: TranslationDictionary = {
     noBookings:
         "Du har ingen bookinger endnu.",
     confirmed: "bekræftet",
-    cancelQuestion: "Er du sikker på, at du vil annullere denne booking?",
+    cancelled: "annulleret",
+    cancelQuestion:
+        "Er du sikker på, at du vil annullere denne booking?",
     roomNotSpecified:
         "Værelse ikke angivet",
 };
@@ -448,7 +473,9 @@ const finnish: TranslationDictionary = {
     noBookings:
         "Sinulla ei ole vielä varauksia.",
     confirmed: "vahvistettu",
-    cancelQuestion: "Haluatko varmasti peruuttaa tämän varauksen?",
+    cancelled: "peruutettu",
+    cancelQuestion:
+        "Haluatko varmasti peruuttaa tämän varauksen?",
     roomNotSpecified:
         "Huonetta ei määritetty",
 };
@@ -479,7 +506,9 @@ const polish: TranslationDictionary = {
     noBookings:
         "Nie masz jeszcze żadnych rezerwacji.",
     confirmed: "potwierdzona",
-    cancelQuestion: "Czy na pewno chcesz anulować tę rezerwację?",
+    cancelled: "anulowana",
+    cancelQuestion:
+        "Czy na pewno chcesz anulować tę rezerwację?",
     roomNotSpecified:
         "Nie określono pokoju",
 };
@@ -510,7 +539,9 @@ const czech: TranslationDictionary = {
     noBookings:
         "Zatím nemáte žádné rezervace.",
     confirmed: "potvrzeno",
-    cancelQuestion: "Opravdu chcete tuto rezervaci zrušit?",
+    cancelled: "zrušeno",
+    cancelQuestion:
+        "Opravdu chcete tuto rezervaci zrušit?",
     roomNotSpecified:
         "Pokoj není specifikován",
 };
@@ -541,7 +572,9 @@ const slovak: TranslationDictionary = {
     noBookings:
         "Zatiaľ nemáte žiadne rezervácie.",
     confirmed: "potvrdené",
-    cancelQuestion: "Naozaj chcete zrušiť túto rezerváciu?",
+    cancelled: "zrušená",
+    cancelQuestion:
+        "Naozaj chcete zrušiť túto rezerváciu?",
     roomNotSpecified:
         "Izba nie je špecifikovaná",
 };
@@ -572,7 +605,9 @@ const hungarian: TranslationDictionary = {
     noBookings:
         "Még nincs foglalásod.",
     confirmed: "megerősítve",
-    cancelQuestion: "Biztosan le szeretnéd mondani ezt a foglalást?",
+    cancelled: "lemondva",
+    cancelQuestion:
+        "Biztosan le szeretnéd mondani ezt a foglalást?",
     roomNotSpecified:
         "Nincs megadva szoba",
 };
@@ -603,7 +638,9 @@ const bulgarian: TranslationDictionary = {
     noBookings:
         "Все още нямате резервации.",
     confirmed: "потвърдена",
-    cancelQuestion: "Сигурни ли сте, че искате да отмените тази резервация?",
+    cancelled: "отменена",
+    cancelQuestion:
+        "Сигурни ли сте, че искате да отмените тази резервация?",
     roomNotSpecified:
         "Стаята не е посочена",
 };
@@ -634,7 +671,9 @@ const croatian: TranslationDictionary = {
     noBookings:
         "Još nemate rezervacija.",
     confirmed: "potvrđena",
-    cancelQuestion: "Jeste li sigurni da želite otkazati ovu rezervaciju?",
+    cancelled: "otkazana",
+    cancelQuestion:
+        "Jeste li sigurni da želite otkazati ovu rezervaciju?",
     roomNotSpecified:
         "Soba nije navedena",
 };
@@ -665,7 +704,9 @@ const slovenian: TranslationDictionary = {
     noBookings:
         "Še nimate nobene rezervacije.",
     confirmed: "potrjeno",
-    cancelQuestion: "Ali ste prepričani, da želite preklicati to rezervacijo?",
+    cancelled: "preklicana",
+    cancelQuestion:
+        "Ali ste prepričani, da želite preklicati to rezervacijo?",
     roomNotSpecified:
         "Soba ni določena",
 };
@@ -696,7 +737,9 @@ const serbian: TranslationDictionary = {
     noBookings:
         "Još nemate rezervacija.",
     confirmed: "potvrđena",
-    cancelQuestion: "Da li ste sigurni da želite da otkažete ovu rezervaciju?",
+    cancelled: "otkazana",
+    cancelQuestion:
+        "Da li ste sigurni da želite da otkažete ovu rezervaciju?",
     roomNotSpecified:
         "Soba nije navedena",
 };
@@ -727,7 +770,9 @@ const bosnian: TranslationDictionary = {
     noBookings:
         "Još nemate rezervacija.",
     confirmed: "potvrđena",
-    cancelQuestion: "Jeste li sigurni da želite otkazati ovu rezervaciju?",
+    cancelled: "otkazana",
+    cancelQuestion:
+        "Jeste li sigurni da želite otkazati ovu rezervaciju?",
     roomNotSpecified:
         "Soba nije navedena",
 };
@@ -758,7 +803,9 @@ const greek: TranslationDictionary = {
     noBookings:
         "Δεν έχετε ακόμη κρατήσεις.",
     confirmed: "επιβεβαιωμένη",
-    cancelQuestion: "Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτή την κράτηση;",
+    cancelled: "ακυρωμένη",
+    cancelQuestion:
+        "Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτή την κράτηση;",
     roomNotSpecified:
         "Δεν έχει καθοριστεί δωμάτιο",
 };
@@ -789,7 +836,9 @@ const turkish: TranslationDictionary = {
     noBookings:
         "Henüz rezervasyonunuz yok.",
     confirmed: "onaylandı",
-    cancelQuestion: "Bu rezervasyonu iptal etmek istediğinizden emin misiniz?",
+    cancelled: "iptal edildi",
+    cancelQuestion:
+        "Bu rezervasyonu iptal etmek istediğinizden emin misiniz?",
     roomNotSpecified:
         "Oda belirtilmemiş",
 };
@@ -820,7 +869,9 @@ const arabic: TranslationDictionary = {
     noBookings:
         "ليس لديك أي حجوزات حتى الآن.",
     confirmed: "مؤكد",
-    cancelQuestion: "هل أنت متأكد أنك تريد إلغاء هذا الحجز؟",
+    cancelled: "ملغى",
+    cancelQuestion:
+        "هل أنت متأكد أنك تريد إلغاء هذا الحجز؟",
     roomNotSpecified:
         "لم يتم تحديد الغرفة",
 };
@@ -851,7 +902,9 @@ const hebrew: TranslationDictionary = {
     noBookings:
         "עדיין אין לך הזמנות.",
     confirmed: "מאושרת",
-    cancelQuestion: "האם אתה בטוח שברצונך לבטל את ההזמנה הזו?",
+    cancelled: "בוטלה",
+    cancelQuestion:
+        "האם אתה בטוח שברצונך לבטל את ההזמנה הזו?",
     roomNotSpecified:
         "החדר לא צוין",
 };
@@ -882,7 +935,9 @@ const hindi: TranslationDictionary = {
     noBookings:
         "आपकी अभी कोई बुकिंग नहीं है।",
     confirmed: "पुष्ट",
-    cancelQuestion: "क्या आप वाकई इस बुकिंग को रद्द करना चाहते हैं?",
+    cancelled: "रद्द",
+    cancelQuestion:
+        "क्या आप वाकई इस बुकिंग को रद्द करना चाहते हैं?",
     roomNotSpecified:
         "कमरा निर्दिष्ट नहीं है",
 };
@@ -913,7 +968,9 @@ const thai: TranslationDictionary = {
     noBookings:
         "คุณยังไม่มีการจอง",
     confirmed: "ยืนยันแล้ว",
-    cancelQuestion: "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้?",
+    cancelled: "ยกเลิกแล้ว",
+    cancelQuestion:
+        "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้?",
     roomNotSpecified:
         "ไม่ได้ระบุห้อง",
 };
@@ -944,7 +1001,9 @@ const indonesian: TranslationDictionary = {
     noBookings:
         "Anda belum memiliki pemesanan.",
     confirmed: "dikonfirmasi",
-    cancelQuestion: "Apakah Anda yakin ingin membatalkan pemesanan ini?",
+    cancelled: "dibatalkan",
+    cancelQuestion:
+        "Apakah Anda yakin ingin membatalkan pemesanan ini?",
     roomNotSpecified:
         "Kamar belum ditentukan",
 };
@@ -975,7 +1034,9 @@ const vietnamese: TranslationDictionary = {
     noBookings:
         "Bạn chưa có đặt chỗ nào.",
     confirmed: "đã xác nhận",
-    cancelQuestion: "Bạn có chắc chắn muốn hủy đặt chỗ này không?",
+    cancelled: "đã hủy",
+    cancelQuestion:
+        "Bạn có chắc chắn muốn hủy đặt chỗ này không?",
     roomNotSpecified:
         "Chưa chỉ định phòng",
 };
@@ -1006,7 +1067,9 @@ const korean: TranslationDictionary = {
     noBookings:
         "아직 예약이 없습니다.",
     confirmed: "확정됨",
-    cancelQuestion: "이 예약을 취소하시겠습니까?",
+    cancelled: "취소됨",
+    cancelQuestion:
+        "이 예약을 취소하시겠습니까?",
     roomNotSpecified:
         "객실이 지정되지 않았습니다",
 };
@@ -1037,7 +1100,9 @@ const japanese: TranslationDictionary = {
     noBookings:
         "まだ予約はありません。",
     confirmed: "確定済み",
-    cancelQuestion: "この予約をキャンセルしてもよろしいですか？",
+    cancelled: "キャンセル済み",
+    cancelQuestion:
+        "この予約をキャンセルしてもよろしいですか？",
     roomNotSpecified:
         "部屋が指定されていません",
 };
@@ -1068,7 +1133,9 @@ const chinese: TranslationDictionary = {
     noBookings:
         "您还没有任何预订。",
     confirmed: "已确认",
-    cancelQuestion: "您确定要取消此预订吗？",
+    cancelled: "已取消",
+    cancelQuestion:
+        "您确定要取消此预订吗？",
     roomNotSpecified:
         "未指定房间",
 };
@@ -1099,7 +1166,9 @@ const traditionalChinese: TranslationDictionary = {
     noBookings:
         "您目前沒有任何預訂。",
     confirmed: "已確認",
-    cancelQuestion: "您確定要取消此預訂嗎？",
+    cancelled: "已取消",
+    cancelQuestion:
+        "您確定要取消此預訂嗎？",
     roomNotSpecified:
         "未指定房間",
 };
@@ -1130,7 +1199,9 @@ const catalan: TranslationDictionary = {
     noBookings:
         "Encara no tens cap reserva.",
     confirmed: "confirmada",
-    cancelQuestion: "Estàs segur que vols cancel·lar aquesta reserva?",
+    cancelled: "cancel·lada",
+    cancelQuestion:
+        "Estàs segur que vols cancel·lar aquesta reserva?",
     roomNotSpecified:
         "Habitació no especificada",
 };
@@ -1161,7 +1232,9 @@ const estonian: TranslationDictionary = {
     noBookings:
         "Sul pole veel broneeringuid.",
     confirmed: "kinnitatud",
-    cancelQuestion: "Kas olete kindel, et soovite selle broneeringu tühistada?",
+    cancelled: "tühistatud",
+    cancelQuestion:
+        "Kas olete kindel, et soovite selle broneeringu tühistada?",
     roomNotSpecified:
         "Tuba pole määratud",
 };
@@ -1192,7 +1265,9 @@ const latvian: TranslationDictionary = {
     noBookings:
         "Jums vēl nav rezervāciju.",
     confirmed: "apstiprināta",
-    cancelQuestion: "Vai tiešām vēlaties atcelt šo rezervāciju?",
+    cancelled: "atcelta",
+    cancelQuestion:
+        "Vai tiešām vēlaties atcelt šo rezervāciju?",
     roomNotSpecified:
         "Numurs nav norādīts",
 };
@@ -1223,7 +1298,9 @@ const lithuanian: TranslationDictionary = {
     noBookings:
         "Dar neturite jokių rezervacijų.",
     confirmed: "patvirtinta",
-    cancelQuestion: "Ar tikrai norite atšaukti šią rezervaciją?",
+    cancelled: "atšaukta",
+    cancelQuestion:
+        "Ar tikrai norite atšaukti šią rezervaciją?",
     roomNotSpecified:
         "Kambarys nenurodytas",
 };

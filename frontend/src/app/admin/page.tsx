@@ -11,7 +11,7 @@ import {
     bookings as mockBookings,
     properties,
     users,
-    destinations,
+    destinations as mockDestinations,
 } from "../../data/mockData";
 
 import { useUser } from "../../context/UserContext";
@@ -22,6 +22,8 @@ import { currencyInfo } from "../../data/currency";
 import {
     Booking,
     Property,
+    Destination,
+    Room,
 } from "../../types/types";
 
 import {
@@ -30,6 +32,19 @@ import {
     getProperties,
     updateProperty,
 } from "../../services/propertyService";
+
+import {
+    createDestination,
+    getDestinations,
+    updateDestination,
+} from "../../services/destinationService";
+
+import {
+    createRoom,
+    deleteRoom,
+    getRoomsByPropertyId,
+    updateRoom,
+} from "../../services/roomService";
 
 export default function AdminPage() {
     const { currentUser } = useUser();
@@ -45,8 +60,8 @@ export default function AdminPage() {
             price * selectedCurrency.rate;
 
         return `${selectedCurrency.symbol}${Math.round(
-    convertedPrice
-).toLocaleString()}`;
+            convertedPrice
+        ).toLocaleString()}`;
     };
 
     const [allBookings, setAllBookings] =
@@ -54,6 +69,9 @@ export default function AdminPage() {
 
     const [allProperties, setAllProperties] =
         useState<Property[]>(properties);
+
+    const [allDestinations, setAllDestinations] =
+        useState<Destination[]>(mockDestinations);
 
     const [isPropertyFormOpen, setIsPropertyFormOpen] =
         useState(false);
@@ -64,8 +82,26 @@ export default function AdminPage() {
     const [propertyName, setPropertyName] =
         useState("");
 
+    const [propertyDescription, setPropertyDescription] =
+        useState("");
+
     const [propertyCountry, setPropertyCountry] =
         useState("France");
+
+    const [propertyCity, setPropertyCity] =
+        useState("");
+
+    const [isNewCity, setIsNewCity] =
+        useState(false);
+
+    const [newCityName, setNewCityName] =
+        useState("");
+
+    const [cityImage, setCityImage] =
+        useState("");
+
+    const [countryImage, setCountryImage] =
+        useState("");
 
     const [propertyDestinationId, setPropertyDestinationId] =
         useState("1");
@@ -86,26 +122,62 @@ export default function AdminPage() {
         useState("");
 
     // =========================================
+    // PROPERTY SEARCH / FILTER / SORT
+    // =========================================
+
+    const [propertySearch, setPropertySearch] =
+        useState("");
+
+    const [propertyDestinationFilter, setPropertyDestinationFilter] =
+        useState("All");
+
+    const [propertySort, setPropertySort] =
+        useState("default");
+
+    // =========================================
+    // USER SEARCH / FILTER
+    // =========================================
+
+    const [userSearch, setUserSearch] =
+        useState("");
+
+    const [userRoleFilter, setUserRoleFilter] =
+        useState("All");
+
+    // =========================================
+    // BOOKING SEARCH / FILTER / SORT
+    // =========================================
+
+    const [bookingSearch, setBookingSearch] =
+        useState("");
+
+    const [bookingStatusFilter, setBookingStatusFilter] =
+        useState("All");
+
+    const [bookingSort, setBookingSort] =
+        useState("newest");
+
+    // =========================================
     // COUNTRIES
     // =========================================
 
     const countries = useMemo(() => {
         return Array.from(
             new Set(
-                destinations.map(
+                allDestinations.map(
                     (destination) =>
                         destination.country
                 )
             )
         ).sort();
-    }, []);
+    }, [allDestinations]);
 
     // =========================================
     // CITIES FOR SELECTED COUNTRY
     // =========================================
 
     const availableCities = useMemo(() => {
-        return destinations
+        return allDestinations
             .filter(
                 (destination) =>
                     destination.country ===
@@ -114,7 +186,224 @@ export default function AdminPage() {
             .sort((a, b) =>
                 a.name.localeCompare(b.name)
             );
-    }, [propertyCountry]);
+    }, [propertyCountry, allDestinations]);
+
+    // =========================================
+    // FILTERED / SORTED PROPERTIES
+    // =========================================
+
+    const filteredProperties = useMemo(() => {
+        const search =
+            propertySearch.trim().toLowerCase();
+
+        const result = allProperties.filter(
+            (property) => {
+                const destination =
+                    allDestinations.find(
+                        (item) =>
+                            item.id ===
+                            property.destinationId
+                    );
+
+                const destinationName =
+                    destination?.name ?? "";
+
+                const matchesSearch =
+                    property.name
+                        .toLowerCase()
+                        .includes(search) ||
+                    property.address
+                        .toLowerCase()
+                        .includes(search) ||
+                    destinationName
+                        .toLowerCase()
+                        .includes(search);
+
+                const matchesDestination =
+                    propertyDestinationFilter ===
+                    "All" ||
+                    destinationName ===
+                    propertyDestinationFilter;
+
+                return (
+                    matchesSearch &&
+                    matchesDestination
+                );
+            }
+        );
+
+        return [...result].sort((a, b) => {
+            switch (propertySort) {
+                case "priceAsc":
+                    return (
+                        a.pricePerNight -
+                        b.pricePerNight
+                    );
+
+                case "priceDesc":
+                    return (
+                        b.pricePerNight -
+                        a.pricePerNight
+                    );
+
+                case "ratingDesc":
+                    return b.rating - a.rating;
+
+                case "nameAsc":
+                    return a.name.localeCompare(
+                        b.name
+                    );
+
+                default:
+                    return 0;
+            }
+        });
+    }, [
+        allProperties,
+        propertySearch,
+        propertyDestinationFilter,
+        propertySort,
+    ]);
+
+    // =========================================
+    // FILTERED USERS
+    // =========================================
+
+    const filteredUsers = useMemo(() => {
+        const search =
+            userSearch.trim().toLowerCase();
+
+        return users.filter((user) => {
+            const matchesSearch =
+                user.name
+                    .toLowerCase()
+                    .includes(search) ||
+                user.email
+                    .toLowerCase()
+                    .includes(search);
+
+            const matchesRole =
+                userRoleFilter === "All" ||
+                user.role === userRoleFilter;
+
+            return (
+                matchesSearch &&
+                matchesRole
+            );
+        });
+    }, [userSearch, userRoleFilter]);
+
+    // =========================================
+    // FILTERED / SORTED BOOKINGS
+    // =========================================
+
+    const filteredBookings = useMemo(() => {
+        const search =
+            bookingSearch.trim().toLowerCase();
+
+        const result = allBookings.filter(
+            (booking) => {
+                const property =
+                    allProperties.find(
+                        (item) =>
+                            item.id ===
+                            booking.propertyId
+                    );
+
+                const user =
+                    users.find(
+                        (item) =>
+                            item.id ===
+                            booking.userId
+                    );
+
+                const propertyName =
+                    property?.name
+                        .toLowerCase() ?? "";
+
+                const userName =
+                    user?.name
+                        .toLowerCase() ?? "";
+
+                const status =
+                    booking.status.toLowerCase();
+
+                const matchesSearch =
+                    propertyName.includes(search) ||
+                    userName.includes(search) ||
+                    status.includes(search);
+
+                const matchesStatus =
+                    bookingStatusFilter ===
+                    "All" ||
+                    booking.status ===
+                    bookingStatusFilter;
+
+                return (
+                    matchesSearch &&
+                    matchesStatus
+                );
+            }
+        );
+
+        return [...result].sort((a, b) => {
+            switch (bookingSort) {
+                case "oldest":
+                    return (
+                        new Date(a.checkIn).getTime() -
+                        new Date(b.checkIn).getTime()
+                    );
+
+                case "totalDesc":
+                    return (
+                        b.totalPrice -
+                        a.totalPrice
+                    );
+
+                case "totalAsc":
+                    return (
+                        a.totalPrice -
+                        b.totalPrice
+                    );
+
+                default:
+                    return (
+                        new Date(b.checkIn).getTime() -
+                        new Date(a.checkIn).getTime()
+                    );
+            }
+        });
+    }, [
+        allBookings,
+        allProperties,
+        bookingSearch,
+        bookingStatusFilter,
+        bookingSort,
+    ]);
+
+    // =========================================
+    // DASHBOARD STATISTICS
+    // =========================================
+
+    const confirmedBookingsCount = useMemo(() => {
+        return allBookings.filter(
+            (booking) =>
+                booking.status === "confirmed"
+        ).length;
+    }, [allBookings]);
+
+    const confirmedRevenue = useMemo(() => {
+        return allBookings
+            .filter(
+                (booking) =>
+                    booking.status === "confirmed"
+            )
+            .reduce(
+                (total, booking) =>
+                    total + booking.totalPrice,
+                0
+            );
+    }, [allBookings]);
 
     // =========================================
     // LOAD DATA
@@ -215,6 +504,10 @@ export default function AdminPage() {
         setAllProperties(
             getProperties()
         );
+
+        setAllDestinations(
+            getDestinations()
+        );
     }, []);
 
     // =========================================
@@ -223,14 +516,42 @@ export default function AdminPage() {
 
     const resetPropertyForm = () => {
         setPropertyName("");
-        setPropertyCountry("France");
-        setPropertyDestinationId("1");
+
+        setPropertyDescription("");
+        
+        setPropertyCountry(
+            "France"
+        );
+
+        setPropertyDestinationId(
+            "1"
+        );
+
+        setPropertyCity(
+            "Paris"
+        );
+
+        setIsNewCity(false);
+
+        setNewCityName("");
+
+        setCityImage("");
+
+        setCountryImage("");
+
         setPropertyAddress("");
+
         setPropertyRating("");
+
         setPropertyPrice("");
+
         setPropertyImage("");
+
         setPropertyError("");
-        setEditingPropertyId(null);
+
+        setEditingPropertyId(
+            null
+        );
     };
 
     // =========================================
@@ -240,10 +561,21 @@ export default function AdminPage() {
     const handleCountryChange = (
         value: string
     ) => {
-        setPropertyCountry(value);
+        setPropertyCountry(
+            value
+        );
+
+        setIsNewCity(false);
+
+        setNewCityName("");
+
+        setCityImage("");
+
+        const allDestinations =
+            getDestinations();
 
         const firstCity =
-            destinations.find(
+            allDestinations.find(
                 (destination) =>
                     destination.country ===
                     value
@@ -253,8 +585,26 @@ export default function AdminPage() {
             setPropertyDestinationId(
                 String(firstCity.id)
             );
+
+            setPropertyCity(
+                firstCity.name
+            );
+
+            setCityImage(
+                firstCity.image
+            );
+
+            setCountryImage(
+                firstCity.countryImage
+            );
         } else {
-            setPropertyDestinationId("");
+            setPropertyDestinationId(
+                ""
+            );
+
+            setPropertyCity(
+                ""
+            );
         }
     };
 
@@ -265,7 +615,48 @@ export default function AdminPage() {
     const handleCityChange = (
         value: string
     ) => {
-        setPropertyDestinationId(value);
+        if (value === "__new__") {
+            setIsNewCity(true);
+
+            setPropertyDestinationId(
+                ""
+            );
+
+            setPropertyCity("");
+
+            setNewCityName("");
+
+            setCityImage("");
+
+            return;
+        }
+
+        setIsNewCity(false);
+
+        setPropertyDestinationId(
+            value
+        );
+
+        const destination =
+            getDestinations().find(
+                (item) =>
+                    item.id ===
+                    Number(value)
+            );
+
+        if (destination) {
+            setPropertyCity(
+                destination.name
+            );
+
+            setCityImage(
+                destination.image
+            );
+
+            setCountryImage(
+                destination.countryImage
+            );
+        }
     };
 
     // =========================================
@@ -279,46 +670,69 @@ export default function AdminPage() {
 
         setPropertyError("");
 
+        /*
+         * VALIDARE PROPERTY
+         */
         if (
             !propertyName.trim() ||
             !propertyCountry ||
-            !propertyDestinationId ||
             !propertyAddress.trim() ||
             !propertyRating ||
             !propertyPrice ||
             !propertyImage.trim()
         ) {
             setPropertyError(
-                "Please complete all fields."
+                "Please complete all property fields."
             );
+
             return;
         }
 
-        const selectedDestination =
-            destinations.find(
-                (destination) =>
-                    destination.id ===
-                    Number(
-                        propertyDestinationId
-                    )
-            );
-
+        /*
+         * VALIDARE CITY
+         */
         if (
-            !selectedDestination ||
-            selectedDestination.country !==
-            propertyCountry
+            isNewCity &&
+            !newCityName.trim()
         ) {
             setPropertyError(
-                "Please select a valid city for the selected country."
+                "Please enter the new city name."
             );
+
             return;
         }
 
-        const rating =
-            Number(propertyRating);
+        if (
+            isNewCity &&
+            !cityImage.trim()
+        ) {
+            setPropertyError(
+                "Please enter an image for the new city."
+            );
 
-        const price =
-            Number(propertyPrice);
+            return;
+        }
+
+        /*
+         * COUNTRY IMAGE
+         */
+        if (
+            !countryImage.trim()
+        ) {
+            setPropertyError(
+                "Please enter an image for the country."
+            );
+
+            return;
+        }
+
+        /*
+         * RATING
+         */
+        const rating =
+            Number(
+                propertyRating
+            );
 
         if (
             Number.isNaN(rating) ||
@@ -328,8 +742,17 @@ export default function AdminPage() {
             setPropertyError(
                 "Rating must be a number between 1 and 10."
             );
+
             return;
         }
+
+        /*
+         * PRICE
+         */
+        const price =
+            Number(
+                propertyPrice
+            );
 
         if (
             Number.isNaN(price) ||
@@ -338,31 +761,149 @@ export default function AdminPage() {
             setPropertyError(
                 "Price must be greater than 0."
             );
+
             return;
         }
+
+        /*
+         * DESTINATION
+         */
+        let destinationId =
+            Number(
+                propertyDestinationId
+            );
+
+        /*
+         * NEW CITY
+         */
+        if (isNewCity) {
+            const cityName =
+                newCityName.trim();
+
+            const existingDestination =
+                getDestinations().find(
+                    (destination) =>
+                        destination.country
+                            .toLowerCase()
+                            .trim() ===
+                        propertyCountry
+                            .toLowerCase()
+                            .trim() &&
+                        destination.name
+                            .toLowerCase()
+                            .trim() ===
+                        cityName
+                            .toLowerCase()
+                            .trim()
+                );
+
+            if (
+                existingDestination
+            ) {
+                destinationId =
+                    existingDestination.id;
+
+                updateDestination({
+                    ...existingDestination,
+                    image:
+                        cityImage.trim(),
+                    countryImage:
+                        countryImage.trim(),
+                });
+            } else {
+                const newDestination =
+                    createDestination({
+                        id:
+                            Date.now(),
+                        name:
+                        cityName,
+                        country:
+                        propertyCountry,
+                        image:
+                            cityImage.trim(),
+                        countryImage:
+                            countryImage.trim(),
+                    });
+
+                destinationId =
+                    newDestination.id;
+            }
+        } else {
+            /*
+             * EXISTING CITY
+             */
+            if (
+                Number.isNaN(
+                    destinationId
+                )
+            ) {
+                setPropertyError(
+                    "Please select a valid city."
+                );
+
+                return;
+            }
+
+            const existingDestination =
+                getDestinations().find(
+                    (destination) =>
+                        destination.id ===
+                        destinationId
+                );
+
+            if (
+                !existingDestination
+            ) {
+                setPropertyError(
+                    "Please select a valid city."
+                );
+
+                return;
+            }
+
+            /*
+             * Actualizăm imaginile
+             * orașului și țării dacă
+             * Admin-ul a modificat
+             * aceste valori.
+             */
+            updateDestination({
+                ...existingDestination,
+                image:
+                    cityImage.trim() ||
+                    existingDestination.image,
+                countryImage:
+                    countryImage.trim() ||
+                    existingDestination.countryImage,
+            });
+        }
+
+        /*
+         * PROPERTY DATA
+         */
 
         const propertyData = {
             name: propertyName.trim(),
 
-            destinationId:
-                Number(
-                    propertyDestinationId
-                ),
+            description: propertyDescription.trim(),
 
-            address:
-                propertyAddress.trim(),
+            destinationId,
+
+            address: propertyAddress.trim(),
 
             rating,
 
-            pricePerNight:
-            price,
+            pricePerNight: price,
 
-            image:
-                propertyImage.trim(),
+            image: propertyImage.trim(),
         };
 
+        /*
+         * CREATE / UPDATE
+         */
         if (
-            editingPropertyId !== null
+            editingPropertyId !==
+            null
         ) {
             updateProperty(
                 editingPropertyId,
@@ -374,10 +915,20 @@ export default function AdminPage() {
             );
         }
 
+        /*
+         * REFRESH
+         */
         setAllProperties(
             getProperties()
         );
 
+        setAllDestinations(
+            getDestinations()
+        );
+
+        /*
+         * RESET
+         */
         resetPropertyForm();
 
         setIsPropertyFormOpen(
@@ -393,7 +944,7 @@ export default function AdminPage() {
         property: Property
     ) => {
         const destination =
-            destinations.find(
+            allDestinations.find(
                 (item) =>
                     item.id ===
                     property.destinationId
@@ -407,6 +958,10 @@ export default function AdminPage() {
             property.name
         );
 
+        setPropertyDescription(
+            property.description ?? ""
+        );
+
         setPropertyCountry(
             destination?.country ??
             "France"
@@ -416,6 +971,22 @@ export default function AdminPage() {
             String(
                 property.destinationId
             )
+        );
+
+        setPropertyCity(
+            destination?.name ?? ""
+        );
+
+        setIsNewCity(false);
+
+        setNewCityName("");
+
+        setCityImage(
+            destination?.image ?? ""
+        );
+
+        setCountryImage(
+            destination?.countryImage ?? ""
         );
 
         setPropertyAddress(
@@ -607,24 +1178,26 @@ export default function AdminPage() {
 
                         <div className="admin-stat-card">
                             <span>
-                                Bookings
+                                Confirmed bookings
                             </span>
 
                             <strong>
                                 {
-                                    allBookings.length
+                                    confirmedBookingsCount
                                 }
                             </strong>
                         </div>
 
                         <div className="admin-stat-card">
                             <span>
-                                Admins
+                                Revenue
                             </span>
 
                             <strong>
                                 {
-                                    adminUsers.length
+                                    formatPrice(
+                                        confirmedRevenue
+                                    )
                                 }
                             </strong>
                         </div>
@@ -719,6 +1292,26 @@ export default function AdminPage() {
                                         />
                                     </div>
 
+                                    {/* PROPERTY DESCRIPTION */}
+
+                                    <div className="form-group form-group-full">
+                                        <label htmlFor="propertyDescription">
+                                            Property description
+                                        </label>
+
+                                        <textarea
+                                            id="propertyDescription"
+                                            value={propertyDescription}
+                                            onChange={(event) =>
+                                                setPropertyDescription(
+                                                    event.target.value
+                                                )
+                                            }
+                                            placeholder="Write the description that guests will see on the property page..."
+                                            rows={5}
+                                        />
+                                    </div>
+
                                     {/* COUNTRY */}
 
                                     <div className="form-group">
@@ -772,37 +1365,91 @@ export default function AdminPage() {
                                         <select
                                             id="propertyCity"
                                             value={
-                                                propertyDestinationId
+                                                isNewCity
+                                                    ? "__new__"
+                                                    : propertyDestinationId
                                             }
-                                            onChange={(
-                                                event
-                                            ) =>
+                                            onChange={(event) =>
                                                 handleCityChange(
-                                                    event
-                                                        .target
-                                                        .value
+                                                    event.target.value
                                                 )
                                             }
                                         >
                                             {availableCities.map(
-                                                (
-                                                    city
-                                                ) => (
+                                                (city) => (
                                                     <option
-                                                        key={
-                                                            city.id
-                                                        }
-                                                        value={
-                                                            city.id
-                                                        }
+                                                        key={city.id}
+                                                        value={city.id}
                                                     >
-                                                        {
-                                                            city.name
-                                                        }
+                                                        {city.name}
                                                     </option>
                                                 )
                                             )}
+
+                                            <option value="__new__">
+                                                + Add new city
+                                            </option>
                                         </select>
+                                    </div>
+
+                                    {isNewCity && (
+                                        <div className="form-group">
+                                            <label htmlFor="newCityName">
+                                                New city name
+                                            </label>
+
+                                            <input
+                                                id="newCityName"
+                                                type="text"
+                                                value={newCityName}
+                                                onChange={(event) =>
+                                                    setNewCityName(
+                                                        event.target.value
+                                                    )
+                                                }
+                                                placeholder="City name"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* CITY IMAGE */}
+
+                                    <div className="form-group">
+                                        <label htmlFor="cityImage">
+                                            City image
+                                        </label>
+
+                                        <input
+                                            id="cityImage"
+                                            type="text"
+                                            value={cityImage}
+                                            onChange={(event) =>
+                                                setCityImage(
+                                                    event.target.value
+                                                )
+                                            }
+                                            placeholder="/city-image.jpg"
+                                        />
+                                    </div>
+
+                                    {/* COUNTRY IMAGE */}
+
+                                    <div className="form-group">
+                                        <label htmlFor="countryImage">
+                                            Country image
+                                        </label>
+
+                                        <input
+                                            id="countryImage"
+                                            type="text"
+                                            value={countryImage}
+                                            onChange={(event) =>
+                                                setCountryImage(
+                                                    event.target.value
+                                                )
+                                            }
+                                            placeholder="/country-image.jpg"
+                                        />
                                     </div>
 
                                     {/* ADDRESS */}
@@ -948,6 +1595,84 @@ export default function AdminPage() {
                             </form>
                         )}
 
+                        {/* PROPERTY SEARCH / FILTER / SORT */}
+
+                        <div className="admin-property-filters">
+
+                            <input
+                                type="text"
+                                placeholder="Search properties..."
+                                value={propertySearch}
+                                onChange={(event) =>
+                                    setPropertySearch(
+                                        event.target.value
+                                    )
+                                }
+                            />
+
+                            <select
+                                value={
+                                    propertyDestinationFilter
+                                }
+                                onChange={(event) =>
+                                    setPropertyDestinationFilter(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="All">
+                                    All destinations
+                                </option>
+
+                                {allDestinations.map(
+                                    (destination) => (
+                                        <option
+                                            key={
+                                                destination.id
+                                            }
+                                            value={
+                                                destination.name
+                                            }
+                                        >
+                                            {
+                                                destination.name
+                                            }
+                                        </option>
+                                    )
+                                )}
+                            </select>
+
+                            <select
+                                value={propertySort}
+                                onChange={(event) =>
+                                    setPropertySort(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="default">
+                                    Sort by
+                                </option>
+
+                                <option value="priceAsc">
+                                    Price: Low to High
+                                </option>
+
+                                <option value="priceDesc">
+                                    Price: High to Low
+                                </option>
+
+                                <option value="ratingDesc">
+                                    Rating: High to Low
+                                </option>
+
+                                <option value="nameAsc">
+                                    Name: A–Z
+                                </option>
+                            </select>
+
+                        </div>
+
                         {/* PROPERTY TABLE */}
 
                         <div className="admin-table">
@@ -976,8 +1701,7 @@ export default function AdminPage() {
 
                             </div>
 
-                            {allProperties.length ===
-                            0 ? (
+                            {allProperties.length === 0 ? (
                                 <div className="admin-empty-state">
 
                                     <p>
@@ -1000,16 +1724,36 @@ export default function AdminPage() {
                                     </button>
 
                                 </div>
+                            ) : filteredProperties.length === 0 ? (
+                                <div className="admin-empty-state">
+
+                                    <p>
+                                        No properties found.
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        className="admin-cancel-button"
+                                        onClick={() => {
+                                            setPropertySearch("");
+                                            setPropertyDestinationFilter(
+                                                "All"
+                                            );
+                                            setPropertySort(
+                                                "default"
+                                            );
+                                        }}
+                                    >
+                                        Clear filters
+                                    </button>
+
+                                </div>
                             ) : (
-                                allProperties.map(
-                                    (
-                                        property
-                                    ) => {
+                                filteredProperties.map(
+                                    (property) => {
                                         const destination =
-                                            destinations.find(
-                                                (
-                                                    item
-                                                ) =>
+                                            allDestinations.find(
+                                                (item) =>
                                                     item.id ===
                                                     property.destinationId
                                             );
@@ -1017,9 +1761,7 @@ export default function AdminPage() {
                                         return (
                                             <div
                                                 className="admin-table-row"
-                                                key={
-                                                    property.id
-                                                }
+                                                key={property.id}
                                             >
 
                                                 <strong>
@@ -1056,7 +1798,9 @@ export default function AdminPage() {
                                                 </span>
 
                                                 <span>
-                                                    {formatPrice(property.pricePerNight)}{" "}
+                                                    {formatPrice(
+                                                        property.pricePerNight
+                                                    )}{" "}
                                                     / night
                                                 </span>
 
@@ -1117,6 +1861,44 @@ export default function AdminPage() {
 
                         </div>
 
+                        {/* USER SEARCH / FILTER */}
+
+                        <div className="admin-user-filters">
+
+                            <input
+                                type="text"
+                                placeholder="Search users..."
+                                value={userSearch}
+                                onChange={(event) =>
+                                    setUserSearch(
+                                        event.target.value
+                                    )
+                                }
+                            />
+
+                            <select
+                                value={userRoleFilter}
+                                onChange={(event) =>
+                                    setUserRoleFilter(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="All">
+                                    All roles
+                                </option>
+
+                                <option value="user">
+                                    User
+                                </option>
+
+                                <option value="admin">
+                                    Admin
+                                </option>
+                            </select>
+
+                        </div>
+
                         <div className="admin-table">
 
                             <div className="admin-table-header">
@@ -1135,41 +1917,62 @@ export default function AdminPage() {
 
                             </div>
 
-                            {users.map(
-                                (user) => (
-                                    <div
-                                        className="admin-table-row"
-                                        key={
-                                            user.id
-                                        }
+                            {filteredUsers.length === 0 ? (
+                                <div className="admin-empty-state">
+
+                                    <p>
+                                        No users found.
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        className="admin-cancel-button"
+                                        onClick={() => {
+                                            setUserSearch("");
+                                            setUserRoleFilter(
+                                                "All"
+                                            );
+                                        }}
                                     >
+                                        Clear filters
+                                    </button>
 
-                                        <strong>
-                                            {
-                                                user.name
-                                            }
-                                        </strong>
-
-                                        <span>
-                                            {
-                                                user.email
-                                            }
-                                        </span>
-
-                                        <span
-                                            className={
-                                                user.role ===
-                                                "admin"
-                                                    ? "role-badge role-admin"
-                                                    : "role-badge"
-                                            }
+                                </div>
+                            ) : (
+                                filteredUsers.map(
+                                    (user) => (
+                                        <div
+                                            className="admin-table-row"
+                                            key={user.id}
                                         >
-                                            {
-                                                user.role
-                                            }
-                                        </span>
 
-                                    </div>
+                                            <strong>
+                                                {
+                                                    user.name
+                                                }
+                                            </strong>
+
+                                            <span>
+                                                {
+                                                    user.email
+                                                }
+                                            </span>
+
+                                            <span
+                                                className={
+                                                    user.role ===
+                                                    "admin"
+                                                        ? "role-badge role-admin"
+                                                        : "role-badge"
+                                                }
+                                            >
+                                                {
+                                                    user.role
+                                                }
+                                            </span>
+
+                                        </div>
+                                    )
                                 )
                             )}
 
@@ -1193,6 +1996,69 @@ export default function AdminPage() {
                                     reservations.
                                 </p>
                             </div>
+
+                        </div>
+
+                        {/* BOOKING SEARCH / FILTER / SORT */}
+
+                        <div className="admin-property-filters">
+
+                            <input
+                                type="text"
+                                placeholder="Search bookings..."
+                                value={bookingSearch}
+                                onChange={(event) =>
+                                    setBookingSearch(
+                                        event.target.value
+                                    )
+                                }
+                            />
+
+                            <select
+                                value={bookingStatusFilter}
+                                onChange={(event) =>
+                                    setBookingStatusFilter(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="All">
+                                    All statuses
+                                </option>
+
+                                <option value="confirmed">
+                                    Confirmed
+                                </option>
+
+                                <option value="cancelled">
+                                    Cancelled
+                                </option>
+                            </select>
+
+                            <select
+                                value={bookingSort}
+                                onChange={(event) =>
+                                    setBookingSort(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="newest">
+                                    Newest first
+                                </option>
+
+                                <option value="oldest">
+                                    Oldest first
+                                </option>
+
+                                <option value="totalDesc">
+                                    Total: High to Low
+                                </option>
+
+                                <option value="totalAsc">
+                                    Total: Low to High
+                                </option>
+                            </select>
 
                         </div>
 
@@ -1222,72 +2088,112 @@ export default function AdminPage() {
 
                             </div>
 
-                            {allBookings.map(
-                                (
-                                    booking
-                                ) => {
+                            {filteredBookings.length === 0 ? (
+                                <div className="admin-empty-state">
 
-                                    const user =
-                                        users.find(
-                                            (
-                                                item
-                                            ) =>
-                                                item.id ===
-                                                booking.userId
+                                    <p>
+                                        No bookings found.
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        className="admin-cancel-button"
+                                        onClick={() => {
+                                            setBookingSearch("");
+                                            setBookingStatusFilter(
+                                                "All"
+                                            );
+                                            setBookingSort(
+                                                "newest"
+                                            );
+                                        }}
+                                    >
+                                        Clear filters
+                                    </button>
+
+                                </div>
+                            ) : (
+                                filteredBookings.map(
+                                    (booking) => {
+
+                                        const user =
+                                            users.find(
+                                                (item) =>
+                                                    item.id ===
+                                                    booking.userId
+                                            );
+
+                                        const property =
+                                            allProperties.find(
+                                                (item) =>
+                                                    item.id ===
+                                                    booking.propertyId
+                                            );
+
+                                        const isConfirmed =
+                                            booking.status ===
+                                            "confirmed";
+
+                                        return (
+                                            <div
+                                                className="admin-table-row"
+                                                key={booking.id}
+                                            >
+
+                                                <strong>
+                                                    {
+                                                        property?.name
+                                                    }
+                                                </strong>
+
+                                                <span>
+                                                    {
+                                                        user?.name
+                                                    }
+                                                </span>
+
+                                                <span>
+                                                    {new Date(
+                                                        booking.checkIn
+                                                    ).toLocaleDateString(
+                                                        "ro-RO"
+                                                    )}{" "}
+                                                    →{" "}
+                                                    {new Date(
+                                                        booking.checkOut
+                                                    ).toLocaleDateString(
+                                                        "ro-RO"
+                                                    )}
+                                                </span>
+
+                                                <span>
+                                                    {formatPrice(
+                                                        booking.totalPrice
+                                                    )}
+                                                </span>
+
+                                                <span
+                                                    className="status-badge"
+                                                    style={{
+                                                        color:
+                                                            isConfirmed
+                                                                ? "#15803d"
+                                                                : "#dc2626",
+                                                        backgroundColor:
+                                                            isConfirmed
+                                                                ? "#eaf7ee"
+                                                                : "#fef0f0",
+                                                    }}
+                                                >
+                                                    {
+                                                        booking.status
+                                                    }
+                                                </span>
+
+                                            </div>
                                         );
-
-                                    const property =
-                                        allProperties.find(
-                                            (
-                                                item
-                                            ) =>
-                                                item.id ===
-                                                booking.propertyId
-                                        );
-
-                                    return (
-                                        <div
-                                            className="admin-table-row"
-                                            key={
-                                                booking.id
-                                            }
-                                        >
-
-                                            <strong>
-                                                {
-                                                    property?.name
-                                                }
-                                            </strong>
-
-                                            <span>
-                                                {
-                                                    user?.name
-                                                }
-                                            </span>
-
-                                            <span>
-                                                {new Date(booking.checkIn).toLocaleDateString(
-                                                    "ro-RO"
-                                                )}{" "}
-                                                →{" "}
-                                                {new Date(booking.checkOut).toLocaleDateString(
-                                                    "ro-RO"
-                                                )}
-                                            </span>
-
-                                            <span>
-                                                {formatPrice(booking.totalPrice)}
-                                            </span>
-
-                                            <span className="status-badge">
-                                                {
-                                                    booking.status
-                                                }
-                                            </span>
-
-                                        </div>
-                                    );
-                                }
+                                    }
+                                )
                             )}
 
                         </div>

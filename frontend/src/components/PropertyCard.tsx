@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Property } from "../types/types";
+import { useEffect, useState } from "react";
+
+import { Property, Room } from "../types/types";
 import { useSettings } from "../context/SettingsContext";
 import { currencyInfo } from "../data/currency";
 import { getTranslation } from "../data/translations";
-import { rooms } from "../data/mockData";
+import { getRoomsByPropertyId } from "../services/roomService";
 
 type PropertyCardProps = {
     property: Property;
@@ -20,15 +22,50 @@ export default function PropertyCard({
         currencyInfo[currency] ??
         currencyInfo["Euro"];
 
-    const convertedPrice =
-        property.pricePerNight *
-        selectedCurrency.rate;
+    const [propertyRooms, setPropertyRooms] =
+        useState<Room[]>([]);
 
-    const propertyRooms = rooms.filter(
-        (room) => room.propertyId === property.id
-    );
+    useEffect(() => {
+        setPropertyRooms(
+            getRoomsByPropertyId(property.id)
+        );
+    }, [property.id]);
 
     const firstRoom = propertyRooms[0];
+
+    const lowestRoomPrice =
+        propertyRooms.length > 0
+            ? Math.min(
+                ...propertyRooms.map(
+                    (room) => room.pricePerNight
+                )
+            )
+            : property.pricePerNight;
+
+    const convertedPrice =
+        lowestRoomPrice * selectedCurrency.rate;
+
+    const roomFeatures =
+        firstRoom?.features ?? [];
+
+    /*
+     * Old mock rooms already contain the unit,
+     * for example "20–25 m²".
+     *
+     * New rooms created by Admin contain only
+     * the numeric value, for example 30.
+     *
+     * Therefore we add m² only for numeric values.
+     */
+    const formattedRoomSize =
+        firstRoom &&
+        firstRoom.size !== undefined &&
+        firstRoom.size !== null &&
+        firstRoom.size !== ""
+            ? typeof firstRoom.size === "number"
+                ? `${firstRoom.size} m²`
+                : firstRoom.size
+            : "";
 
     return (
         <Link
@@ -70,41 +107,67 @@ export default function PropertyCard({
                         </strong>
 
                         <p>
-                            {firstRoom.size}
-                            {" · "}
-                            {firstRoom.bed}
+                            {firstRoom.guests
+                                ? `Up to ${firstRoom.guests} guests`
+                                : ""}
+
+                            {formattedRoomSize && (
+                                <>
+                                    {" · "}
+                                    {formattedRoomSize}
+                                </>
+                            )}
+
+                            {firstRoom.bed && (
+                                <>
+                                    {" · "}
+                                    {firstRoom.bed}
+                                </>
+                            )}
                         </p>
 
-                        <div className="property-features">
-                            {firstRoom.features
-                                .slice(0, 3)
-                                .map((feature) => (
-                                    <span key={feature}>
-                                        <span className="checkmark">
-                                            ✓
+                        {roomFeatures.length > 0 && (
+                            <div className="property-features">
+                                {roomFeatures
+                                    .slice(0, 3)
+                                    .map((feature) => (
+                                        <span
+                                            key={feature}
+                                        >
+                                            <span className="checkmark">
+                                                ✓
+                                            </span>
+                                            {feature}
                                         </span>
-                                        {feature}
-                                    </span>
-                                ))}
-                        </div>
+                                    ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
                 <div className="property-bottom">
                     <div className="property-benefits">
-                        <span>
-                            <span className="checkmark">
-                                ✓
+                        {(!firstRoom ||
+                            firstRoom.freeCancellation !==
+                            false) && (
+                            <span>
+                                <span className="checkmark">
+                                    ✓
+                                </span>
+                                Free cancellation
                             </span>
-                            Free cancellation
-                        </span>
+                        )}
 
-                        <span>
-                            <span className="checkmark">
-                                ✓
+                        {(!firstRoom ||
+                            firstRoom.noPrepayment !==
+                            false) && (
+                            <span>
+                                <span className="checkmark">
+                                    ✓
+                                </span>
+                                No prepayment needed
                             </span>
-                            No prepayment needed
-                        </span>
+                        )}
                     </div>
 
                     <div className="property-price-box">

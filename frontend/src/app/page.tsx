@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+
 import {
     useEffect,
     useMemo,
@@ -8,65 +9,216 @@ import {
 } from "react";
 
 import {
-    destinations,
     properties as mockProperties,
 } from "../data/mockData";
 
 import SearchBar from "../components/SearchBar";
 
-import { useSettings } from "../context/SettingsContext";
+import {
+    useSettings,
+} from "../context/SettingsContext";
 
-import { getTranslation } from "../data/translations";
+import {
+    getTranslation,
+} from "../data/translations";
 
-import { currencyInfo } from "../data/currency";
+import {
+    currencyInfo,
+} from "../data/currency";
 
-import { getProperties } from "../services/propertyService";
+import {
+    getProperties,
+} from "../services/propertyService";
 
-import { Property } from "../types/types";
+import {
+    getDestinations,
+} from "../services/destinationService";
+
+import {
+    Property,
+    Destination,
+} from "../types/types";
 
 export default function Home() {
-    const { language, currency } = useSettings();
+    const {
+        language,
+        currency,
+    } = useSettings();
 
     const selectedCurrency =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
 
     // =========================================
-    // PROPERTIES FROM SERVICE / LOCAL STORAGE
+    // PROPERTIES
     // =========================================
 
-    const [availableProperties, setAvailableProperties] =
-        useState<Property[]>([]);
+    const [
+        availableProperties,
+        setAvailableProperties,
+    ] = useState<Property[]>(
+        []
+    );
+
+    // =========================================
+    // DESTINATIONS
+    // =========================================
+
+    const [
+        availableDestinations,
+        setAvailableDestinations,
+    ] = useState<
+        Destination[]
+    >([]);
+
+    // =========================================
+    // LOADING / ERROR
+    // =========================================
+
+    const [
+        isLoading,
+        setIsLoading,
+    ] = useState(true);
+
+    const [
+        hasError,
+        setHasError,
+    ] = useState(false);
+
+    // =========================================
+    // LOAD DATA FROM SERVICES
+    // =========================================
 
     useEffect(() => {
         try {
             const loadedProperties =
                 getProperties();
 
+            const loadedDestinations =
+                getDestinations();
+
             setAvailableProperties(
                 loadedProperties
             );
+
+            setAvailableDestinations(
+                loadedDestinations
+            );
+
+            setHasError(false);
         } catch {
+            /*
+             * Dacă serviciul nu poate încărca
+             * datele, folosim mock properties
+             * pentru ca pagina să nu rămână goală.
+             */
             setAvailableProperties(
                 mockProperties
             );
+
+            setAvailableDestinations(
+                getDestinations()
+            );
+
+            setHasError(true);
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 
     // =========================================
-    // ONLY DESTINATIONS WITH PROPERTIES
+    // DESTINATIONS WITH PROPERTIES
     // =========================================
+    /*
+     * O destinație este vizibilă numai dacă
+     * există cel puțin o proprietate care
+     * folosește destinationId-ul ei.
+     */
 
-    const visibleDestinations = useMemo(() => {
-        return destinations.filter(
-            (destination) =>
-                availableProperties.some(
-                    (property) =>
-                        property.destinationId ===
-                        destination.id
-                )
-        );
-    }, [availableProperties]);
+    const visibleDestinations =
+        useMemo(() => {
+            return availableDestinations.filter(
+                (destination) =>
+                    availableProperties.some(
+                        (property) =>
+                            property.destinationId ===
+                            destination.id
+                    )
+            );
+        }, [
+            availableDestinations,
+            availableProperties,
+        ]);
+
+    // =========================================
+    // ONE COUNTRY CARD PER COUNTRY
+    // =========================================
+    /*
+     * Mai multe orașe pot aparține aceleiași
+     * țări.
+     *
+     * Exemplu:
+     *
+     * France
+     *   Paris
+     *   Lyon
+     *   Nice
+     *
+     * Home trebuie să afișeze:
+     *
+     * France
+     *
+     * o singură dată.
+     *
+     * Imaginea folosită este countryImage.
+     */
+
+    const visibleCountries =
+        useMemo(() => {
+            const countries =
+                new Map<
+                    string,
+                    Destination
+                >();
+
+            visibleDestinations.forEach(
+                (destination) => {
+                    const countryKey =
+                        destination.country
+                            .trim()
+                            .toLowerCase();
+
+                    /*
+                     * Dacă țara nu există încă
+                     * în Map, o adăugăm.
+                     *
+                     * Dacă există deja, nu mai
+                     * creăm un al doilea card.
+                     */
+                    if (
+                        !countries.has(
+                            countryKey
+                        )
+                    ) {
+                        countries.set(
+                            countryKey,
+                            destination
+                        );
+                    }
+                }
+            );
+
+            return Array.from(
+                countries.values()
+            ).sort(
+                (a, b) =>
+                    a.country.localeCompare(
+                        b.country
+                    )
+            );
+        }, [
+            visibleDestinations,
+        ]);
 
     // =========================================
     // FEATURED PROPERTIES
@@ -78,14 +230,110 @@ export default function Home() {
                 0,
                 6
             );
-        }, [availableProperties]);
+        }, [
+            availableProperties,
+        ]);
+
+    // =========================================
+    // LOADING
+    // =========================================
+
+    if (isLoading) {
+        return (
+            <main className="home-page page-enter">
+
+                <section className="home-hero">
+                    <div className="container home-hero-inner">
+
+                        <div className="hero-content">
+
+                            <div className="hero-badge">
+                                ✦ YOUR JOURNEY STARTS HERE
+                            </div>
+
+                            <h1>
+                                FIND YOUR
+                                <br />
+                                <span>
+                                    PERFECT STAY.
+                                </span>
+                            </h1>
+
+                            <p className="hero-subtitle">
+                                Loading StayWay...
+                            </p>
+
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        );
+    }
+
+    // =========================================
+    // ERROR
+    // =========================================
+
+    if (
+        hasError &&
+        availableProperties.length === 0
+    ) {
+        return (
+            <main className="home-page page-enter">
+
+                <section className="home-hero">
+                    <div className="container home-hero-inner">
+
+                        <div className="hero-content">
+
+                            <div className="hero-badge">
+                                ✦ STAYWAY
+                            </div>
+
+                            <h1>
+                                SOMETHING
+                                <br />
+                                <span>
+                                    WENT WRONG.
+                                </span>
+                            </h1>
+
+                            <p className="hero-subtitle">
+                                We could not load
+                                the available
+                                stays.
+                            </p>
+
+                            <Link
+                                href="/500"
+                                className="home-cta-button"
+                            >
+                                VIEW ERROR PAGE
+                                <span>↗</span>
+                            </Link>
+
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        );
+    }
 
     return (
         <main className="home-page page-enter">
 
-            {/* HERO */}
+            {/* =================================================
+                HERO
+            ================================================= */}
+
             <section className="home-hero">
+
                 <div className="hero-glow hero-glow-one"></div>
+
                 <div className="hero-glow hero-glow-two"></div>
 
                 <div className="container home-hero-inner">
@@ -99,19 +347,27 @@ export default function Home() {
                         <h1>
                             FIND YOUR
                             <br />
-                            <span>PERFECT STAY.</span>
+                            <span>
+                                PERFECT STAY.
+                            </span>
                         </h1>
 
                         <p className="hero-subtitle">
-                            Discover beautiful places, unforgettable stays
-                            and destinations worth exploring.
+                            Discover beautiful places,
+                            unforgettable stays
+                            and destinations worth
+                            exploring.
                         </p>
 
                         <div className="hero-stats">
 
+                            {/* UNIQUE STAYS */}
+
                             <div>
                                 <strong>
-                                    {availableProperties.length}
+                                    {
+                                        availableProperties.length
+                                    }
                                 </strong>
 
                                 <span>
@@ -119,15 +375,21 @@ export default function Home() {
                                 </span>
                             </div>
 
+                            {/* COUNTRIES */}
+
                             <div>
                                 <strong>
-                                    {visibleDestinations.length}
+                                    {
+                                        visibleCountries.length
+                                    }
                                 </strong>
 
                                 <span>
-                                    Popular cities
+                                    Available countries
                                 </span>
                             </div>
+
+                            {/* RATING */}
 
                             <div>
                                 <strong>
@@ -140,9 +402,11 @@ export default function Home() {
                             </div>
 
                         </div>
+
                     </div>
 
                     {/* SEARCH */}
+
                     <div className="home-search-wrapper">
                         <SearchBar />
                     </div>
@@ -150,22 +414,30 @@ export default function Home() {
                 </div>
 
                 <div className="hero-scroll">
+
                     <span>
                         SCROLL TO EXPLORE
                     </span>
 
                     <div className="scroll-line"></div>
+
                 </div>
+
             </section>
 
 
-            {/* DESTINATIONS */}
+            {/* =================================================
+                COUNTRIES
+            ================================================= */}
+
             <section className="home-destinations">
+
                 <div className="container">
 
                     <div className="home-section-heading">
 
                         <div>
+
                             <span className="home-eyebrow">
                                 DISCOVER
                             </span>
@@ -173,90 +445,134 @@ export default function Home() {
                             <h2>
                                 EXPLORE
                                 <br />
-                                <span>EUROPE.</span>
+                                <span>
+                                    THE WORLD.
+                                </span>
                             </h2>
+
                         </div>
 
                         <p>
-                            From romantic streets to sunny coastlines,
-                            discover destinations made for your next adventure.
+                            Explore countries with
+                            available StayWay
+                            properties and discover
+                            cities waiting for your
+                            next adventure.
                         </p>
 
                     </div>
 
 
-                    <div className="home-destination-grid">
+                    {/* COUNTRY CARDS */}
 
-                        {visibleDestinations.map(
-                            (
-                                destination,
-                                index
-                            ) => (
-                                <Link
-                                    href={`/destinations/${destination.id}`}
-                                    className={`home-destination-card destination-card-${index + 1}`}
-                                    key={
-                                        destination.id
-                                    }
-                                >
+                    {visibleCountries.length ===
+                    0 ? (
+                        <div className="home-empty-state">
 
-                                    <img
-                                        src={
-                                            destination.image
-                                        }
-                                        alt={
-                                            destination.name
-                                        }
-                                    />
+                            <h3>
+                                No destinations
+                                available
+                            </h3>
 
-                                    <div className="destination-overlay"></div>
+                            <p>
+                                New countries will
+                                appear here when an
+                                administrator adds a
+                                property there.
+                            </p>
 
-                                    <div className="destination-number">
-                                        {String(
+                        </div>
+                    ) : (
+                        <div className="home-destination-grid">
+
+                            {visibleCountries.map(
+                                (
+                                    destination,
+                                    index
+                                ) => (
+                                    <Link
+                                        href="/destinations"
+                                        className={`home-destination-card destination-card-${
                                             index + 1
-                                        ).padStart(
-                                            2,
-                                            "0"
-                                        )}
-                                    </div>
+                                        }`}
+                                        key={
+                                            destination.country
+                                        }
+                                    >
 
-                                    <div className="destination-arrow">
-                                        ↗
-                                    </div>
+                                        {/* COUNTRY IMAGE */}
 
-                                    <div className="destination-info">
-
-                                        <span>
-                                            {
+                                        <img
+                                            src={
+                                                destination.countryImage ||
+                                                destination.image
+                                            }
+                                            alt={
                                                 destination.country
                                             }
-                                        </span>
+                                        />
 
-                                        <h3>
-                                            {
-                                                destination.name
-                                            }
-                                        </h3>
+                                        <div className="destination-overlay"></div>
 
-                                    </div>
+                                        {/* NUMBER */}
 
-                                </Link>
-                            )
-                        )}
+                                        <div className="destination-number">
 
-                    </div>
+                                            {String(
+                                                index + 1
+                                            ).padStart(
+                                                2,
+                                                "0"
+                                            )}
+
+                                        </div>
+
+                                        {/* ARROW */}
+
+                                        <div className="destination-arrow">
+                                            ↗
+                                        </div>
+
+                                        {/* COUNTRY INFO */}
+
+                                        <div className="destination-info">
+
+                                            <span>
+                                                STAYWAY
+                                            </span>
+
+                                            <h3>
+                                                {
+                                                    destination.country
+                                                }
+                                            </h3>
+
+                                        </div>
+
+                                    </Link>
+                                )
+                            )}
+
+                        </div>
+                    )}
 
                 </div>
+
             </section>
 
 
-            {/* FEATURED STAYS */}
+            {/* =================================================
+                FEATURED STAYS
+            ================================================= */}
+
             <section className="home-stays">
+
                 <div className="container">
 
                     <div className="home-section-heading stays-heading">
 
                         <div>
+
                             <span className="home-eyebrow">
                                 HANDPICKED STAYS
                             </span>
@@ -264,8 +580,11 @@ export default function Home() {
                             <h2>
                                 STAY SOMEWHERE
                                 <br />
-                                <span>SPECIAL.</span>
+                                <span>
+                                    SPECIAL.
+                                </span>
                             </h2>
+
                         </div>
 
                         <Link
@@ -278,103 +597,130 @@ export default function Home() {
                     </div>
 
 
-                    <div className="home-property-grid">
+                    {/* FEATURED PROPERTY CARDS */}
 
-                        {featuredProperties.map(
-                            (property) => (
-                                <Link
-                                    href={`/stays/${property.id}`}
-                                    className="home-property-card"
-                                    key={
-                                        property.id
-                                    }
-                                >
+                    {featuredProperties.length ===
+                    0 ? (
+                        <div className="home-empty-state">
 
-                                    <div className="home-property-image">
+                            <h3>
+                                No stays available
+                            </h3>
 
-                                        <img
-                                            src={
-                                                property.image
-                                            }
-                                            alt={
-                                                property.name
-                                            }
-                                        />
+                            <p>
+                                Properties added by
+                                the administrator
+                                will appear here.
+                            </p>
 
-                                        <div className="property-image-overlay"></div>
+                        </div>
+                    ) : (
+                        <div className="home-property-grid">
 
-                                        <div className="property-rating-badge">
-                                            ★{" "}
-                                            {
-                                                property.rating
-                                            }
-                                        </div>
+                            {featuredProperties.map(
+                                (
+                                    property
+                                ) => (
+                                    <Link
+                                        href={`/stays/${property.id}`}
+                                        className="home-property-card"
+                                        key={
+                                            property.id
+                                        }
+                                    >
 
-                                        <div className="property-view">
-                                            VIEW STAY ↗
-                                        </div>
+                                        <div className="home-property-image">
 
-                                    </div>
-
-                                    <div className="home-property-content">
-
-                                        <div>
-
-                                            <span className="property-location">
-                                                📍{" "}
-                                                {
-                                                    property.address
+                                            <img
+                                                src={
+                                                    property.image
                                                 }
-                                            </span>
-
-                                            <h3>
-                                                {
+                                                alt={
                                                     property.name
                                                 }
-                                            </h3>
+                                            />
+
+                                            <div className="property-image-overlay"></div>
+
+                                            <div className="property-rating-badge">
+                                                ★{" "}
+                                                {
+                                                    property.rating
+                                                }
+                                            </div>
+
+                                            <div className="property-view">
+                                                VIEW STAY ↗
+                                            </div>
 
                                         </div>
 
-                                        <div className="home-property-price">
+                                        <div className="home-property-content">
 
-                                            <strong>
-                                                {
-                                                    selectedCurrency.symbol
-                                                }
-                                                {Math.round(
-                                                    property.pricePerNight *
-                                                    selectedCurrency.rate
-                                                ).toLocaleString()}
-                                            </strong>
+                                            <div>
 
-                                            <span>
-                                                {" / "}
-                                                {
-                                                    getTranslation(
-                                                        language,
-                                                        "perNight"
-                                                    )
-                                                }
-                                            </span>
+                                                <span className="property-location">
+                                                    📍{" "}
+                                                    {
+                                                        property.address
+                                                    }
+                                                </span>
+
+                                                <h3>
+                                                    {
+                                                        property.name
+                                                    }
+                                                </h3>
+
+                                            </div>
+
+                                            <div className="home-property-price">
+
+                                                <strong>
+                                                    {
+                                                        selectedCurrency.symbol
+                                                    }
+
+                                                    {Math.round(
+                                                        property.pricePerNight *
+                                                        selectedCurrency.rate
+                                                    ).toLocaleString()}
+                                                </strong>
+
+                                                <span>
+                                                    {" / "}
+                                                    {
+                                                        getTranslation(
+                                                            language,
+                                                            "perNight"
+                                                        )
+                                                    }
+                                                </span>
+
+                                            </div>
 
                                         </div>
 
-                                    </div>
+                                    </Link>
+                                )
+                            )}
 
-                                </Link>
-                            )
-                        )}
-
-                    </div>
+                        </div>
+                    )}
 
                 </div>
+
             </section>
 
 
-            {/* CTA */}
+            {/* =================================================
+                CTA
+            ================================================= */}
+
             <section className="home-cta">
 
                 <div className="home-cta-shape home-cta-shape-one"></div>
+
                 <div className="home-cta-shape home-cta-shape-two"></div>
 
                 <div className="container home-cta-inner">
@@ -388,7 +734,9 @@ export default function Home() {
                         <h2>
                             READY TO
                             <br />
-                            <span>GET AWAY?</span>
+                            <span>
+                                GET AWAY?
+                            </span>
                         </h2>
 
                     </div>
@@ -396,7 +744,10 @@ export default function Home() {
 
                     <div className="home-cta-stats">
 
+                        {/* STAYS */}
+
                         <div>
+
                             <strong>
                                 {
                                     availableProperties.length
@@ -406,21 +757,31 @@ export default function Home() {
                             <span>
                                 STAYS
                             </span>
+
                         </div>
 
+
+                        {/* COUNTRIES */}
+
                         <div>
+
                             <strong>
                                 {
-                                    visibleDestinations.length
+                                    visibleCountries.length
                                 }
                             </strong>
 
                             <span>
-                                DESTINATIONS
+                                COUNTRIES
                             </span>
+
                         </div>
 
+
+                        {/* RATING */}
+
                         <div>
+
                             <strong>
                                 4.8
                             </strong>
@@ -428,6 +789,7 @@ export default function Home() {
                             <span>
                                 GUEST RATING
                             </span>
+
                         </div>
 
                     </div>
