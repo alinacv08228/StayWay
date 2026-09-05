@@ -2,6 +2,7 @@ import Link from "next/link";
 import { properties, reviews, rooms } from "../../../data/mockData";
 import PhotoGallery from "../../../components/PhotoGallery";
 import RoomImageViewer from "../../../components/RoomImageViewer";
+import Price from "../../../components/Price";
 
 type StayPageProps = {
     params: Promise<{
@@ -307,7 +308,7 @@ export default async function StayPage({
                                         <div className="room-price">
 
                                             <strong>
-                                                €{room.pricePerNight}
+                                                <Price amount={room.pricePerNight} />
                                             </strong>
 
                                             <span>

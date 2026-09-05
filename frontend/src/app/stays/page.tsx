@@ -2,13 +2,14 @@
 
 import {
     Suspense,
+    useCallback,
+    useEffect,
     useMemo,
     useState,
 } from "react";
 import { useSearchParams } from "next/navigation";
 
 import {
-    properties,
     destinations,
 } from "../../data/mockData";
 
@@ -24,10 +25,17 @@ import {
 
 import { currencyInfo } from "../../data/currency";
 
+import {
+    getProperties,
+} from "../../services/propertyService";
+
+import { Property } from "../../types/types";
+
 function StaysContent() {
     const searchParams = useSearchParams();
 
     const { language, currency } = useSettings();
+
     const selectedCurrencyInfo =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
@@ -57,7 +65,7 @@ function StaysContent() {
     > = {
         france: "France",
         franța: "France",
-        "franta": "France",
+        franta: "France",
         франция: "France",
 
         italy: "Italy",
@@ -98,9 +106,42 @@ function StaysContent() {
         );
 
     // =========================================
+    // PROPERTIES FROM SERVICE
+    // =========================================
+
+    const [properties, setProperties] =
+        useState<Property[]>([]);
+
+    const [isLoading, setIsLoading] =
+        useState(true);
+
+    const [hasError, setHasError] =
+        useState(false);
+
+    useEffect(() => {
+        try {
+            const loadedProperties = getProperties();
+
+            setProperties(loadedProperties);
+            setHasError(false);
+        } catch {
+            setHasError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    // =========================================
     // FILTER STATE
     // =========================================
 
+    const [allProperties, setAllProperties] =
+        useState<Property[]>([]);
+
+    useEffect(() => {
+        setAllProperties(getProperties());
+    }, []);
+    
     const [selectedCountry, setSelectedCountry] =
         useState(
             selectedDestination?.country ??
@@ -129,23 +170,32 @@ function StaysContent() {
     // COUNTRIES
     // =========================================
 
+    const visibleDestinations = useMemo(() => {
+        return destinations.filter((destination) =>
+            allProperties.some(
+                (property) =>
+                    property.destinationId === destination.id
+            )
+        );
+    }, [allProperties]);
+
     const countries = useMemo(() => {
         return Array.from(
             new Set(
-                destinations.map(
+                visibleDestinations.map(
                     (destination) =>
                         destination.country
                 )
             )
         ).sort();
-    }, []);
+    }, [visibleDestinations]);
 
     // =========================================
     // CITIES
     // =========================================
 
     const availableCities = useMemo(() => {
-        return destinations
+        return visibleDestinations
             .filter((destination) =>
                 selectedCountry
                     ? destination.country ===
@@ -157,14 +207,17 @@ function StaysContent() {
                     destination.name
             )
             .sort();
-    }, [selectedCountry]);
+    }, [
+        visibleDestinations,
+        selectedCountry,
+    ]);
 
     // =========================================
     // FILTER + SORT
     // =========================================
 
     const filteredProperties = useMemo(() => {
-        let result = [...properties];
+        let result = [...allProperties];
 
         // SearchBar destination
         if (selectedDestination) {
@@ -269,8 +322,17 @@ function StaysContent() {
             );
         }
 
+        if (sortBy === "rating-low") {
+            result.sort(
+                (a, b) =>
+                    a.rating -
+                    b.rating
+            );
+        }
+
         return result;
     }, [
+        allProperties,
         selectedDestination,
         selectedCountry,
         selectedCity,
@@ -285,38 +347,100 @@ function StaysContent() {
     // RESET
     // =========================================
 
-    const handleResetFilters = () => {
+    const handleResetFilters = useCallback(() => {
         setSelectedCountry("");
         setSelectedCity("");
         setMinPrice("");
         setMaxPrice("");
         setMinRating("0");
         setSortBy("default");
-    };
+    }, []);
 
     // =========================================
     // COUNTRY CHANGE
     // =========================================
 
-    const handleCountryChange = (
-        value: string
-    ) => {
-        setSelectedCountry(value);
+    const handleCountryChange = useCallback(
+        (value: string) => {
+            setSelectedCountry(value);
 
-        if (!value) {
-            setSelectedCity("");
-            return;
-        }
+            if (!value) {
+                setSelectedCity("");
+                return;
+            }
 
-        const firstCity =
-            destinations.find(
-                (destination) =>
-                    destination.country ===
-                    value
-            )?.name ?? "";
+            const firstCity =
+                destinations.find(
+                    (destination) =>
+                        destination.country ===
+                        value
+                )?.name ?? "";
 
-        setSelectedCity(firstCity);
-    };
+            setSelectedCity(firstCity);
+        },
+        []
+    );
+
+    // =========================================
+    // LOADING
+    // =========================================
+
+    if (isLoading) {
+        return (
+            <main>
+                <section className="section">
+                    <div className="container">
+                        <p className="admin-label">
+                            STAYWAY
+                        </p>
+
+                        <h1 className="page-title">
+                            Loading...
+                        </h1>
+
+                        <p className="admin-description">
+                            Loading available stays...
+                        </p>
+                    </div>
+                </section>
+            </main>
+        );
+    }
+
+    // =========================================
+    // ERROR
+    // =========================================
+
+    if (hasError) {
+        return (
+            <main>
+                <section className="section">
+                    <div className="container">
+                        <div className="no-stays">
+                            <h2>
+                                Something went wrong
+                            </h2>
+
+                            <p>
+                                We could not load the
+                                available stays.
+                            </p>
+
+                            <button
+                                type="button"
+                                className="reset-filters-button"
+                                onClick={() =>
+                                    window.location.reload()
+                                }
+                            >
+                                Try again
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        );
+    }
 
     return (
         <main>
@@ -617,8 +741,8 @@ function StaysContent() {
                                         className="stay-card-animation"
                                         style={{
                                             animationDelay: `${
-    index * 0.08
-}s`,
+                                                index * 0.08
+                                            }s`,
                                         }}
                                         key={
                                             property.id

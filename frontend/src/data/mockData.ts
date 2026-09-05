@@ -23,6 +23,10 @@ export const users: User[] = [
 ];
 
 export const destinations: Destination[] = [
+    // =========================
+    // FRANCE
+    // =========================
+
     {
         id: 1,
         name: "Paris",
@@ -30,16 +34,223 @@ export const destinations: Destination[] = [
         image: "/Paris.jpg",
     },
     {
+        id: 4,
+        name: "Nice",
+        country: "France",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 5,
+        name: "Lyon",
+        country: "France",
+        image: "/Paris.jpg",
+    },
+
+    // =========================
+    // ITALY
+    // =========================
+
+    {
         id: 2,
         name: "Rome",
         country: "Italy",
         image: "/Rome.jpg",
     },
     {
+        id: 6,
+        name: "Milan",
+        country: "Italy",
+        image: "/Rome.jpg",
+    },
+    {
+        id: 7,
+        name: "Florence",
+        country: "Italy",
+        image: "/Rome.jpg",
+    },
+
+    // =========================
+    // SPAIN
+    // =========================
+
+    {
         id: 3,
         name: "Barcelona",
         country: "Spain",
         image: "/Barcelona.jpg",
+    },
+    {
+        id: 8,
+        name: "Madrid",
+        country: "Spain",
+        image: "/Barcelona.jpg",
+    },
+    {
+        id: 9,
+        name: "Seville",
+        country: "Spain",
+        image: "/Barcelona.jpg",
+    },
+
+    // =========================
+    // GERMANY
+    // =========================
+
+    {
+        id: 10,
+        name: "Berlin",
+        country: "Germany",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 11,
+        name: "Munich",
+        country: "Germany",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 12,
+        name: "Hamburg",
+        country: "Germany",
+        image: "/Paris.jpg",
+    },
+
+    // =========================
+    // PORTUGAL
+    // =========================
+
+    {
+        id: 13,
+        name: "Lisbon",
+        country: "Portugal",
+        image: "/Barcelona.jpg",
+    },
+    {
+        id: 14,
+        name: "Porto",
+        country: "Portugal",
+        image: "/Barcelona.jpg",
+    },
+    {
+        id: 15,
+        name: "Faro",
+        country: "Portugal",
+        image: "/Barcelona.jpg",
+    },
+
+    // =========================
+    // GREECE
+    // =========================
+
+    {
+        id: 16,
+        name: "Athens",
+        country: "Greece",
+        image: "/Rome.jpg",
+    },
+    {
+        id: 17,
+        name: "Thessaloniki",
+        country: "Greece",
+        image: "/Rome.jpg",
+    },
+    {
+        id: 18,
+        name: "Heraklion",
+        country: "Greece",
+        image: "/Rome.jpg",
+    },
+
+    // =========================
+    // AUSTRIA
+    // =========================
+
+    {
+        id: 19,
+        name: "Vienna",
+        country: "Austria",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 20,
+        name: "Salzburg",
+        country: "Austria",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 21,
+        name: "Innsbruck",
+        country: "Austria",
+        image: "/Paris.jpg",
+    },
+
+    // =========================
+    // NETHERLANDS
+    // =========================
+
+    {
+        id: 22,
+        name: "Amsterdam",
+        country: "Netherlands",
+        image: "/Barcelona.jpg",
+    },
+    {
+        id: 23,
+        name: "Rotterdam",
+        country: "Netherlands",
+        image: "/Barcelona.jpg",
+    },
+    {
+        id: 24,
+        name: "Utrecht",
+        country: "Netherlands",
+        image: "/Barcelona.jpg",
+    },
+
+    // =========================
+    // CZECH REPUBLIC
+    // =========================
+
+    {
+        id: 25,
+        name: "Prague",
+        country: "Czech Republic",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 26,
+        name: "Brno",
+        country: "Czech Republic",
+        image: "/Paris.jpg",
+    },
+    {
+        id: 27,
+        name: "Ostrava",
+        country: "Czech Republic",
+        image: "/Paris.jpg",
+    },
+
+    // =========================
+    // HUNGARY
+    // =========================
+
+    {
+        id: 28,
+        name: "Budapest",
+        country: "Hungary",
+        image: "/Rome.jpg",
+    },
+    {
+        id: 29,
+        name: "Debrecen",
+        country: "Hungary",
+        image: "/Rome.jpg",
+    },
+    {
+        id: 30,
+        name: "Szeged",
+        country: "Hungary",
+        image: "/Rome.jpg",
     },
 ];
 

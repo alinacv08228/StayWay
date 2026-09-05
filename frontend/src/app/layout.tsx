@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+
 import { UserProvider } from "../context/UserContext";
 import { SettingsProvider } from "../context/SettingsContext";
+import SiteShell from "../components/SiteShell";
 
 export const metadata: Metadata = {
     title: "StayWay",
@@ -20,11 +20,9 @@ export default function RootLayout({
         <body>
         <UserProvider>
             <SettingsProvider>
-                <Header />
-
-                {children}
-
-                <Footer />
+                <SiteShell>
+                    {children}
+                </SiteShell>
             </SettingsProvider>
         </UserProvider>
         </body>

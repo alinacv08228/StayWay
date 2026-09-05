@@ -3,14 +3,31 @@
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+
 import { properties, rooms } from "../../../data/mockData";
+import ProtectedRoute from "../../../components/ProtectedRoute";
+import { useSettings } from "../../../context/SettingsContext";
+import { useUser } from "../../../context/UserContext";
+import { currencyInfo } from "../../../data/currency";
 
 function NewBookingForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    const propertyId = Number(searchParams.get("propertyId"));
-    const roomId = Number(searchParams.get("roomId"));
+    const { currency } = useSettings();
+    const { currentUser } = useUser();
+
+    const selectedCurrency =
+        currencyInfo[currency] ??
+        currencyInfo["Euro"];
+
+    const propertyId = Number(
+        searchParams.get("propertyId")
+    );
+
+    const roomId = Number(
+        searchParams.get("roomId")
+    );
 
     const property = properties.find(
         (item) => item.id === propertyId
@@ -22,10 +39,23 @@ function NewBookingForm() {
             room.propertyId === propertyId
     );
 
-    const [checkIn, setCheckIn] = useState("");
-    const [checkOut, setCheckOut] = useState("");
-    const [guests, setGuests] = useState(1);
-    const [error, setError] = useState("");
+    const [checkIn, setCheckIn] =
+        useState("");
+
+    const [checkOut, setCheckOut] =
+        useState("");
+
+    const [adults, setAdults] =
+        useState(1);
+
+    const [children, setChildren] =
+        useState(0);
+
+    const [infants, setInfants] =
+        useState(0);
+
+    const [error, setError] =
+        useState("");
 
     if (!property) {
         return (
@@ -43,26 +73,53 @@ function NewBookingForm() {
         selectedRoom?.pricePerNight ??
         property.pricePerNight;
 
+    const totalGuests =
+        adults +
+        children +
+        infants;
+
+    const roomCapacity =
+        selectedRoom?.guests ??
+        1;
+
     const calculateNights = () => {
         if (!checkIn || !checkOut) {
             return 0;
         }
 
-        const start = new Date(checkIn);
-        const end = new Date(checkOut);
+        const start =
+            new Date(checkIn);
+
+        const end =
+            new Date(checkOut);
 
         const difference =
-            end.getTime() - start.getTime();
+            end.getTime() -
+            start.getTime();
 
         return Math.ceil(
-            difference / (1000 * 60 * 60 * 24)
+            difference /
+            (1000 * 60 * 60 * 24)
         );
     };
 
-    const nights = calculateNights();
+    const nights =
+        calculateNights();
 
     const totalPrice =
         nights * pricePerNight;
+
+    const formatPrice = (
+        price: number
+    ) => {
+        const convertedPrice =
+            price *
+            selectedCurrency.rate;
+
+        return `${selectedCurrency.symbol}${Math.round(
+            convertedPrice
+        ).toLocaleString()}`;
+    };
 
     const handleBooking = () => {
         setError("");
@@ -71,6 +128,7 @@ function NewBookingForm() {
             setError(
                 "Please select check-in and check-out dates."
             );
+
             return;
         }
 
@@ -78,237 +136,536 @@ function NewBookingForm() {
             setError(
                 "Check-out date must be after check-in date."
             );
+
+            return;
+        }
+
+        if (adults < 1) {
+            setError(
+                "At least one adult is required."
+            );
+
             return;
         }
 
         if (
             selectedRoom &&
-            guests > selectedRoom.guests
+            adults + children >
+            selectedRoom.guests
         ) {
             setError(
-                `This room can accommodate up to ${selectedRoom.guests} guests.`
+                `This room can accommodate up to ${selectedRoom.guests} adults and children.`
             );
+
             return;
         }
 
         const newBooking = {
             id: Date.now(),
-            userId: 1,
-            propertyId: property.id,
-            roomId: selectedRoom?.id,
+
+            userId: currentUser?.id ?? 0,
+
+            propertyId:
+            property.id,
+
+            roomId:
+            selectedRoom?.id,
+
             checkIn,
             checkOut,
-            guests,
+
+            adults,
+            children,
+            infants,
+
+            // Totalul tuturor oaspeților.
+            guests: totalGuests,
+
+            // Prețul este salvat în moneda
+            // de bază a aplicației.
             totalPrice,
-            status: "confirmed" as const,
+
+            status:
+                "confirmed" as const,
         };
 
         const savedBookings =
-            localStorage.getItem("stayway_bookings");
+            localStorage.getItem(
+                "stayway_bookings"
+            );
 
-        const bookings = savedBookings
-            ? JSON.parse(savedBookings)
-            : [];
+        const bookings =
+            savedBookings
+                ? JSON.parse(
+                    savedBookings
+                )
+                : [];
 
-        bookings.push(newBooking);
+        bookings.push(
+            newBooking
+        );
 
         localStorage.setItem(
             "stayway_bookings",
-            JSON.stringify(bookings)
+            JSON.stringify(
+                bookings
+            )
         );
 
-        router.push("/bookings");
+        router.push(
+            "/bookings"
+        );
+    };
+
+    const decreaseAdults = () => {
+        setAdults(
+            (current) =>
+                Math.max(
+                    1,
+                    current - 1
+                )
+        );
+    };
+
+    const decreaseChildren = () => {
+        setChildren(
+            (current) =>
+                Math.max(
+                    0,
+                    current - 1
+                )
+        );
+    };
+
+    const decreaseInfants = () => {
+        setInfants(
+            (current) =>
+                Math.max(
+                    0,
+                    current - 1
+                )
+        );
+    };
+
+    const increaseAdults = () => {
+        if (
+            adults +
+            1 +
+            children <=
+            roomCapacity
+        ) {
+            setAdults(
+                (current) =>
+                    current + 1
+            );
+        }
+    };
+
+    const increaseChildren = () => {
+        if (
+            adults +
+            children +
+            1 <=
+            roomCapacity
+        ) {
+            setChildren(
+                (current) =>
+                    current + 1
+            );
+        }
+    };
+
+    const increaseInfants = () => {
+        setInfants(
+            (current) =>
+                current + 1
+        );
     };
 
     return (
-        <main>
-            <section className="section">
-                <div className="container booking-page">
+        <ProtectedRoute>
+            <main>
+                <section className="section">
+                    <div className="container booking-page">
 
-                    <Link href={`/stays/${property.id}`}>
-                        ← Back to property
-                    </Link>
+                        <Link
+                            href={`/stays/${property.id}`}
+                        >
+                            ← Back to property
+                        </Link>
 
-                    <h1>Book your stay</h1>
+                        <h1>
+                            Book your stay
+                        </h1>
 
-                    <div className="booking-layout">
+                        <div className="booking-layout">
 
-                        {/* FORMULAR */}
-                        <div className="booking-form">
+                            {/* FORMULAR */}
+                            <div className="booking-form">
 
-                            <h2>{property.name}</h2>
+                                <h2>
+                                    {property.name}
+                                </h2>
 
-                            <p>{property.address}</p>
-
-                            {selectedRoom && (
-                                <div className="selected-room-info">
-
-                                    <strong>
-                                        {selectedRoom.name}
-                                    </strong>
-
-                                    <p>
-                                        {selectedRoom.size}
-                                        {" · "}
-                                        {selectedRoom.bed}
-                                    </p>
-
-                                    <p>
-                                        €{selectedRoom.pricePerNight}
-                                        {" / night"}
-                                    </p>
-
-                                </div>
-                            )}
-
-                            <label>
-                                Check-in
-
-                                <input
-                                    type="date"
-                                    value={checkIn}
-                                    onChange={(e) =>
-                                        setCheckIn(
-                                            e.target.value
-                                        )
+                                <p>
+                                    {
+                                        property.address
                                     }
-                                />
-                            </label>
+                                </p>
 
-                            <label>
-                                Check-out
+                                {selectedRoom && (
+                                    <div className="selected-room-info">
 
-                                <input
-                                    type="date"
-                                    value={checkOut}
-                                    onChange={(e) =>
-                                        setCheckOut(
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                            </label>
+                                        <strong>
+                                            {
+                                                selectedRoom.name
+                                            }
+                                        </strong>
 
-                            <label>
-                                Guests
+                                        <p>
+                                            {
+                                                selectedRoom.size
+                                            }
+                                            {" · "}
+                                            {
+                                                selectedRoom.bed
+                                            }
+                                        </p>
 
-                                <select
-                                    value={guests}
-                                    onChange={(e) =>
-                                        setGuests(
-                                            Number(
+                                        <p>
+                                            {
+                                                formatPrice(
+                                                    selectedRoom.pricePerNight
+                                                )
+                                            }
+                                            {" / night"}
+                                        </p>
+
+                                    </div>
+                                )}
+
+                                <label>
+                                    Check-in
+
+                                    <input
+                                        type="date"
+                                        value={checkIn}
+                                        onChange={(e) =>
+                                            setCheckIn(
                                                 e.target.value
                                             )
-                                        )
+                                        }
+                                    />
+                                </label>
+
+                                <label>
+                                    Check-out
+
+                                    <input
+                                        type="date"
+                                        value={checkOut}
+                                        onChange={(e) =>
+                                            setCheckOut(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                </label>
+
+                                {/* GUESTS */}
+                                <div className="guest-selector">
+
+                                    <h3>
+                                        Guests
+                                    </h3>
+
+                                    {/* ADULTS */}
+                                    <div className="guest-row">
+
+                                        <div>
+                                            <strong>
+                                                Adults
+                                            </strong>
+
+                                            <span>
+                                                13+ years
+                                            </span>
+                                        </div>
+
+                                        <div className="guest-counter">
+
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    decreaseAdults
+                                                }
+                                                disabled={
+                                                    adults === 1
+                                                }
+                                            >
+                                                −
+                                            </button>
+
+                                            <span>
+                                                {adults}
+                                            </span>
+
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    increaseAdults
+                                                }
+                                                disabled={
+                                                    adults +
+                                                    children >=
+                                                    roomCapacity
+                                                }
+                                            >
+                                                +
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    {/* CHILDREN */}
+                                    <div className="guest-row">
+
+                                        <div>
+                                            <strong>
+                                                Children
+                                            </strong>
+
+                                            <span>
+                                                2–12 years
+                                            </span>
+                                        </div>
+
+                                        <div className="guest-counter">
+
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    decreaseChildren
+                                                }
+                                                disabled={
+                                                    children === 0
+                                                }
+                                            >
+                                                −
+                                            </button>
+
+                                            <span>
+                                                {children}
+                                            </span>
+
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    increaseChildren
+                                                }
+                                                disabled={
+                                                    adults +
+                                                    children >=
+                                                    roomCapacity
+                                                }
+                                            >
+                                                +
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    {/* INFANTS */}
+                                    <div className="guest-row">
+
+                                        <div>
+                                            <strong>
+                                                Infants
+                                            </strong>
+
+                                            <span>
+                                                Under 2 years
+                                            </span>
+                                        </div>
+
+                                        <div className="guest-counter">
+
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    decreaseInfants
+                                                }
+                                                disabled={
+                                                    infants === 0
+                                                }
+                                            >
+                                                −
+                                            </button>
+
+                                            <span>
+                                                {infants}
+                                            </span>
+
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    increaseInfants
+                                                }
+                                            >
+                                                +
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    <p className="guest-summary">
+
+                                        {adults}{" "}
+
+                                        {adults === 1
+                                            ? "adult"
+                                            : "adults"}
+
+                                        {" · "}
+
+                                        {children}{" "}
+
+                                        {children === 1
+                                            ? "child"
+                                            : "children"}
+
+                                        {" · "}
+
+                                        {infants}{" "}
+
+                                        {infants === 1
+                                            ? "infant"
+                                            : "infants"}
+
+                                    </p>
+
+                                    <p className="guest-capacity">
+                                        Room capacity:{" "}
+                                        {roomCapacity}{" "}
+                                        guests
+                                    </p>
+
+                                </div>
+
+                                {error && (
+                                    <p className="booking-error">
+                                        {error}
+                                    </p>
+                                )}
+
+                                <button
+                                    type="button"
+                                    className="primary-button"
+                                    onClick={
+                                        handleBooking
                                     }
                                 >
-                                    <option value={1}>
-                                        1 guest
-                                    </option>
+                                    Confirm booking
+                                </button>
 
-                                    <option value={2}>
-                                        2 guests
-                                    </option>
+                            </div>
 
-                                    <option value={3}>
-                                        3 guests
-                                    </option>
+                            {/* REZUMAT */}
+                            <div className="booking-summary">
 
-                                    <option value={4}>
-                                        4 guests
-                                    </option>
+                                <img
+                                    src={
+                                        property.image
+                                    }
+                                    alt={
+                                        property.name
+                                    }
+                                />
 
-                                    <option value={5}>
-                                        5 guests
-                                    </option>
+                                <h2>
+                                    {property.name}
+                                </h2>
 
-                                    <option value={6}>
-                                        6 guests
-                                    </option>
-                                </select>
-                            </label>
-
-                            {error && (
-                                <p className="booking-error">
-                                    {error}
+                                <p>
+                                    {
+                                        property.address
+                                    }
                                 </p>
-                            )}
 
-                            <button
-                                className="primary-button"
-                                onClick={handleBooking}
-                            >
-                                Confirm booking
-                            </button>
+                                {selectedRoom && (
+                                    <div className="booking-room-summary">
 
-                        </div>
+                                        <strong>
+                                            {
+                                                selectedRoom.name
+                                            }
+                                        </strong>
 
+                                        <p>
+                                            {
+                                                selectedRoom.size
+                                            }
+                                            {" · "}
+                                            {
+                                                selectedRoom.bed
+                                            }
+                                        </p>
 
-                        {/* REZUMAT */}
-                        <div className="booking-summary">
+                                    </div>
+                                )}
 
-                            <img
-                                src={property.image}
-                                alt={property.name}
-                            />
+                                <p>
+                                    {
+                                        formatPrice(
+                                            pricePerNight
+                                        )
+                                    }
+                                    {" / night"}
+                                </p>
 
-                            <h2>
-                                {property.name}
-                            </h2>
+                                {nights > 0 && (
+                                    <div className="booking-total">
 
-                            <p>
-                                {property.address}
-                            </p>
+                                        <p>
+                                            {nights}{" "}
+                                            {nights === 1
+                                                ? "night"
+                                                : "nights"}
+                                        </p>
 
-                            {selectedRoom && (
-                                <div className="booking-room-summary">
+                                        <p>
+                                            {
+                                                formatPrice(
+                                                    pricePerNight
+                                                )
+                                            }
+                                            {" × "}
+                                            {nights}
+                                        </p>
 
-                                    <strong>
-                                        {selectedRoom.name}
-                                    </strong>
+                                        <strong>
+                                            Total:{" "}
+                                            {
+                                                formatPrice(
+                                                    totalPrice
+                                                )
+                                            }
+                                        </strong>
 
-                                    <p>
-                                        {selectedRoom.size}
-                                        {" · "}
-                                        {selectedRoom.bed}
-                                    </p>
+                                    </div>
+                                )}
 
-                                </div>
-                            )}
-
-                            <p>
-                                €{pricePerNight} / night
-                            </p>
-
-                            {nights > 0 && (
-                                <div className="booking-total">
-
-                                    <p>
-                                        {nights}{" "}
-                                        {nights === 1
-                                            ? "night"
-                                            : "nights"}
-                                    </p>
-
-                                    <p>
-                                        €{pricePerNight} ×{" "}
-                                        {nights}
-                                    </p>
-
-                                    <strong>
-                                        Total: €{totalPrice}
-                                    </strong>
-
-                                </div>
-                            )}
+                            </div>
 
                         </div>
 
                     </div>
-
-                </div>
-            </section>
-        </main>
+                </section>
+            </main>
+        </ProtectedRoute>
     );
 }
 
@@ -317,7 +674,9 @@ export default function NewBookingPage() {
         <Suspense
             fallback={
                 <main className="container">
-                    <p>Loading booking...</p>
+                    <p>
+                        Loading booking...
+                    </p>
                 </main>
             }
         >

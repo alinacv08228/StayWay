@@ -1,34 +1,65 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
+
 import { User } from "../types/types";
 
+import {
+    getCurrentUser,
+    logout as logoutService,
+} from "../services/authService";
+
 type UserContextType = {
-    currentUser: User;
-    setCurrentUser: (user: User) => void;
+    currentUser: User | null;
+    setCurrentUser: (user: User | null) => void;
+    logout: () => void;
+    isLoading: boolean;
 };
 
-const UserContext = createContext<UserContextType | undefined>(
-    undefined
-);
+const UserContext =
+    createContext<UserContextType | undefined>(
+        undefined
+    );
 
 export function UserProvider({
                                  children,
                              }: {
     children: React.ReactNode;
 }) {
-    const [currentUser, setCurrentUser] = useState<User>({
-        id: 2,
-        name: "Admin",
-        email: "admin@stayway.com",
-        role: "admin",
-    });
+    const [currentUser, setCurrentUser] =
+        useState<User | null>(null);
+
+    const [isLoading, setIsLoading] =
+        useState(true);
+
+    useEffect(() => {
+        const savedUser =
+            getCurrentUser();
+
+        if (savedUser) {
+            setCurrentUser(savedUser);
+        }
+
+        setIsLoading(false);
+    }, []);
+
+    const logout = () => {
+        logoutService();
+        setCurrentUser(null);
+    };
 
     return (
         <UserContext.Provider
             value={{
                 currentUser,
                 setCurrentUser,
+                logout,
+                isLoading,
             }}
         >
             {children}
@@ -37,7 +68,8 @@ export function UserProvider({
 }
 
 export function useUser() {
-    const context = useContext(UserContext);
+    const context =
+        useContext(UserContext);
 
     if (!context) {
         throw new Error(

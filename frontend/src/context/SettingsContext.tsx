@@ -7,11 +7,15 @@ import {
     useState,
 } from "react";
 
+type Theme = "light" | "dark";
+
 type SettingsContextType = {
     language: string;
     currency: string;
+    theme: Theme;
     setLanguage: (language: string) => void;
     setCurrency: (currency: string) => void;
+    setTheme: (theme: Theme) => void;
 };
 
 const SettingsContext =
@@ -30,12 +34,18 @@ export function SettingsProvider({
     const [currency, setCurrencyState] =
         useState("Euro");
 
+    const [theme, setThemeState] =
+        useState<Theme>("light");
+
     useEffect(() => {
         const savedLanguage =
             localStorage.getItem("stayway_language");
 
         const savedCurrency =
             localStorage.getItem("stayway_currency");
+
+        const savedTheme =
+            localStorage.getItem("stayway_theme") as Theme | null;
 
         if (savedLanguage) {
             setLanguageState(savedLanguage);
@@ -44,7 +54,18 @@ export function SettingsProvider({
         if (savedCurrency) {
             setCurrencyState(savedCurrency);
         }
+
+        if (savedTheme === "light" || savedTheme === "dark") {
+            setThemeState(savedTheme);
+        }
     }, []);
+
+    useEffect(() => {
+        document.documentElement.setAttribute(
+            "data-theme",
+            theme
+        );
+    }, [theme]);
 
     const setLanguage = (value: string) => {
         setLanguageState(value);
@@ -87,13 +108,24 @@ export function SettingsProvider({
         );
     };
 
+    const setTheme = (value: Theme) => {
+        setThemeState(value);
+
+        localStorage.setItem(
+            "stayway_theme",
+            value
+        );
+    };
+
     return (
         <SettingsContext.Provider
             value={{
                 language,
                 currency,
+                theme,
                 setLanguage,
                 setCurrency,
+                setTheme,
             }}
         >
             {children}

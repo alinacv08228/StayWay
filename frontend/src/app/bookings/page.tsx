@@ -1,7 +1,11 @@
 "use client";
 
+import ProtectedRoute from "../../components/ProtectedRoute";
+
 import { useEffect, useState } from "react";
+
 import Link from "next/link";
+
 import {
     Building2,
     DoorOpen,
@@ -20,7 +24,11 @@ import {
 } from "../../data/mockData";
 
 import { useSettings } from "../../context/SettingsContext";
+
+import { useUser } from "../../context/UserContext";
+
 import { currencyInfo } from "../../data/currency";
+
 import { getTranslation } from "../../data/translations";
 
 type Booking = {
@@ -30,58 +38,113 @@ type Booking = {
     roomId?: number;
     checkIn: string;
     checkOut: string;
+
+    // Pentru rezervările noi
+    adults?: number;
+    children?: number;
+    infants?: number;
+
+    // Păstrăm guests pentru rezervările vechi
     guests: number;
+
     totalPrice: number;
-    status: string;
+
+    status:
+        | "confirmed"
+        | "cancelled"
+        | string;
 };
 
 function formatDate(date: string) {
-    const [year, month, day] = date.split("-");
+    const [year, month, day] =
+        date.split("-");
 
     return `${day}.${month}.${year}`;
 }
 
 export default function BookingsPage() {
+    return (
+        <ProtectedRoute>
+            <BookingsContent />
+        </ProtectedRoute>
+    );
+}
+
+function BookingsContent() {
     const {
         language,
         currency,
     } = useSettings();
+
+    const {
+        currentUser,
+    } = useUser();
 
     const [userBookings, setUserBookings] =
         useState<Booking[]>([]);
 
     const [isLoaded, setIsLoaded] =
         useState(false);
-    
 
     const selectedCurrency =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
 
-    
-
     useEffect(() => {
+        if (!currentUser) {
+            return;
+        }
+
         const savedBookings =
             localStorage.getItem(
                 "stayway_bookings"
             );
 
-        if (savedBookings) {
-            const saved: Booking[] =
-                JSON.parse(savedBookings);
+        let allBookings: Booking[] = [];
 
-            setUserBookings(saved);
+        if (savedBookings) {
+            try {
+                allBookings =
+                    JSON.parse(
+                        savedBookings
+                    );
+            } catch {
+                allBookings =
+                    mockBookings as Booking[];
+            }
         } else {
+            allBookings =
+                mockBookings as Booking[];
+
             localStorage.setItem(
                 "stayway_bookings",
-                JSON.stringify(mockBookings)
+                JSON.stringify(
+                    allBookings
+                )
             );
-
-            setUserBookings(mockBookings);
         }
 
+        /*
+         * Adminul vede toate rezervările.
+         *
+         * Un user normal vede doar rezervările
+         * care au userId-ul lui.
+         */
+        const visibleBookings =
+            currentUser.role === "admin"
+                ? allBookings
+                : allBookings.filter(
+                    (booking) =>
+                        booking.userId ===
+                        currentUser.id
+                );
+
+        setUserBookings(
+            visibleBookings
+        );
+
         setIsLoaded(true);
-    }, []);
+    }, [currentUser]);
 
     const handleCancelBooking = (
         bookingId: number
@@ -98,21 +161,67 @@ export default function BookingsPage() {
             return;
         }
 
-        const updatedBookings =
-            userBookings.filter(
-                (booking) =>
-                    booking.id !== bookingId
+        const savedBookings =
+            localStorage.getItem(
+                "stayway_bookings"
             );
 
-        setUserBookings(
-            updatedBookings
-        );
+        if (!savedBookings) {
+            return;
+        }
+
+        let allBookings: Booking[];
+
+        try {
+            allBookings =
+                JSON.parse(
+                    savedBookings
+                );
+        } catch {
+            return;
+        }
+
+        /*
+         * Nu ștergem rezervarea.
+         * Schimbăm statusul în cancelled.
+         */
+        const updatedAllBookings =
+            allBookings.map(
+                (booking) =>
+                    booking.id ===
+                    bookingId
+                        ? {
+                            ...booking,
+                            status:
+                                "cancelled",
+                        }
+                        : booking
+            );
 
         localStorage.setItem(
             "stayway_bookings",
             JSON.stringify(
-                updatedBookings
+                updatedAllBookings
             )
+        );
+
+        /*
+         * După modificare:
+         * Adminul vede toate rezervările.
+         * Userul vede doar rezervările lui.
+         */
+        const visibleBookings =
+            currentUser?.role ===
+            "admin"
+                ? updatedAllBookings
+                : updatedAllBookings.filter(
+                    (booking) =>
+                        booking.userId ===
+                        currentUser?.id
+                );
+
+        setUserBookings(
+            visibleBookings
         );
     };
 
@@ -127,24 +236,93 @@ export default function BookingsPage() {
             convertedPrice
         ).toLocaleString()}`;
     };
-    const getStatusText = (status: string) => {
-        if (status === "confirmed") {
+
+    const getStatusText = (
+        status: string
+    ) => {
+        if (
+            status ===
+            "confirmed"
+        ) {
             return getTranslation(
                 language,
                 "confirmed"
             );
         }
 
+        if (
+            status ===
+            "cancelled"
+        ) {
+            return getTranslation(
+                language,
+                "cancelled"
+            );
+        }
+
         return status;
+    };
+
+    const getGuestText = (
+        booking: Booking
+    ) => {
+        /*
+         * Rezervare nouă:
+         * avem adulți, copii și sugari.
+         */
+        if (
+            booking.adults !==
+            undefined ||
+            booking.children !==
+            undefined ||
+            booking.infants !==
+            undefined
+        ) {
+            const adults =
+                booking.adults ?? 0;
+
+            const children =
+                booking.children ?? 0;
+
+            const infants =
+                booking.infants ?? 0;
+
+            return `${adults} ${
+                adults === 1
+                    ? "adult"
+                    : "adults"
+            } · ${children} ${
+                children === 1
+                    ? "child"
+                    : "children"
+            } · ${infants} ${
+                infants === 1
+                    ? "infant"
+                    : "infants"
+            }`;
+        }
+
+        /*
+         * Rezervare veche:
+         * folosim guests.
+         */
+        return `${booking.guests} ${
+            booking.guests === 1
+                ? "guest"
+                : "guests"
+        }`;
     };
 
     if (!isLoaded) {
         return (
-            <main>
+            <main className="bookings-loading-page">
                 <section className="section">
-                    <div className="container">
+                    <div className="container bookings-page">
                         <p>
-                            getTranslation(language, "loading")
+                            {getTranslation(
+                                language,
+                                "loading"
+                            )}
                         </p>
                     </div>
                 </section>
@@ -157,14 +335,19 @@ export default function BookingsPage() {
             <section className="section">
                 <div className="container bookings-page">
 
-                    <h1 className="page-title bookings-title-animation">
-                        {getTranslation(language, "myBookings")}
+                    <h1 className="page-title">
+                        {getTranslation(
+                            language,
+                            "myBookings"
+                        )}
                     </h1>
 
-                    {userBookings.length ===
-                    0 ? (
-                        <p className="bookings-description-animation">
-                            getTranslation(language, "noBookings")
+                    {userBookings.length === 0 ? (
+                        <p>
+                            {getTranslation(
+                                language,
+                                "noBookings"
+                            )}
                         </p>
                     ) : (
                         <div className="bookings-list">
@@ -174,23 +357,30 @@ export default function BookingsPage() {
                                     booking,
                                     index
                                 ) => {
+
                                     const user =
                                         users.find(
-                                            (item) =>
+                                            (
+                                                item
+                                            ) =>
                                                 item.id ===
                                                 booking.userId
                                         );
 
                                     const property =
                                         properties.find(
-                                            (item) =>
+                                            (
+                                                item
+                                            ) =>
                                                 item.id ===
                                                 booking.propertyId
                                         );
 
                                     const room =
                                         rooms.find(
-                                            (item) =>
+                                            (
+                                                item
+                                            ) =>
                                                 item.id ===
                                                 booking.roomId &&
                                                 item.propertyId ===
@@ -218,13 +408,18 @@ export default function BookingsPage() {
 
                                                 <div className="booking-info">
 
+                                                    {/* PROPERTY */}
                                                     <div className="booking-info-row">
+
                                                         <Building2 className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "property")  
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "property"
+                                                                    )
                                                                 }
                                                             </strong>
 
@@ -234,52 +429,74 @@ export default function BookingsPage() {
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* ROOM */}
                                                     <div className="booking-info-row">
+
                                                         <DoorOpen className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "room")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "room"
+                                                                    )
                                                                 }
                                                             </strong>
 
                                                             <span>
                                                                 {
                                                                     room?.name ??
-                                                                    getTranslation(language, "roomNotSpecified")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "roomNotSpecified"
+                                                                    )
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* USER */}
                                                     <div className="booking-info-row">
+
                                                         <User className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "user")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "user"
+                                                                    )
                                                                 }
                                                             </strong>
 
                                                             <span>
                                                                 {
-                                                                    user?.name
+                                                                    user?.name ??
+                                                                    "Unknown user"
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* CHECK-IN */}
                                                     <div className="booking-info-row">
+
                                                         <CalendarDays className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "checkIn")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "checkIn"
+                                                                    )
                                                                 }
                                                             </strong>
 
@@ -291,15 +508,21 @@ export default function BookingsPage() {
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* CHECK-OUT */}
                                                     <div className="booking-info-row">
+
                                                         <CalendarDays className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "checkOut")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "checkOut"
+                                                                    )
                                                                 }
                                                             </strong>
 
@@ -311,33 +534,47 @@ export default function BookingsPage() {
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* GUESTS */}
                                                     <div className="booking-info-row">
+
                                                         <Users className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "guests")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "guests"
+                                                                    )
                                                                 }
                                                             </strong>
 
                                                             <span>
                                                                 {
-                                                                    booking.guests
+                                                                    getGuestText(
+                                                                        booking
+                                                                    )
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* TOTAL */}
                                                     <div className="booking-info-row">
+
                                                         <Tag className="booking-info-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "total")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "total"
+                                                                    )
                                                                 }
                                                             </strong>
 
@@ -349,15 +586,21 @@ export default function BookingsPage() {
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
+                                                    {/* STATUS */}
                                                     <div className="booking-info-row">
+
                                                         <Circle className="booking-info-icon status-icon" />
 
                                                         <div>
                                                             <strong>
                                                                 {
-                                                                    getTranslation(language, "status")
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "status"
+                                                                    )
                                                                 }
                                                             </strong>
 
@@ -369,6 +612,7 @@ export default function BookingsPage() {
                                                                 }
                                                             </span>
                                                         </div>
+
                                                     </div>
 
                                                 </div>
@@ -381,23 +625,33 @@ export default function BookingsPage() {
                                                             className="button"
                                                         >
                                                             {
-                                                                getTranslation(language, "viewProperty")
+                                                                getTranslation(
+                                                                    language,
+                                                                    "viewProperty"
+                                                                )
                                                             }
                                                         </Link>
                                                     )}
 
-                                                    <button
-                                                        className="cancel-button"
-                                                        onClick={() =>
-                                                            handleCancelBooking(
-                                                                booking.id
-                                                            )
-                                                        }
-                                                    >
-                                                        {
-                                                            getTranslation(language, "cancelBooking")
-                                                        }
-                                                    </button>
+                                                    {booking.status !==
+                                                        "cancelled" && (
+                                                            <button
+                                                                type="button"
+                                                                className="cancel-button"
+                                                                onClick={() =>
+                                                                    handleCancelBooking(
+                                                                        booking.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                {
+                                                                    getTranslation(
+                                                                        language,
+                                                                        "cancelBooking"
+                                                                    )
+                                                                }
+                                                            </button>
+                                                        )}
 
                                                 </div>
 

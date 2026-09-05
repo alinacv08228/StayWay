@@ -35,7 +35,7 @@ const english: TranslationDictionary = {
     destinations: "Destinations",
     stays: "Stays",
     myBookings: "My Bookings",
-    admin: "Admin",
+    admin: "Admin Dashboard",
     findYourPerfectStay: "Find your perfect stay",
     search: "Search",
     whereAreYouGoing: "Where are you going?",

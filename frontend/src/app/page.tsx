@@ -1,18 +1,85 @@
 "use client";
 
 import Link from "next/link";
-import { destinations, properties } from "../data/mockData";
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    destinations,
+    properties as mockProperties,
+} from "../data/mockData";
+
 import SearchBar from "../components/SearchBar";
+
 import { useSettings } from "../context/SettingsContext";
+
 import { getTranslation } from "../data/translations";
+
 import { currencyInfo } from "../data/currency";
+
+import { getProperties } from "../services/propertyService";
+
+import { Property } from "../types/types";
 
 export default function Home() {
     const { language, currency } = useSettings();
-    
+
     const selectedCurrency =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
+
+    // =========================================
+    // PROPERTIES FROM SERVICE / LOCAL STORAGE
+    // =========================================
+
+    const [availableProperties, setAvailableProperties] =
+        useState<Property[]>([]);
+
+    useEffect(() => {
+        try {
+            const loadedProperties =
+                getProperties();
+
+            setAvailableProperties(
+                loadedProperties
+            );
+        } catch {
+            setAvailableProperties(
+                mockProperties
+            );
+        }
+    }, []);
+
+    // =========================================
+    // ONLY DESTINATIONS WITH PROPERTIES
+    // =========================================
+
+    const visibleDestinations = useMemo(() => {
+        return destinations.filter(
+            (destination) =>
+                availableProperties.some(
+                    (property) =>
+                        property.destinationId ===
+                        destination.id
+                )
+        );
+    }, [availableProperties]);
+
+    // =========================================
+    // FEATURED PROPERTIES
+    // =========================================
+
+    const featuredProperties =
+        useMemo(() => {
+            return availableProperties.slice(
+                0,
+                6
+            );
+        }, [availableProperties]);
+
     return (
         <main className="home-page page-enter">
 
@@ -43,18 +110,33 @@ export default function Home() {
                         <div className="hero-stats">
 
                             <div>
-                                <strong>120+</strong>
-                                <span>Unique stays</span>
+                                <strong>
+                                    {availableProperties.length}
+                                </strong>
+
+                                <span>
+                                    Unique stays
+                                </span>
                             </div>
 
                             <div>
-                                <strong>3</strong>
-                                <span>Popular cities</span>
+                                <strong>
+                                    {visibleDestinations.length}
+                                </strong>
+
+                                <span>
+                                    Popular cities
+                                </span>
                             </div>
 
                             <div>
-                                <strong>4.8</strong>
-                                <span>Guest rating</span>
+                                <strong>
+                                    4.8
+                                </strong>
+
+                                <span>
+                                    Guest rating
+                                </span>
                             </div>
 
                         </div>
@@ -68,7 +150,10 @@ export default function Home() {
                 </div>
 
                 <div className="hero-scroll">
-                    <span>SCROLL TO EXPLORE</span>
+                    <span>
+                        SCROLL TO EXPLORE
+                    </span>
+
                     <div className="scroll-line"></div>
                 </div>
             </section>
@@ -102,22 +187,37 @@ export default function Home() {
 
                     <div className="home-destination-grid">
 
-                        {destinations.map(
-                            (destination, index) => (
+                        {visibleDestinations.map(
+                            (
+                                destination,
+                                index
+                            ) => (
                                 <Link
                                     href={`/destinations/${destination.id}`}
                                     className={`home-destination-card destination-card-${index + 1}`}
-                                    key={destination.id}
+                                    key={
+                                        destination.id
+                                    }
                                 >
+
                                     <img
-                                        src={destination.image}
-                                        alt={destination.name}
+                                        src={
+                                            destination.image
+                                        }
+                                        alt={
+                                            destination.name
+                                        }
                                     />
 
                                     <div className="destination-overlay"></div>
 
                                     <div className="destination-number">
-                                        0{index + 1}
+                                        {String(
+                                            index + 1
+                                        ).padStart(
+                                            2,
+                                            "0"
+                                        )}
                                     </div>
 
                                     <div className="destination-arrow">
@@ -125,14 +225,21 @@ export default function Home() {
                                     </div>
 
                                     <div className="destination-info">
+
                                         <span>
-                                            {destination.country}
+                                            {
+                                                destination.country
+                                            }
                                         </span>
 
                                         <h3>
-                                            {destination.name}
+                                            {
+                                                destination.name
+                                            }
                                         </h3>
+
                                     </div>
+
                                 </Link>
                             )
                         )}
@@ -173,26 +280,34 @@ export default function Home() {
 
                     <div className="home-property-grid">
 
-                        {properties
-                            .slice(0, 6)
-                            .map((property) => (
+                        {featuredProperties.map(
+                            (property) => (
                                 <Link
                                     href={`/stays/${property.id}`}
                                     className="home-property-card"
-                                    key={property.id}
+                                    key={
+                                        property.id
+                                    }
                                 >
 
                                     <div className="home-property-image">
 
                                         <img
-                                            src={property.image}
-                                            alt={property.name}
+                                            src={
+                                                property.image
+                                            }
+                                            alt={
+                                                property.name
+                                            }
                                         />
 
                                         <div className="property-image-overlay"></div>
 
                                         <div className="property-rating-badge">
-                                            ★ {property.rating}
+                                            ★{" "}
+                                            {
+                                                property.rating
+                                            }
                                         </div>
 
                                         <div className="property-view">
@@ -206,11 +321,16 @@ export default function Home() {
                                         <div>
 
                                             <span className="property-location">
-                                                📍 {property.address}
+                                                📍{" "}
+                                                {
+                                                    property.address
+                                                }
                                             </span>
 
                                             <h3>
-                                                {property.name}
+                                                {
+                                                    property.name
+                                                }
                                             </h3>
 
                                         </div>
@@ -218,7 +338,9 @@ export default function Home() {
                                         <div className="home-property-price">
 
                                             <strong>
-                                                {selectedCurrency.symbol}
+                                                {
+                                                    selectedCurrency.symbol
+                                                }
                                                 {Math.round(
                                                     property.pricePerNight *
                                                     selectedCurrency.rate
@@ -227,10 +349,12 @@ export default function Home() {
 
                                             <span>
                                                 {" / "}
-                                                {getTranslation(
-                                                    language,
-                                                    "perNight"
-                                                )}
+                                                {
+                                                    getTranslation(
+                                                        language,
+                                                        "perNight"
+                                                    )
+                                                }
                                             </span>
 
                                         </div>
@@ -238,7 +362,8 @@ export default function Home() {
                                     </div>
 
                                 </Link>
-                            ))}
+                            )
+                        )}
 
                     </div>
 
@@ -272,18 +397,37 @@ export default function Home() {
                     <div className="home-cta-stats">
 
                         <div>
-                            <strong>9</strong>
-                            <span>STAYS</span>
+                            <strong>
+                                {
+                                    availableProperties.length
+                                }
+                            </strong>
+
+                            <span>
+                                STAYS
+                            </span>
                         </div>
 
                         <div>
-                            <strong>3</strong>
-                            <span>DESTINATIONS</span>
+                            <strong>
+                                {
+                                    visibleDestinations.length
+                                }
+                            </strong>
+
+                            <span>
+                                DESTINATIONS
+                            </span>
                         </div>
 
                         <div>
-                            <strong>4.8</strong>
-                            <span>GUEST RATING</span>
+                            <strong>
+                                4.8
+                            </strong>
+
+                            <span>
+                                GUEST RATING
+                            </span>
                         </div>
 
                     </div>
