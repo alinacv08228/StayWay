@@ -35,7 +35,47 @@ export function getProperties(): Property[] {
     }
 
     try {
-        return JSON.parse(savedProperties) as Property[];
+        const parsedProperties =
+            JSON.parse(savedProperties) as Property[];
+
+        /*
+         * Proprietățile existente în localStorage
+         * pot proveni din versiunea anterioară,
+         * unde nu exista câmpul "stars".
+         *
+         * Pentru acestea folosim numărul de stele
+         * din mockData, dacă proprietatea există acolo.
+         *
+         * Proprietățile create de Admin și care au deja
+         * "stars" își păstrează valoarea.
+         */
+        const updatedProperties =
+            parsedProperties.map((property) => {
+                if (
+                    typeof property.stars === "number"
+                ) {
+                    return property;
+                }
+
+                const mockProperty =
+                    mockProperties.find(
+                        (item) =>
+                            item.id === property.id
+                    );
+
+                return {
+                    ...property,
+                    stars:
+                        mockProperty?.stars ?? 1,
+                };
+            });
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(updatedProperties)
+        );
+
+        return updatedProperties;
     } catch {
         localStorage.removeItem(STORAGE_KEY);
 

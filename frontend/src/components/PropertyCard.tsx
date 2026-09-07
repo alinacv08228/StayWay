@@ -285,9 +285,7 @@ export default function PropertyCard({
         firstRoom.size !== undefined &&
         firstRoom.size !== null &&
         firstRoom.size !== ""
-            ? typeof firstRoom.size === "number"
-                ? `${firstRoom.size} m²`
-                : firstRoom.size
+            ? `${firstRoom.size} m²`
             : "";
 
     return (
@@ -313,15 +311,8 @@ export default function PropertyCard({
                     </div>
 
                     <div className="property-rating-box">
-                        <span className="property-rating-label">
-                            {getTranslation(
-                                language,
-                                "excellent"
-                            )}
-                        </span>
-
                         <span className="property-rating">
-                            {property.rating}
+                            {"★".repeat(property.stars)}
                         </span>
                     </div>
                 </div>

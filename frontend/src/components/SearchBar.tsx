@@ -3,7 +3,16 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSettings } from "../context/SettingsContext";
-import { getTranslation } from "../data/translations";
+
+import {
+    getTranslation,
+    getLocalizedCountryName,
+    getLocalizedCityName,
+} from "../data/translations";
+
+import {
+    getDestinations,
+} from "../services/destinationService";
 
 export default function SearchBar() {
     const router = useRouter();
@@ -229,7 +238,7 @@ export default function SearchBar() {
             ? "1 guest"
             : `${count} guests`;
     };
-    
+
     const handleSearch = (
         event: FormEvent<HTMLFormElement>
     ) => {
@@ -238,9 +247,151 @@ export default function SearchBar() {
         const params = new URLSearchParams();
 
         if (destination.trim()) {
+            const normalizedDestination =
+                destination
+                    .trim()
+                    .toLowerCase();
+
+            const destinations =
+                getDestinations();
+
+            const matchingDestination =
+                destinations.find(
+                    (item) => {
+                        if (
+                            item.name
+                                .trim()
+                                .toLowerCase() ===
+                            normalizedDestination
+                        ) {
+                            return true;
+                        }
+
+                        return [
+                            "English",
+                            "Română",
+                            "Русский",
+                            "Français",
+                            "Español",
+                            "Deutsch",
+                            "Italiano",
+                            "Português",
+                            "Polski",
+                            "Українська",
+                            "中文",
+                            "繁體中文",
+                            "日本語",
+                            "한국어",
+                            "Türkçe",
+                            "العربية",
+                            "Ελληνικά",
+                            "Nederlands",
+                            "Norsk",
+                            "Svenska",
+                            "Dansk",
+                            "Suomi",
+                            "Čeština",
+                            "Slovenčina",
+                            "Magyar",
+                            "Български",
+                            "Hrvatski",
+                            "Slovenščina",
+                            "Srpski",
+                            "Bosanski",
+                            "עברית",
+                            "हिन्दी",
+                            "ไทย",
+                            "Bahasa Indonesia",
+                            "Tiếng Việt",
+                            "Català",
+                            "Eesti",
+                            "Latviešu",
+                            "Lietuvių",
+                        ].some(
+                            (supportedLanguage) =>
+                                getLocalizedCityName(
+                                    item.name,
+                                    supportedLanguage
+                                )
+                                    .trim()
+                                    .toLowerCase() ===
+                                normalizedDestination
+                        );
+                    }
+                );
+
+            const matchingCountry =
+                destinations.find(
+                    (item) => {
+                        if (
+                            item.country
+                                .trim()
+                                .toLowerCase() ===
+                            normalizedDestination
+                        ) {
+                            return true;
+                        }
+
+                        return [
+                            "English",
+                            "Română",
+                            "Русский",
+                            "Français",
+                            "Español",
+                            "Deutsch",
+                            "Italiano",
+                            "Português",
+                            "Polski",
+                            "Українська",
+                            "中文",
+                            "繁體中文",
+                            "日本語",
+                            "한국어",
+                            "Türkçe",
+                            "العربية",
+                            "Ελληνικά",
+                            "Nederlands",
+                            "Norsk",
+                            "Svenska",
+                            "Dansk",
+                            "Suomi",
+                            "Čeština",
+                            "Slovenčina",
+                            "Magyar",
+                            "Български",
+                            "Hrvatski",
+                            "Slovenščina",
+                            "Srpski",
+                            "Bosanski",
+                            "עברית",
+                            "हिन्दी",
+                            "ไทย",
+                            "Bahasa Indonesia",
+                            "Tiếng Việt",
+                            "Català",
+                            "Eesti",
+                            "Latviešu",
+                            "Lietuvių",
+                        ].some(
+                            (supportedLanguage) =>
+                                getLocalizedCountryName(
+                                    item.country,
+                                    supportedLanguage
+                                )
+                                    .trim()
+                                    .toLowerCase() ===
+                                normalizedDestination
+                        );
+                    }
+                );
+
             params.set(
                 "destination",
-                destination.trim()
+                matchingDestination
+                    ? matchingDestination.name
+                    : matchingCountry
+                        ? matchingCountry.country
+                        : destination.trim()
             );
         }
 

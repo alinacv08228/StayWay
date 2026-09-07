@@ -66,9 +66,7 @@ export default function DynamicRoomList({
                     room.size !== undefined &&
                     room.size !== null &&
                     room.size !== ""
-                        ? typeof room.size === "number"
-                            ? `${room.size} m²`
-                            : room.size
+                        ? `${room.size} m²`
                         : "";
 
                 return (

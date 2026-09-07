@@ -1677,9 +1677,7 @@ function NewBookingForm() {
         selectedRoom.size !== undefined &&
         selectedRoom.size !== null &&
         selectedRoom.size !== ""
-            ? typeof selectedRoom.size === "number"
-                ? `${selectedRoom.size} m²`
-                : selectedRoom.size
+            ? `${selectedRoom.size} m²`
             : "";
 
 

@@ -155,7 +155,7 @@ export default function AdminPage() {
     const [propertyAddress, setPropertyAddress] =
         useState("");
 
-    const [propertyRating, setPropertyRating] =
+    const [propertyStars, setPropertyStars] =
         useState("");
 
     const [propertyPrice, setPropertyPrice] =
@@ -685,7 +685,7 @@ export default function AdminPage() {
 
         setPropertyAddress("");
 
-        setPropertyRating("");
+        setPropertyStars("");
 
         setPropertyPrice("");
 
@@ -826,7 +826,7 @@ export default function AdminPage() {
             !propertyName.trim() ||
             !propertyCountry ||
             !propertyAddress.trim() ||
-            !propertyRating ||
+            !propertyStars ||
             !propertyPrice ||
             !propertyImage.trim()
         ) {
@@ -871,20 +871,21 @@ export default function AdminPage() {
         }
 
         /*
-         * RATING
-         */
-        const rating =
+ * NUMBER OF STARS
+ */
+        const stars =
             Number(
-                propertyRating
+                propertyStars
             );
 
         if (
-            Number.isNaN(rating) ||
-            rating < 1 ||
-            rating > 10
+            Number.isNaN(stars) ||
+            stars < 1 ||
+            stars > 5 ||
+            !Number.isInteger(stars)
         ) {
             setPropertyError(
-                "Rating must be a number between 1 and 10."
+                "Number of stars must be a whole number between 1 and 5."
             );
 
             return;
@@ -1011,17 +1012,19 @@ export default function AdminPage() {
 
         const propertyData = {
             name: propertyName.trim(),
-
             description: propertyDescription.trim(),
-
             destinationId,
-
             address: propertyAddress.trim(),
-
-            rating,
-
+            stars,
+            rating:
+                editingPropertyId !== null
+                    ? allProperties.find(
+                    (property) =>
+                        property.id ===
+                        editingPropertyId
+                )?.rating ?? 0
+                    : 0,
             pricePerNight: price,
-
             image: propertyImage.trim(),
         };
 
@@ -1116,8 +1119,8 @@ export default function AdminPage() {
             property.address
         );
 
-        setPropertyRating(
-            String(property.rating)
+        setPropertyStars(
+            String(property.stars)
         );
 
         setPropertyPrice(
@@ -1586,32 +1589,26 @@ export default function AdminPage() {
                                         />
                                     </div>
 
-                                    {/* RATING */}
+                                    {/* NUMBER OF STARS */}
 
                                     <div className="form-group">
-                                        <label htmlFor="propertyRating">
-                                            Rating
+                                        <label htmlFor="propertyStars">
+                                            Number of stars
                                         </label>
 
                                         <input
-                                            id="propertyRating"
+                                            id="propertyStars"
                                             type="number"
                                             min="1"
-                                            max="10"
-                                            step="0.1"
-                                            value={
-                                                propertyRating
-                                            }
-                                            onChange={(
-                                                event
-                                            ) =>
-                                                setPropertyRating(
-                                                    event
-                                                        .target
-                                                        .value
+                                            max="5"
+                                            step="1"
+                                            value={propertyStars}
+                                            onChange={(event) =>
+                                                setPropertyStars(
+                                                    event.target.value
                                                 )
                                             }
-                                            placeholder="1 - 10"
+                                            placeholder="1 - 5"
                                         />
                                     </div>
 
@@ -1800,7 +1797,7 @@ export default function AdminPage() {
                                 </span>
 
                                 <span>
-                                    Rating
+                                    Stars
                                 </span>
 
                                 <span>
@@ -1905,10 +1902,7 @@ export default function AdminPage() {
                                                 </span>
 
                                                 <span>
-                                                    ★{" "}
-                                                    {
-                                                        property.rating
-                                                    }
+                                                    {"★".repeat(property.stars)}
                                                 </span>
 
                                                 <span>

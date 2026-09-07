@@ -1203,7 +1203,7 @@ footer p {
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 /* LOGO */
@@ -1212,6 +1212,8 @@ footer p {
   display: inline-flex;
   align-items: center;
   gap: 9px;
+
+  margin-right: 85px;
 
   color: #202024;
   font-size: 22px;
@@ -8301,14 +8303,20 @@ html[data-theme="dark"] .nav-icon-button:hover {
    HEADER - NAVIGATION
    ========================================================= */
 
+
 .nav {
   display: flex;
   align-items: center;
   gap: 28px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-link {
   position: relative;
+
+  white-space: nowrap;
+  flex-shrink: 0;
 
   display: inline-flex;
   align-items: center;

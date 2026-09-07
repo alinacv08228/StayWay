@@ -24,7 +24,7 @@ export interface Property {
     name: string;
     description?: string;
     destinationId: number;
-    address: string;
+    stars: number;
     rating: number;
     pricePerNight: number;
     image: string;

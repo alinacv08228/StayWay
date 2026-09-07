@@ -930,11 +930,11 @@ export default function StayPageClient({
                         <div className="stay-rating-large">
 
                             <strong>
-                                ★ {property.rating}
+                                {"★".repeat(property.stars)}
                             </strong>
 
                             <span>
-                                {text.excellent}
+                                Hotel
                             </span>
 
                         </div>

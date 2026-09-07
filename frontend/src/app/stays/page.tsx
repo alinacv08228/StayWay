@@ -11,7 +11,10 @@ import PropertyCard from "../../components/PropertyCard";
 
 import { useSettings } from "../../context/SettingsContext";
 
-import { getTranslation } from "../../data/translations";
+import {
+    getTranslation,
+    getLocalizedCountryName,
+} from "../../data/translations";
 
 import {
     getFilterTranslation,
@@ -187,9 +190,21 @@ export default function StaysPage() {
 
     const countryInEnglish =
         normalizedDestination
-            ? countryAliases[
-                normalizedDestination
-                ]
+            ? (
+                availableDestinations.find(
+                    (destination) =>
+                        getLocalizedCountryName(
+                            destination.country,
+                            language
+                        )
+                            .trim()
+                            .toLowerCase() ===
+                        normalizedDestination
+                )?.country ??
+                countryAliases[
+                    normalizedDestination
+                    ]
+            )
             : undefined;
 
     const selectedDestination =
@@ -228,8 +243,8 @@ export default function StaysPage() {
         useState("default");
 
     // =========================================
-    // INITIAL DESTINATION FILTER
-    // =========================================
+// INITIAL DESTINATION FILTER
+// =========================================
 
     useEffect(() => {
         if (selectedDestination) {
@@ -244,14 +259,34 @@ export default function StaysPage() {
             return;
         }
 
-        if (countryInEnglish) {
-            setSelectedCountry(
-                countryInEnglish
+        if (!normalizedDestination) {
+            return;
+        }
+
+        const matchingCountry =
+            availableDestinations.find(
+                (destination) =>
+                    getLocalizedCountryName(
+                        destination.country,
+                        language
+                    )
+                        .trim()
+                        .toLowerCase() ===
+                    normalizedDestination
             );
+
+        if (matchingCountry) {
+            setSelectedCountry(
+                matchingCountry.country
+            );
+
+            setSelectedCity("");
         }
     }, [
         selectedDestination,
-        countryInEnglish,
+        normalizedDestination,
+        availableDestinations,
+        language,
     ]);
 
     // =========================================
