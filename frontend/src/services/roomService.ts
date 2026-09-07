@@ -1,4 +1,4 @@
-import { rooms as mockRooms } from "../data/mockData";
+import { rooms as mockRooms, properties as mockProperties } from "../data/mockData";
 import { Room } from "../types/types";
 
 const ROOMS_KEY = "stayway_rooms";
@@ -96,9 +96,36 @@ export function saveRooms(
 export function getRoomsByPropertyId(
     propertyId: number
 ): Room[] {
+    const isMockProperty =
+        mockProperties.some(
+            (property) =>
+                property.id === propertyId
+        );
+
     return getRooms().filter(
-        (room) =>
-            room.propertyId === propertyId
+        (room) => {
+            if (
+                room.propertyId !==
+                propertyId
+            ) {
+                return false;
+            }
+
+            if (isMockProperty) {
+                return true;
+            }
+
+            const isMockRoom =
+                mockRooms.some(
+                    (mockRoom) =>
+                        mockRoom.id ===
+                        room.id &&
+                        mockRoom.propertyId ===
+                        room.propertyId
+                );
+
+            return !isMockRoom;
+        }
     );
 }
 

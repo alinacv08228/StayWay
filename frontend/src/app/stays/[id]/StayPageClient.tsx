@@ -1187,38 +1187,42 @@ export default function StayPageClient({
 
                         {/* ROOMS */}
 
-                        <div
-                            className="stay-info-block"
-                            id="rooms"
-                        >
+                        {propertyRooms.length > 0 && (
 
-                            <div className="rooms-heading">
+                            <div
+                                className="stay-info-block"
+                                id="rooms"
+                            >
 
-                                <div>
+                                <div className="rooms-heading">
 
-                                    <h2>
-                                        {text.chooseRoom}
-                                    </h2>
+                                    <div>
 
-                                    <p>
-                                        {text.chooseRoomDescription}
-                                    </p>
+                                        <h2>
+                                            {text.chooseRoom}
+                                        </h2>
+
+                                        <p>
+                                            {text.chooseRoomDescription}
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
+
+                                <DynamicRoomList
+                                    propertyId={
+                                        property.id
+                                    }
+                                    initialRooms={
+                                        propertyRooms
+                                    }
+                                />
+
                             </div>
 
-
-                            <DynamicRoomList
-                                propertyId={
-                                    property.id
-                                }
-                                initialRooms={
-                                    propertyRooms
-                                }
-                            />
-
-                        </div>
+                        )} 
 
 
                         {/* REVIEWS */}

@@ -30,6 +30,12 @@ export default function RoomImageViewer({
         };
     }, [isOpen]);
 
+    if (!image) {
+        return (
+            <div className="room-image-button" />
+        );
+    }
+
     const modal = isOpen ? (
         <div
             className="room-photo-modal"
@@ -59,21 +65,27 @@ export default function RoomImageViewer({
 
     return (
         <>
-            <button
-                type="button"
-                className="room-image-button"
-                onClick={() => setIsOpen(true)}
-                aria-label={`Open ${alt}`}
-            >
-                <img
-                    src={image}
-                    alt={alt}
-                    className="room-image-clickable"
-                />
-            </button>
+            {image ? (
+                <button
+                    type="button"
+                    className="room-image-button"
+                    onClick={() => setIsOpen(true)}
+                    aria-label={`Open ${alt}`}
+                >
+                    <img
+                        src={image}
+                        alt={alt}
+                        className="room-image-clickable"
+                    />
+                </button>
+            ) : (
+                <div className="room-image-button" />
+            )}
 
             {typeof document !== "undefined" &&
                 createPortal(modal, document.body)}
         </>
     );
+    
+    
 }
