@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 
 import { useSettings } from "../context/SettingsContext";
 import { currencyInfo } from "../data/currency";
+import {
+    getTranslation,
+    getLocalizedRoomFeature,
+    getLocalizedBedType,
+} from "../data/translations";
 
 import RoomImageViewer from "./RoomImageViewer";
 import { getRoomsByPropertyId } from "../services/roomService";
@@ -19,12 +24,12 @@ export default function DynamicRoomList({
                                             propertyId,
                                             initialRooms,
                                         }: DynamicRoomListProps) {
-    const { currency } = useSettings();
+    const { currency, language } = useSettings();
 
     const selectedCurrency =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
-    
+
     const [propertyRooms, setPropertyRooms] =
         useState<Room[]>(initialRooms);
 
@@ -37,11 +42,18 @@ export default function DynamicRoomList({
     if (propertyRooms.length === 0) {
         return (
             <div className="home-empty-state">
-                <h3>No rooms available</h3>
+                <h3>
+                    {getTranslation(
+                        language,
+                        "noRoomsAvailable"
+                    )}
+                </h3>
 
                 <p>
-                    This property currently has no
-                    rooms available for booking.
+                    {getTranslation(
+                        language,
+                        "noRoomsDescription"
+                    )}
                 </p>
             </div>
         );
@@ -80,8 +92,16 @@ export default function DynamicRoomList({
 
                             <div className="room-meta">
                                 <span>
-                                    👤 Up to{" "}
-                                    {room.guests} guests
+                                    👤{" "}
+                                    {getTranslation(
+                                        language,
+                                        "upToGuests"
+                                    )}{" "}
+                                    {room.guests}{" "}
+                                    {getTranslation(
+                                        language,
+                                        "guests"
+                                    ).toLowerCase()}
                                 </span>
 
                                 {formattedRoomSize && (
@@ -92,18 +112,26 @@ export default function DynamicRoomList({
                                 )}
 
                                 <span>
-                                    🛏️ {room.bed}
+                                    🛏️{" "}
+                                    {getLocalizedBedType(
+                                        room.bed,
+                                        language
+                                    )}
                                 </span>
                             </div>
 
                             <div className="room-features">
-                                {room.features
+                                {(room.features ?? [])
                                     .slice(0, 3)
                                     .map((feature) => (
                                         <span
                                             key={feature}
                                         >
-                                            ✓ {feature}
+                                            ✓{" "}
+                                            {getLocalizedRoomFeature(
+                                                feature,
+                                                language
+                                            )}
                                         </span>
                                     ))}
                             </div>
@@ -112,15 +140,22 @@ export default function DynamicRoomList({
                                 {room.freeCancellation !==
                                     false && (
                                         <span>
-                                        ✓ Free cancellation
+                                        ✓{" "}
+                                            {getTranslation(
+                                                language,
+                                                "freeCancellation"
+                                            )}
                                     </span>
                                     )}
 
                                 {room.noPrepayment !==
                                     false && (
                                         <span>
-                                        ✓ No prepayment
-                                        needed
+                                        ✓{" "}
+                                            {getTranslation(
+                                                language,
+                                                "noPrepayment"
+                                            )}
                                     </span>
                                     )}
                             </div>
@@ -135,17 +170,29 @@ export default function DynamicRoomList({
                                 ).toLocaleString()}
                             </strong>
 
-                            <span>/ night</span>
+                            <span>
+                                /{" "}
+                                {getTranslation(
+                                    language,
+                                    "perNight"
+                                )}
+                            </span>
 
                             <small>
-                                + taxes and fees
+                                {getTranslation(
+                                    language,
+                                    "taxesAndFees"
+                                )}
                             </small>
 
                             <Link
                                 href={`/bookings/new?propertyId=${propertyId}&roomId=${room.id}`}
                                 className="room-button"
                             >
-                                Select room
+                                {getTranslation(
+                                    language,
+                                    "selectRoom"
+                                )}
                             </Link>
                         </div>
                     </div>

@@ -1,13 +1,11 @@
 "use client";
 
 import {
-    Suspense,
     useCallback,
     useEffect,
     useMemo,
     useState,
 } from "react";
-import { useSearchParams } from "next/navigation";
 
 import PropertyCard from "../../components/PropertyCard";
 
@@ -22,6 +20,10 @@ import {
 import { currencyInfo } from "../../data/currency";
 
 import {
+    properties as mockProperties,
+} from "../../data/mockData";
+
+import {
     getProperties,
 } from "../../services/propertyService";
 
@@ -31,9 +33,7 @@ import {
 
 import { Property } from "../../types/types";
 
-function StaysContent() {
-    const searchParams = useSearchParams();
-
+export default function StaysPage() {
     const { language, currency } = useSettings();
 
     const selectedCurrencyInfo =
@@ -41,18 +41,101 @@ function StaysContent() {
         currencyInfo["Euro"];
 
     // =========================================
-    // DESTINATIONS
+    // INITIAL DATA
     // =========================================
+
+    const [allProperties, setAllProperties] =
+        useState<Property[]>(mockProperties);
 
     const [availableDestinations, setAvailableDestinations] =
-        useState(() => getDestinations());
+        useState(() => {
+            try {
+                return getDestinations();
+            } catch {
+                return [];
+            }
+        });
+
+    const [isLoading, setIsLoading] =
+        useState(false);
+
+    const [hasError, setHasError] =
+        useState(false);
 
     // =========================================
-    // SEARCH PARAMS
+    // DESTINATION FROM URL
     // =========================================
 
-    const destinationName =
-        searchParams.get("destination");
+    const [destinationName, setDestinationName] =
+        useState<string | null>(null);
+
+    useEffect(() => {
+        try {
+            const params = new URLSearchParams(
+                window.location.search
+            );
+
+            setDestinationName(
+                params.get("destination")
+            );
+        } catch {
+            setDestinationName(null);
+        }
+    }, []);
+
+    // =========================================
+    // LOAD LOCAL STORAGE DATA
+    // =========================================
+
+    useEffect(() => {
+        let mounted = true;
+
+        try {
+            const loadedProperties =
+                getProperties();
+
+            const loadedDestinations =
+                getDestinations();
+
+            if (!mounted) {
+                return;
+            }
+
+            setAllProperties(
+                loadedProperties.length > 0
+                    ? loadedProperties
+                    : mockProperties
+            );
+
+            setAvailableDestinations(
+                loadedDestinations
+            );
+
+            setHasError(false);
+        } catch {
+            if (!mounted) {
+                return;
+            }
+
+            setAllProperties(
+                mockProperties
+            );
+
+            setHasError(false);
+        } finally {
+            if (mounted) {
+                setIsLoading(false);
+            }
+        }
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    // =========================================
+    // DESTINATION ALIASES
+    // =========================================
 
     const destinationAliases: Record<
         string,
@@ -123,67 +206,14 @@ function StaysContent() {
         );
 
     // =========================================
-    // PROPERTIES FROM SERVICE
-    // =========================================
-
-    const [properties, setProperties] =
-        useState<Property[]>([]);
-
-    const [isLoading, setIsLoading] =
-        useState(true);
-
-    const [hasError, setHasError] =
-        useState(false);
-
-    useEffect(() => {
-        try {
-            const loadedProperties =
-                getProperties();
-
-            const loadedDestinations =
-                getDestinations();
-
-            setProperties(
-                loadedProperties
-            );
-
-            setAvailableDestinations(
-                loadedDestinations
-            );
-
-            setHasError(false);
-        } catch {
-            setHasError(true);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    // =========================================
     // FILTER STATE
     // =========================================
 
-    const [allProperties, setAllProperties] =
-        useState<Property[]>([]);
-
-    useEffect(() => {
-        setAllProperties(
-            getProperties()
-        );
-    }, []);
-
     const [selectedCountry, setSelectedCountry] =
-        useState(
-            selectedDestination?.country ??
-            countryInEnglish ??
-            ""
-        );
+        useState("");
 
     const [selectedCity, setSelectedCity] =
-        useState(
-            selectedDestination?.name ??
-            ""
-        );
+        useState("");
 
     const [minPrice, setMinPrice] =
         useState("");
@@ -198,7 +228,34 @@ function StaysContent() {
         useState("default");
 
     // =========================================
-    // COUNTRIES
+    // INITIAL DESTINATION FILTER
+    // =========================================
+
+    useEffect(() => {
+        if (selectedDestination) {
+            setSelectedCountry(
+                selectedDestination.country
+            );
+
+            setSelectedCity(
+                selectedDestination.name
+            );
+
+            return;
+        }
+
+        if (countryInEnglish) {
+            setSelectedCountry(
+                countryInEnglish
+            );
+        }
+    }, [
+        selectedDestination,
+        countryInEnglish,
+    ]);
+
+    // =========================================
+    // VISIBLE DESTINATIONS
     // =========================================
 
     const visibleDestinations =
@@ -215,6 +272,10 @@ function StaysContent() {
             availableDestinations,
             allProperties,
         ]);
+
+    // =========================================
+    // COUNTRIES
+    // =========================================
 
     const countries =
         useMemo(() => {
@@ -396,7 +457,7 @@ function StaysContent() {
         ]);
 
     // =========================================
-    // RESET
+    // RESET FILTERS
     // =========================================
 
     const handleResetFilters =
@@ -438,32 +499,6 @@ function StaysContent() {
                 availableDestinations,
             ]
         );
-
-    // =========================================
-    // LOADING
-    // =========================================
-
-    if (isLoading) {
-        return (
-            <main>
-                <section className="section">
-                    <div className="container">
-                        <p className="admin-label">
-                            STAYWAY
-                        </p>
-
-                        <h1 className="page-title">
-                            Loading...
-                        </h1>
-
-                        <p className="admin-description">
-                            Loading available stays...
-                        </p>
-                    </div>
-                </section>
-            </main>
-        );
-    }
 
     // =========================================
     // ERROR
@@ -870,17 +905,5 @@ function StaysContent() {
                 </div>
             </section>
         </main>
-    );
-}
-
-export default function StaysPage() {
-    return (
-        <Suspense
-            fallback={
-                <p>Loading...</p>
-            }
-        >
-            <StaysContent />
-        </Suspense>
     );
 }

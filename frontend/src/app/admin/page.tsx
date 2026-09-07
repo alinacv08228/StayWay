@@ -17,6 +17,12 @@ import {
 import { useUser } from "../../context/UserContext";
 
 import { useSettings } from "../../context/SettingsContext";
+
+import {
+    getDestinationUiTranslation,
+    getLocalizedCountryName,
+    getLocalizedCityName,
+} from "../../data/translations";
 import { currencyInfo } from "../../data/currency";
 
 import {
@@ -34,22 +40,23 @@ import {
 } from "../../services/propertyService";
 
 import {
+    createRoom,
+    deleteRoom,
+    getRooms,
+    updateRoom,
+} from "../../services/roomService";
+
+import {
     createDestination,
     getDestinations,
     updateDestination,
 } from "../../services/destinationService";
 
-import {
-    createRoom,
-    deleteRoom,
-    getRoomsByPropertyId,
-    updateRoom,
-} from "../../services/roomService";
 
 export default function AdminPage() {
     const { currentUser } = useUser();
 
-    const { currency } = useSettings();
+    const { currency, language } = useSettings();
 
     const selectedCurrency =
         currencyInfo[currency] ??
@@ -73,6 +80,51 @@ export default function AdminPage() {
     const [allDestinations, setAllDestinations] =
         useState<Destination[]>(mockDestinations);
 
+    const [allRooms, setAllRooms] =
+        useState<Room[]>(getRooms());
+
+    const [selectedPropertyId, setSelectedPropertyId] =
+        useState<number | null>(null);
+
+    const [isRoomFormOpen, setIsRoomFormOpen] =
+        useState(false);
+
+    const [editingRoomId, setEditingRoomId] =
+        useState<number | null>(null);
+
+    const [roomName, setRoomName] =
+        useState("");
+
+    const [roomDescription, setRoomDescription] =
+        useState("");
+
+    const [roomGuests, setRoomGuests] =
+        useState("2");
+
+    const [roomSize, setRoomSize] =
+        useState("");
+
+    const [roomBed, setRoomBed] =
+        useState("");
+
+    const [roomPrice, setRoomPrice] =
+        useState("");
+
+    const [roomImage, setRoomImage] =
+        useState("");
+
+    const [roomFeatures, setRoomFeatures] =
+        useState("");
+
+    const [roomFreeCancellation, setRoomFreeCancellation] =
+        useState(true);
+
+    const [roomNoPrepayment, setRoomNoPrepayment] =
+        useState(true);
+
+    const [roomError, setRoomError] =
+        useState("");
+
     const [isPropertyFormOpen, setIsPropertyFormOpen] =
         useState(false);
 
@@ -89,12 +141,6 @@ export default function AdminPage() {
         useState("France");
 
     const [propertyCity, setPropertyCity] =
-        useState("");
-
-    const [isNewCity, setIsNewCity] =
-        useState(false);
-
-    const [newCityName, setNewCityName] =
         useState("");
 
     const [cityImage, setCityImage] =
@@ -148,44 +194,143 @@ export default function AdminPage() {
     // BOOKING SEARCH / FILTER / SORT
     // =========================================
 
-    const [bookingSearch, setBookingSearch] =
-        useState("");
-
+    const [bookingSearch, setBookingSearch] = useState("");
     const [bookingStatusFilter, setBookingStatusFilter] =
         useState("All");
-
-    const [bookingSort, setBookingSort] =
-        useState("newest");
+    const [bookingSort, setBookingSort] = useState("newest");
+    const [bookingUserFilter, setBookingUserFilter] =
+        useState("All");
 
     // =========================================
-    // COUNTRIES
-    // =========================================
+// ADMIN COUNTRIES
+// =========================================
 
-    const countries = useMemo(() => {
-        return Array.from(
-            new Set(
-                allDestinations.map(
-                    (destination) =>
-                        destination.country
-                )
-            )
-        ).sort();
-    }, [allDestinations]);
+    const adminCountries = [
+        "France",
+        "Italy",
+        "Spain",
+        "Germany",
+        "United Kingdom",
+        "Greece",
+        "Portugal",
+        "Austria",
+        "Netherlands",
+        "Czech Republic",
+    ];
 
     // =========================================
     // CITIES FOR SELECTED COUNTRY
     // =========================================
 
-    const availableCities = useMemo(() => {
-        return allDestinations
-            .filter(
+    const adminCities: Record<string, string[]> = {
+        France: [
+            "Paris",
+            "Nice",
+            "Lyon",
+            "Marseille",
+        ],
+
+        Italy: [
+            "Rome",
+            "Milan",
+            "Venice",
+            "Florence",
+        ],
+
+        Spain: [
+            "Madrid",
+            "Barcelona",
+            "Valencia",
+            "Seville",
+        ],
+
+        Germany: [
+            "Berlin",
+            "Munich",
+            "Hamburg",
+            "Frankfurt",
+        ],
+
+        "United Kingdom": [
+            "London",
+            "Edinburgh",
+            "Manchester",
+            "Liverpool",
+        ],
+
+        Greece: [
+            "Athens",
+            "Thessaloniki",
+            "Santorini",
+            "Mykonos",
+        ],
+
+        Portugal: [
+            "Lisbon",
+            "Porto",
+            "Faro",
+            "Braga",
+        ],
+
+        Austria: [
+            "Vienna",
+            "Salzburg",
+            "Innsbruck",
+            "Graz",
+        ],
+
+        Netherlands: [
+            "Amsterdam",
+            "Rotterdam",
+            "The Hague",
+            "Utrecht",
+        ],
+
+        "Czech Republic": [
+            "Prague",
+            "Brno",
+            "Ostrava",
+            "Karlovy Vary",
+        ],
+    };
+    const adminAvailableCities = useMemo(() => {
+        const existingDestinations =
+            allDestinations.filter(
                 (destination) =>
-                    destination.country ===
-                    propertyCountry
-            )
-            .sort((a, b) =>
-                a.name.localeCompare(b.name)
+                    destination.country === propertyCountry
             );
+
+        const cities =
+            adminCities[propertyCountry] ?? [];
+
+        return cities.map((city) => {
+            const existingDestination =
+                existingDestinations.find(
+                    (destination) =>
+                        destination.name
+                            .toLowerCase()
+                            .trim() ===
+                        city
+                            .toLowerCase()
+                            .trim()
+                );
+
+            if (existingDestination) {
+                return {
+                    id: existingDestination.id,
+                    name: existingDestination.name,
+                };
+            }
+
+            const cityIndex = Object.values(adminCities)
+                .flat()
+                .indexOf(city);
+
+            return {
+                id: -(cityIndex + 1),
+                name: city,
+            };
+        });
     }, [propertyCountry, allDestinations]);
 
     // =========================================
@@ -293,92 +438,94 @@ export default function AdminPage() {
         });
     }, [userSearch, userRoleFilter]);
 
+
     // =========================================
-    // FILTERED / SORTED BOOKINGS
-    // =========================================
+// FILTERED / SORTED BOOKINGS
+// =========================================
 
     const filteredBookings = useMemo(() => {
         const search =
             bookingSearch.trim().toLowerCase();
 
-        const result = allBookings.filter(
-            (booking) => {
-                const property =
-                    allProperties.find(
-                        (item) =>
-                            item.id ===
-                            booking.propertyId
-                    );
+        let result = allBookings.filter((booking) => {
+            const property = allProperties.find(
+                (item) => item.id === booking.propertyId
+            );
 
-                const user =
-                    users.find(
-                        (item) =>
-                            item.id ===
-                            booking.userId
-                    );
+            const user = users.find(
+                (item) => item.id === booking.userId
+            );
 
-                const propertyName =
-                    property?.name
-                        .toLowerCase() ?? "";
+            const propertyName =
+                property?.name.toLowerCase() ?? "";
 
-                const userName =
-                    user?.name
-                        .toLowerCase() ?? "";
+            const userName =
+                user?.name.toLowerCase() ?? "";
 
-                const status =
-                    booking.status.toLowerCase();
+            const checkIn =
+                booking.checkIn.toLowerCase();
 
-                const matchesSearch =
-                    propertyName.includes(search) ||
-                    userName.includes(search) ||
-                    status.includes(search);
+            const checkOut =
+                booking.checkOut.toLowerCase();
 
-                const matchesStatus =
-                    bookingStatusFilter ===
-                    "All" ||
-                    booking.status ===
-                    bookingStatusFilter;
+            const status =
+                booking.status.toLowerCase();
 
+            const matchesSearch =
+                !search ||
+                propertyName.includes(search) ||
+                userName.includes(search) ||
+                checkIn.includes(search) ||
+                checkOut.includes(search) ||
+                status.includes(search);
+
+            const matchesUser =
+                bookingUserFilter === "All" ||
+                booking.userId === Number(bookingUserFilter);
+
+            const matchesStatus =
+                bookingStatusFilter === "All" ||
+                booking.status === bookingStatusFilter;
+
+            return (
+                matchesSearch &&
+                matchesUser &&
+                matchesStatus
+            );
+        });
+
+        result = [...result].sort((a, b) => {
+            if (bookingSort === "oldest") {
                 return (
-                    matchesSearch &&
-                    matchesStatus
+                    new Date(a.checkIn).getTime() -
+                    new Date(b.checkIn).getTime()
                 );
             }
-        );
 
-        return [...result].sort((a, b) => {
-            switch (bookingSort) {
-                case "oldest":
-                    return (
-                        new Date(a.checkIn).getTime() -
-                        new Date(b.checkIn).getTime()
-                    );
-
-                case "totalDesc":
-                    return (
-                        b.totalPrice -
-                        a.totalPrice
-                    );
-
-                case "totalAsc":
-                    return (
-                        a.totalPrice -
-                        b.totalPrice
-                    );
-
-                default:
-                    return (
-                        new Date(b.checkIn).getTime() -
-                        new Date(a.checkIn).getTime()
-                    );
+            if (bookingSort === "totalDesc") {
+                return b.totalPrice - a.totalPrice;
             }
+
+            if (bookingSort === "totalAsc") {
+                return a.totalPrice - b.totalPrice;
+            }
+
+            return (
+                new Date(b.checkIn).getTime() -
+                new Date(a.checkIn).getTime()
+            );
         });
+
+        return result;
     }, [
         allBookings,
         allProperties,
+        users,
+        currentUser,
         bookingSearch,
         bookingStatusFilter,
         bookingSort,
+        bookingUserFilter,
     ]);
 
     // =========================================
@@ -518,7 +665,7 @@ export default function AdminPage() {
         setPropertyName("");
 
         setPropertyDescription("");
-        
+
         setPropertyCountry(
             "France"
         );
@@ -531,9 +678,6 @@ export default function AdminPage() {
             "Paris"
         );
 
-        setIsNewCity(false);
-
-        setNewCityName("");
 
         setCityImage("");
 
@@ -558,104 +702,109 @@ export default function AdminPage() {
     // COUNTRY CHANGE
     // =========================================
 
-    const handleCountryChange = (
-        value: string
-    ) => {
-        setPropertyCountry(
-            value
-        );
-
-        setIsNewCity(false);
-
-        setNewCityName("");
+    const handleCountryChange = (value: string) => {
+        setPropertyError("");
+        setPropertyCountry(value);
 
         setCityImage("");
+        setCountryImage("");
 
-        const allDestinations =
-            getDestinations();
+        const destinations = getDestinations();
 
-        const firstCity =
-            allDestinations.find(
-                (destination) =>
-                    destination.country ===
-                    value
-            );
+        // Căutăm dacă primul oraș din catalogul Admin
+        // există deja în destinations.
+        const firstAdminCity = adminCities[value]?.[0];
 
-        if (firstCity) {
-            setPropertyDestinationId(
-                String(firstCity.id)
-            );
-
-            setPropertyCity(
-                firstCity.name
-            );
-
-            setCityImage(
-                firstCity.image
-            );
-
-            setCountryImage(
-                firstCity.countryImage
-            );
-        } else {
-            setPropertyDestinationId(
-                ""
-            );
-
-            setPropertyCity(
-                ""
-            );
+        if (!firstAdminCity) {
+            setPropertyDestinationId("");
+            setPropertyCity("");
+            return;
         }
+
+        const existingDestination = destinations.find(
+            (destination) =>
+                destination.country === value &&
+                destination.name.toLowerCase().trim() ===
+                firstAdminCity.toLowerCase().trim()
+        );
+
+        // Dacă orașul există deja, folosim ID-ul real.
+        if (existingDestination) {
+            setPropertyDestinationId(
+                String(existingDestination.id)
+            );
+            setPropertyCity(
+                existingDestination.name
+            );
+            setCityImage(
+                existingDestination.image
+            );
+            setCountryImage(
+                existingDestination.countryImage
+            );
+
+            return;
+        }
+
+        // Dacă orașul nu există încă,
+        // folosim un ID temporar negativ.
+        const cityIndex = Object.values(adminCities)
+            .flat()
+            .indexOf(firstAdminCity);
+
+        const temporaryCityId = -(cityIndex + 1);
+
+        setPropertyDestinationId(
+            String(temporaryCityId)
+        );
+        setPropertyCity(firstAdminCity);
     };
 
     // =========================================
     // CITY CHANGE
     // =========================================
 
-    const handleCityChange = (
-        value: string
-    ) => {
+    const handleCityChange = (value: string) => {
+        setPropertyError("");
+
         if (value === "__new__") {
-            setIsNewCity(true);
-
-            setPropertyDestinationId(
-                ""
-            );
-
+            setPropertyDestinationId("");
             setPropertyCity("");
-
-            setNewCityName("");
-
             setCityImage("");
-
             return;
         }
 
-        setIsNewCity(false);
+        const numericValue = Number(value);
 
-        setPropertyDestinationId(
-            value
+        // Oraș predefinit care încă nu există
+        if (numericValue < 0) {
+            const city = adminAvailableCities.find(
+                (item) => item.id === numericValue
+            );
+
+            if (city) {
+                // Păstrăm ID-ul temporar negativ,
+                // pentru ca orașul să poată fi creat
+                // atunci când salvăm proprietatea.
+                setPropertyDestinationId(value);
+                setPropertyCity(city.name);
+                setCityImage("");
+
+                return;
+            }
+        }
+
+        // Oraș care există deja
+        setPropertyDestinationId(value);
+
+        const destination = getDestinations().find(
+            (item) => item.id === numericValue
         );
 
-        const destination =
-            getDestinations().find(
-                (item) =>
-                    item.id ===
-                    Number(value)
-            );
-
         if (destination) {
-            setPropertyCity(
-                destination.name
-            );
-
-            setCityImage(
-                destination.image
-            );
-
-            setCountryImage(
-                destination.countryImage
-            );
+            setPropertyCity(destination.name);
+            setCityImage(destination.image);
+            setCountryImage(destination.countryImage);
         }
     };
 
@@ -691,25 +840,20 @@ export default function AdminPage() {
         /*
          * VALIDARE CITY
          */
-        if (
-            isNewCity &&
-            !newCityName.trim()
-        ) {
+        if (!propertyDestinationId) {
             setPropertyError(
-                "Please enter the new city name."
+                "Please select a valid city."
             );
-
             return;
         }
 
         if (
-            isNewCity &&
+            Number(propertyDestinationId) < 0 &&
             !cityImage.trim()
         ) {
             setPropertyError(
-                "Please enter an image for the new city."
+                "Please enter an image for the city."
             );
-
             return;
         }
 
@@ -776,67 +920,35 @@ export default function AdminPage() {
         /*
          * NEW CITY
          */
-        if (isNewCity) {
-            const cityName =
-                newCityName.trim();
+        /*
+  * SELECTED CITY
+  */
 
-            const existingDestination =
-                getDestinations().find(
-                    (destination) =>
-                        destination.country
-                            .toLowerCase()
-                            .trim() ===
-                        propertyCountry
-                            .toLowerCase()
-                            .trim() &&
-                        destination.name
-                            .toLowerCase()
-                            .trim() ===
-                        cityName
-                            .toLowerCase()
-                            .trim()
+        if (
+            Number.isNaN(
+                destinationId
+            )
+        ) {
+            setPropertyError(
+                "Please select a valid city."
+            );
+
+            return;
+        }
+
+        /*
+         * Oraș predefinit care încă
+         * nu există în destinations.
+         */
+        if (destinationId < 0) {
+            const selectedCity =
+                adminAvailableCities.find(
+                    (city) =>
+                        city.id ===
+                        destinationId
                 );
 
-            if (
-                existingDestination
-            ) {
-                destinationId =
-                    existingDestination.id;
-
-                updateDestination({
-                    ...existingDestination,
-                    image:
-                        cityImage.trim(),
-                    countryImage:
-                        countryImage.trim(),
-                });
-            } else {
-                const newDestination =
-                    createDestination({
-                        id:
-                            Date.now(),
-                        name:
-                        cityName,
-                        country:
-                        propertyCountry,
-                        image:
-                            cityImage.trim(),
-                        countryImage:
-                            countryImage.trim(),
-                    });
-
-                destinationId =
-                    newDestination.id;
-            }
-        } else {
-            /*
-             * EXISTING CITY
-             */
-            if (
-                Number.isNaN(
-                    destinationId
-                )
-            ) {
+            if (!selectedCity) {
                 setPropertyError(
                     "Please select a valid city."
                 );
@@ -844,6 +956,25 @@ export default function AdminPage() {
                 return;
             }
 
+            const newDestination =
+                createDestination({
+                    id: Date.now(),
+                    name:
+                    selectedCity.name,
+                    country:
+                    propertyCountry,
+                    image:
+                        cityImage.trim(),
+                    countryImage:
+                        countryImage.trim(),
+                });
+
+            destinationId =
+                newDestination.id;
+        } else {
+            /*
+             * Oraș care există deja.
+             */
             const existingDestination =
                 getDestinations().find(
                     (destination) =>
@@ -851,9 +982,7 @@ export default function AdminPage() {
                         destinationId
                 );
 
-            if (
-                !existingDestination
-            ) {
+            if (!existingDestination) {
                 setPropertyError(
                     "Please select a valid city."
                 );
@@ -863,9 +992,7 @@ export default function AdminPage() {
 
             /*
              * Actualizăm imaginile
-             * orașului și țării dacă
-             * Admin-ul a modificat
-             * aceste valori.
+             * orașului și țării.
              */
             updateDestination({
                 ...existingDestination,
@@ -977,10 +1104,6 @@ export default function AdminPage() {
             destination?.name ?? ""
         );
 
-        setIsNewCity(false);
-
-        setNewCityName("");
-
         setCityImage(
             destination?.image ?? ""
         );
@@ -1037,6 +1160,24 @@ export default function AdminPage() {
         setAllProperties(
             getProperties()
         );
+    };
+
+    const handleAddRoom = () => {
+        setEditingRoomId(null);
+
+        setRoomName("");
+        setRoomDescription("");
+        setRoomGuests("2");
+        setRoomSize("");
+        setRoomBed("");
+        setRoomPrice("");
+        setRoomImage("");
+        setRoomFeatures("");
+        setRoomFreeCancellation(true);
+        setRoomNoPrepayment(true);
+        setRoomError("");
+
+        setIsRoomFormOpen(true);
     };
 
     // =========================================
@@ -1312,43 +1453,33 @@ export default function AdminPage() {
                                         />
                                     </div>
 
+
                                     {/* COUNTRY */}
 
                                     <div className="form-group">
                                         <label htmlFor="propertyCountry">
-                                            Country
+                                            {getDestinationUiTranslation(language, "country")}
                                         </label>
 
                                         <select
                                             id="propertyCountry"
-                                            value={
-                                                propertyCountry
-                                            }
-                                            onChange={(
-                                                event
-                                            ) =>
+                                            value={propertyCountry}
+                                            onChange={(event) =>
                                                 handleCountryChange(
-                                                    event
-                                                        .target
-                                                        .value
+                                                    event.target.value
                                                 )
                                             }
                                         >
-                                            {countries.map(
-                                                (
-                                                    country
-                                                ) => (
+                                            {adminCountries.map(
+                                                (country) => (
                                                     <option
-                                                        key={
-                                                            country
-                                                        }
-                                                        value={
-                                                            country
-                                                        }
+                                                        key={country}
+                                                        value={country}
                                                     >
-                                                        {
-                                                            country
-                                                        }
+                                                        {getLocalizedCountryName(
+                                                            country,
+                                                            language
+                                                        )}
                                                     </option>
                                                 )
                                             )}
@@ -1359,64 +1490,41 @@ export default function AdminPage() {
 
                                     <div className="form-group">
                                         <label htmlFor="propertyCity">
-                                            City
+                                            {getDestinationUiTranslation(language, "city")}
                                         </label>
 
                                         <select
                                             id="propertyCity"
-                                            value={
-                                                isNewCity
-                                                    ? "__new__"
-                                                    : propertyDestinationId
-                                            }
+                                            value={propertyDestinationId}
                                             onChange={(event) =>
                                                 handleCityChange(
                                                     event.target.value
                                                 )
                                             }
                                         >
-                                            {availableCities.map(
+                                            {adminAvailableCities.map(
                                                 (city) => (
                                                     <option
                                                         key={city.id}
                                                         value={city.id}
                                                     >
-                                                        {city.name}
+                                                        {getLocalizedCityName(
+                                                            city.name,
+                                                            language
+                                                        )}
                                                     </option>
                                                 )
                                             )}
 
-                                            <option value="__new__">
-                                                + Add new city
-                                            </option>
                                         </select>
                                     </div>
 
-                                    {isNewCity && (
-                                        <div className="form-group">
-                                            <label htmlFor="newCityName">
-                                                New city name
-                                            </label>
-
-                                            <input
-                                                id="newCityName"
-                                                type="text"
-                                                value={newCityName}
-                                                onChange={(event) =>
-                                                    setNewCityName(
-                                                        event.target.value
-                                                    )
-                                                }
-                                                placeholder="City name"
-                                            />
-                                        </div>
-                                    )}
 
                                     {/* CITY IMAGE */}
 
                                     <div className="form-group">
                                         <label htmlFor="cityImage">
-                                            City image
+                                            {getDestinationUiTranslation(language, "cityImage")}
                                         </label>
 
                                         <input
@@ -1436,7 +1544,7 @@ export default function AdminPage() {
 
                                     <div className="form-group">
                                         <label htmlFor="countryImage">
-                                            Country image
+                                            {getDestinationUiTranslation(language, "countryImage")}
                                         </label>
 
                                         <input
@@ -1621,7 +1729,10 @@ export default function AdminPage() {
                                 }
                             >
                                 <option value="All">
-                                    All destinations
+                                    {getDestinationUiTranslation(
+                                        language,
+                                        "allDestinations"
+                                    )}
                                 </option>
 
                                 {allDestinations.map(
@@ -1634,9 +1745,10 @@ export default function AdminPage() {
                                                 destination.name
                                             }
                                         >
-                                            {
-                                                destination.name
-                                            }
+                                            {getLocalizedCityName(
+                                                destination.name,
+                                                language
+                                            )}
                                         </option>
                                     )
                                 )}
@@ -1772,16 +1884,18 @@ export default function AdminPage() {
 
                                                 <span>
                                                     <strong>
-                                                        {
-                                                            destination?.name
-                                                        }
+                                                        {getLocalizedCityName(
+                                                            destination?.name ?? "",
+                                                            language
+                                                        )}
                                                     </strong>
 
                                                     <br />
 
-                                                    {
-                                                        destination?.country
-                                                    }
+                                                    {getLocalizedCountryName(
+                                                        destination?.country ?? "",
+                                                        language
+                                                    )}
 
                                                     <br />
 
@@ -1805,6 +1919,18 @@ export default function AdminPage() {
                                                 </span>
 
                                                 <div className="admin-row-actions">
+
+                                                    <button
+                                                        type="button"
+                                                        className="admin-action-button"
+                                                        onClick={() => {
+                                                            setSelectedPropertyId(
+                                                                property.id
+                                                            );
+                                                        }}
+                                                    >
+                                                        Manage rooms
+                                                    </button>
 
                                                     <button
                                                         type="button"
@@ -1841,6 +1967,479 @@ export default function AdminPage() {
                         </div>
 
                     </section>
+
+                    {/* ROOMS */}
+
+                    {selectedPropertyId !== null && (
+                        <section className="admin-section">
+
+                            {isRoomFormOpen && (
+                                <div className="admin-room-form">
+
+                                    <div className="admin-room-form-header">
+                                        <div>
+                                            <h3>
+                                                {editingRoomId === null
+                                                    ? "Add room"
+                                                    : "Edit room"}
+                                            </h3>
+
+                                            <p>
+                                                {editingRoomId === null
+                                                    ? "Add a new room and provide its details."
+                                                    : "Update the details and facilities of this room."}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {roomError && (
+                                        <p className="admin-form-error">
+                                            {roomError}
+                                        </p>
+                                    )}
+
+                                    <div className="admin-room-fields-grid">
+
+                                        {/* Room name */}
+                                        <div className="admin-room-field">
+                                            <label>Room name</label>
+
+                                            <input
+                                                type="text"
+                                                value={roomName}
+                                                onChange={(e) =>
+                                                    setRoomName(e.target.value)
+                                                }
+                                                placeholder="Deluxe Double Room"
+                                            />
+                                        </div>
+
+                                        {/* Guests */}
+                                        <div className="admin-room-field">
+                                            <label>Maximum guests</label>
+
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={roomGuests}
+                                                onChange={(e) =>
+                                                    setRoomGuests(e.target.value)
+                                                }
+                                                placeholder="2"
+                                            />
+                                        </div>
+
+                                        {/* Size */}
+                                        <div className="admin-room-field">
+                                            <label>Room size (m²)</label>
+
+                                            <input
+                                                type="text"
+                                                value={roomSize}
+                                                onChange={(e) =>
+                                                    setRoomSize(e.target.value)
+                                                }
+                                                placeholder="28"
+                                            />
+                                        </div>
+
+                                        {/* Bed */}
+                                        <div className="admin-room-field">
+                                            <label>Bed type</label>
+
+                                            <input
+                                                type="text"
+                                                value={roomBed}
+                                                onChange={(e) =>
+                                                    setRoomBed(e.target.value)
+                                                }
+                                                placeholder="1 king bed"
+                                            />
+                                        </div>
+
+                                        {/* Price */}
+                                        <div className="admin-room-field">
+                                            <label>Room price per night</label>
+
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={roomPrice}
+                                                onChange={(e) =>
+                                                    setRoomPrice(e.target.value)
+                                                }
+                                                placeholder="150"
+                                            />
+                                        </div>
+
+                                        {/* Image */}
+                                        <div className="admin-room-field">
+                                            <label>Room image</label>
+
+                                            <input
+                                                type="text"
+                                                value={roomImage}
+                                                onChange={(e) =>
+                                                    setRoomImage(e.target.value)
+                                                }
+                                                placeholder="/hotel-paris.jpg"
+                                            />
+                                        </div>
+
+                                        {/* Description */}
+                                        <div className="admin-room-field admin-room-field-full">
+                                            <label>Room description</label>
+
+                                            <textarea
+                                                value={roomDescription}
+                                                onChange={(e) =>
+                                                    setRoomDescription(e.target.value)
+                                                }
+                                                placeholder="Comfortable room with modern facilities."
+                                                rows={5}
+                                            />
+                                        </div>
+
+                                    </div>
+
+                                    {/* Facilities */}
+                                    <div className="admin-room-facilities">
+                                        <label className="admin-room-section-label">
+                                            Facilities
+                                        </label>
+
+                                        <div className="admin-room-facilities-grid">
+
+                                            {[
+                                                "Free Wi-Fi",
+                                                "Air conditioning",
+                                                "Private bathroom",
+                                                "TV",
+                                                "Private balcony",
+                                                "Parking",
+                                                "Room service",
+                                                "Breakfast included",
+                                            ].map((facility) => {
+
+                                                const selectedFeatures =
+                                                    roomFeatures
+                                                        .split(",")
+                                                        .map((feature) => feature.trim())
+                                                        .filter(Boolean);
+
+                                                const isSelected =
+                                                    selectedFeatures.includes(facility);
+
+                                                return (
+                                                    <label
+                                                        key={facility}
+                                                        className={`admin-room-feature ${
+                                                            isSelected
+                                                                ? "selected"
+                                                                : ""
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isSelected}
+                                                            onChange={(e) => {
+                                                                const currentFeatures =
+                                                                    roomFeatures
+                                                                        .split(",")
+                                                                        .map((feature) =>
+                                                                            feature.trim()
+                                                                        )
+                                                                        .filter(Boolean);
+
+                                                                const updatedFeatures =
+                                                                    e.target.checked
+                                                                        ? [
+                                                                            ...currentFeatures,
+                                                                            facility,
+                                                                        ]
+                                                                        : currentFeatures.filter(
+                                                                            (feature) =>
+                                                                                feature !==
+                                                                                facility
+                                                                        );
+
+                                                                setRoomFeatures(
+                                                                    updatedFeatures.join(", ")
+                                                                );
+                                                            }}
+                                                        />
+
+                                                        <span>{facility}</span>
+                                                    </label>
+                                                );
+                                            })}
+
+                                        </div>
+                                    </div>
+
+                                    {/* Booking options */}
+                                    <div className="admin-room-options">
+
+                                        <label className="admin-room-option">
+                                            <input
+                                                type="checkbox"
+                                                checked={roomFreeCancellation}
+                                                onChange={(e) =>
+                                                    setRoomFreeCancellation(
+                                                        e.target.checked
+                                                    )
+                                                }
+                                            />
+
+                                            <span>Free cancellation</span>
+                                        </label>
+
+                                        <label className="admin-room-option">
+                                            <input
+                                                type="checkbox"
+                                                checked={roomNoPrepayment}
+                                                onChange={(e) =>
+                                                    setRoomNoPrepayment(
+                                                        e.target.checked
+                                                    )
+                                                }
+                                            />
+
+                                            <span>No prepayment needed</span>
+                                        </label>
+
+                                    </div>
+
+                                    <div className="admin-room-form-actions">
+
+                                        <button
+                                            type="button"
+                                            className="admin-room-cancel-button"
+                                            onClick={() => {
+                                                setIsRoomFormOpen(false);
+                                                setEditingRoomId(null);
+                                                setRoomError("");
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="admin-room-save-button"
+                                            onClick={() => {
+
+                                                if (!roomName.trim()) {
+                                                    setRoomError(
+                                                        "Room name is required."
+                                                    );
+                                                    return;
+                                                }
+
+                                                if (!roomPrice.trim()) {
+                                                    setRoomError(
+                                                        "Room price is required."
+                                                    );
+                                                    return;
+                                                }
+
+                                                if (selectedPropertyId === null) {
+                                                    return;
+                                                }
+
+                                                const roomData = {
+                                                    propertyId: selectedPropertyId,
+                                                    name: roomName.trim(),
+                                                    description:
+                                                        roomDescription.trim(),
+                                                    guests:
+                                                        Number(roomGuests) || 1,
+                                                    size: roomSize.trim(),
+                                                    bed: roomBed.trim(),
+                                                    pricePerNight:
+                                                        Number(roomPrice) || 0,
+                                                    image: roomImage.trim(),
+                                                    features:
+                                                        roomFeatures
+                                                            .split(",")
+                                                            .map((feature) =>
+                                                                feature.trim()
+                                                            )
+                                                            .filter(Boolean),
+                                                    freeCancellation:
+                                                    roomFreeCancellation,
+                                                    noPrepayment:
+                                                    roomNoPrepayment,
+                                                };
+
+                                                if (editingRoomId === null) {
+                                                    createRoom(roomData);
+                                                } else {
+                                                    updateRoom(
+                                                        editingRoomId,
+                                                        roomData
+                                                    );
+                                                }
+
+                                                setAllRooms(getRooms());
+                                                setIsRoomFormOpen(false);
+                                                setEditingRoomId(null);
+                                                setRoomError("");
+                                            }}
+                                        >
+                                            {editingRoomId === null
+                                                ? "Add room"
+                                                : "Save changes"}
+                                        </button>
+
+                                    </div>
+
+                                </div>
+                            )}
+
+                            <div className="admin-section-header">
+
+                                <div>
+                                    <h2>Rooms</h2>
+
+                                    <p>
+                                        Manage rooms for{" "}
+                                        {
+                                            allProperties.find(
+                                                (property) =>
+                                                    property.id ===
+                                                    selectedPropertyId
+                                            )?.name
+                                        }
+                                        .
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="admin-action-button"
+                                    onClick={handleAddRoom}
+                                >
+                                    + Add room
+                                </button>
+
+                            </div>
+
+                            <div className="admin-room-table">
+
+                                <div className="admin-room-table-header">
+                                    <span>Room</span>
+                                    <span>Guests</span>
+                                    <span>Size</span>
+                                    <span>Price</span>
+                                    <span>Actions</span>
+                                </div>
+
+                                {allRooms
+                                    .filter(
+                                        (room) =>
+                                            room.propertyId ===
+                                            selectedPropertyId
+                                    )
+                                    .map((room) => (
+
+                                        <div
+                                            className="admin-room-table-row"
+                                            key={room.id}
+                                        >
+
+                                            <strong>
+                                                {room.name}
+                                            </strong>
+
+                                            <span>
+                            {room.guests} guests
+                        </span>
+
+                                            <span>
+                            {room.size}
+                        </span>
+
+                                            <span>
+                            {formatPrice(
+                                room.pricePerNight
+                            )}{" "}
+                                                / night
+                        </span>
+
+                                            <div className="admin-row-actions">
+
+                                                <button
+                                                    type="button"
+                                                    className="admin-edit-button"
+                                                    onClick={() => {
+                                                        setEditingRoomId(room.id);
+
+                                                        setRoomName(room.name);
+                                                        setRoomDescription(
+                                                            room.description
+                                                        );
+                                                        setRoomGuests(
+                                                            String(room.guests)
+                                                        );
+                                                        setRoomSize(
+                                                            String(room.size)
+                                                        );
+                                                        setRoomBed(room.bed);
+                                                        setRoomPrice(
+                                                            String(
+                                                                room.pricePerNight
+                                                            )
+                                                        );
+                                                        setRoomImage(room.image);
+                                                        setRoomFeatures(
+                                                            room.features.join(", ")
+                                                        );
+                                                        setRoomFreeCancellation(
+                                                            room.freeCancellation ??
+                                                            true
+                                                        );
+                                                        setRoomNoPrepayment(
+                                                            room.noPrepayment ??
+                                                            true
+                                                        );
+
+                                                        setRoomError("");
+                                                        setIsRoomFormOpen(true);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="admin-delete-button"
+                                                    onClick={() => {
+                                                        const confirmed =
+                                                            window.confirm(
+                                                                `Delete "${room.name}"?`
+                                                            );
+
+                                                        if (!confirmed) {
+                                                            return;
+                                                        }
+
+                                                        deleteRoom(room.id);
+                                                        setAllRooms(getRooms());
+                                                    }}
+                                                >
+                                                    Delete
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+                                    ))}
+
+                            </div>
+
+                        </section>
+                    )}
 
                     {/* USERS */}
 
@@ -1980,9 +2579,10 @@ export default function AdminPage() {
 
                     </section>
 
+
                     {/* BOOKINGS */}
 
-                    <section className="admin-section">
+                    <section className="admin-section admin-bookings-section">
 
                         <div className="admin-section-header">
 
@@ -1992,20 +2592,20 @@ export default function AdminPage() {
                                 </h2>
 
                                 <p>
-                                    Recent
-                                    reservations.
+                                    Manage all reservations.
                                 </p>
                             </div>
 
                         </div>
 
-                        {/* BOOKING SEARCH / FILTER / SORT */}
 
-                        <div className="admin-property-filters">
+                        {/* BOOKING FILTERS */}
+
+                        <div className="admin-booking-filters">
 
                             <input
                                 type="text"
-                                placeholder="Search bookings..."
+                                placeholder="Search by hotel, user or date..."
                                 value={bookingSearch}
                                 onChange={(event) =>
                                     setBookingSearch(
@@ -2013,6 +2613,28 @@ export default function AdminPage() {
                                     )
                                 }
                             />
+
+                            <select
+                                value={bookingUserFilter}
+                                onChange={(event) =>
+                                    setBookingUserFilter(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="All">
+                                    All users
+                                </option>
+
+                                {users.map((user) => (
+                                    <option
+                                        key={user.id}
+                                        value={user.id}
+                                    >
+                                        {user.name}
+                                    </option>
+                                ))}
+                            </select>
 
                             <select
                                 value={bookingStatusFilter}
@@ -2052,39 +2674,70 @@ export default function AdminPage() {
                                 </option>
 
                                 <option value="totalDesc">
-                                    Total: High to Low
+                                    Price: High to Low
                                 </option>
 
                                 <option value="totalAsc">
-                                    Total: Low to High
+                                    Price: Low to High
                                 </option>
                             </select>
 
+                            <button
+                                type="button"
+                                className="admin-booking-clear"
+                                onClick={() => {
+                                    setBookingSearch("");
+                                    setBookingStatusFilter("All");
+                                    setBookingSort("newest");
+                                    setBookingUserFilter("All");
+                                }}
+                            >
+                                Clear
+                            </button>
+
                         </div>
+
+                        {/* RESULTS COUNT */}
+
+                        <div className="admin-booking-results">
+
+                            Showing{" "}
+                            <strong>
+                                {filteredBookings.length}
+                            </strong>{" "}
+                            of{" "}
+                            <strong>
+                                {allBookings.length}
+                            </strong>{" "}
+                            bookings
+
+                        </div>
+
+                        {/* BOOKINGS TABLE */}
 
                         <div className="admin-table">
 
                             <div className="admin-table-header">
 
-                                <span>
-                                    Property
-                                </span>
+            <span>
+                Property
+            </span>
 
                                 <span>
-                                    User
-                                </span>
+                User
+            </span>
 
                                 <span>
-                                    Dates
-                                </span>
+                Dates
+            </span>
 
                                 <span>
-                                    Total
-                                </span>
+                Total
+            </span>
 
                                 <span>
-                                    Status
-                                </span>
+                Status
+            </span>
 
                             </div>
 
@@ -2106,6 +2759,7 @@ export default function AdminPage() {
                                             setBookingSort(
                                                 "newest"
                                             );
+                                            setBookingUserFilter("All");
                                         }}
                                     >
                                         Clear filters
@@ -2141,36 +2795,34 @@ export default function AdminPage() {
                                             >
 
                                                 <strong>
-                                                    {
-                                                        property?.name
-                                                    }
+                                                    {property?.name ??
+                                                        "Unknown property"}
                                                 </strong>
 
                                                 <span>
-                                                    {
-                                                        user?.name
-                                                    }
-                                                </span>
+                                {user?.name ??
+                                    "Unknown user"}
+                            </span>
 
                                                 <span>
-                                                    {new Date(
-                                                        booking.checkIn
-                                                    ).toLocaleDateString(
-                                                        "ro-RO"
-                                                    )}{" "}
+                                {new Date(
+                                    booking.checkIn
+                                ).toLocaleDateString(
+                                    "ro-RO"
+                                )}{" "}
                                                     →{" "}
                                                     {new Date(
                                                         booking.checkOut
                                                     ).toLocaleDateString(
                                                         "ro-RO"
                                                     )}
-                                                </span>
+                            </span>
 
                                                 <span>
-                                                    {formatPrice(
-                                                        booking.totalPrice
-                                                    )}
-                                                </span>
+                                {formatPrice(
+                                    booking.totalPrice
+                                )}
+                            </span>
 
                                                 <span
                                                     className="status-badge"
@@ -2185,10 +2837,8 @@ export default function AdminPage() {
                                                                 : "#fef0f0",
                                                     }}
                                                 >
-                                                    {
-                                                        booking.status
-                                                    }
-                                                </span>
+                                {booking.status}
+                            </span>
 
                                             </div>
                                         );
@@ -2199,6 +2849,7 @@ export default function AdminPage() {
                         </div>
 
                     </section>
+
 
                     {/* CURRENT MOCK USER */}
 
@@ -2245,3 +2896,4 @@ export default function AdminPage() {
         </main>
     );
 }
+

@@ -6,12 +6,244 @@ import { useEffect, useState } from "react";
 import { Property, Room } from "../types/types";
 import { useSettings } from "../context/SettingsContext";
 import { currencyInfo } from "../data/currency";
-import { getTranslation } from "../data/translations";
+import {
+    getTranslation,
+    getLocalizedRoomFeature,
+    getLocalizedBedType,
+} from "../data/translations";
 import { getRoomsByPropertyId } from "../services/roomService";
 
 type PropertyCardProps = {
     property: Property;
 };
+
+
+function getGuestsText(
+    count: number,
+    language: string
+): string {
+    const languageName =
+        language.split("|")[0];
+
+    switch (languageName) {
+        case "Română":
+            return `Până la ${count} ${
+                count === 1
+                    ? "oaspete"
+                    : "oaspeți"
+            }`;
+
+        case "Русский":
+            return `До ${count} ${
+                count === 1
+                    ? "гостя"
+                    : count >= 2 && count <= 4
+                        ? "гостей"
+                        : "гостей"
+            }`;
+
+        case "Українська":
+            return `До ${count} ${
+                count === 1
+                    ? "гостя"
+                    : count >= 2 && count <= 4
+                        ? "гостей"
+                        : "гостей"
+            }`;
+
+        case "Français":
+            return `Jusqu'à ${count} ${
+                count > 1
+                    ? "voyageurs"
+                    : "voyageur"
+            }`;
+
+        case "Español":
+            return `Hasta ${count} ${
+                count > 1
+                    ? "huéspedes"
+                    : "huésped"
+            }`;
+
+        case "Deutsch":
+            return `Bis zu ${count} ${
+                count === 1
+                    ? "Gast"
+                    : "Gäste"
+            }`;
+
+        case "Italiano":
+            return `Fino a ${count} ${
+                count === 1
+                    ? "ospite"
+                    : "ospiti"
+            }`;
+
+        case "Português":
+            return `Até ${count} ${
+                count === 1
+                    ? "hóspede"
+                    : "hóspedes"
+            }`;
+
+        case "Nederlands":
+            return `Tot ${count} ${
+                count === 1
+                    ? "gast"
+                    : "gasten"
+            }`;
+
+        case "Polski":
+            return `Do ${count} ${
+                count === 1
+                    ? "gościa"
+                    : "gości"
+            }`;
+
+        case "Čeština":
+            return `Až ${count} ${
+                count === 1
+                    ? "host"
+                    : "hosté"
+            }`;
+
+        case "Ελληνικά":
+            return `Έως ${count} ${
+                count === 1
+                    ? "επισκέπτη"
+                    : "επισκέπτες"
+            }`;
+
+        case "Български":
+            return `До ${count} ${
+                count === 1
+                    ? "гост"
+                    : "гости"
+            }`;
+
+        case "Türkçe":
+            return `En fazla ${count} ${
+                count === 1
+                    ? "misafir"
+                    : "misafir"
+            }`;
+
+        case "العربية":
+            return `حتى ${count} ضيوف`;
+
+        case "עברית":
+            return `עד ${count} ${
+                count === 1
+                    ? "אורח"
+                    : "אורחים"
+            }`;
+
+        case "हिन्दी":
+            return `${count} मेहमानों तक`;
+
+        case "ไทย":
+            return `สูงสุด ${count} ผู้เข้าพัก`;
+
+        case "Bahasa Indonesia":
+            return `Hingga ${count} tamu`;
+
+        case "Tiếng Việt":
+            return `Tối đa ${count} khách`;
+
+        case "한국어":
+            return `최대 ${count}명`;
+
+        case "日本語":
+            return `${count}名まで`;
+
+        case "中文":
+            return `最多 ${count} 位客人`;
+
+        case "繁體中文":
+            return `最多 ${count} 位房客`;
+
+        case "Català":
+            return `Fins a ${count} ${
+                count === 1
+                    ? "hoste"
+                    : "hostes"
+            }`;
+
+        case "Eesti":
+            return `Kuni ${count} külalist`;
+
+        case "Latviešu":
+            return `Līdz ${count} viesiem`;
+
+        case "Lietuvių":
+            return `Iki ${count} svečių`;
+
+        case "Slovenčina":
+            return `Až ${count} ${
+                count === 1
+                    ? "hosť"
+                    : "hostí"
+            }`;
+
+        case "Magyar":
+            return `Legfeljebb ${count} ${
+                count === 1
+                    ? "vendég"
+                    : "vendég"
+            }`;
+
+        case "Hrvatski":
+            return `Do ${count} ${
+                count === 1
+                    ? "gosta"
+                    : "gostiju"
+            }`;
+
+        case "Slovenščina":
+            return `Do ${count} gostov`;
+
+        case "Srpski":
+            return `Do ${count} ${
+                count === 1
+                    ? "gosta"
+                    : "gostiju"
+            }`;
+
+        case "Bosanski":
+            return `Do ${count} ${
+                count === 1
+                    ? "gosta"
+                    : "gostiju"
+            }`;
+
+        case "Norsk":
+            return `Opptil ${count} ${
+                count === 1
+                    ? "gjest"
+                    : "gjester"
+            }`;
+
+        case "Svenska":
+            return `Upp till ${count} ${
+                count === 1
+                    ? "gäst"
+                    : "gäster"
+            }`;
+
+        case "Dansk":
+            return `Op til ${count} ${
+                count === 1
+                    ? "gæst"
+                    : "gæster"
+            }`;
+
+        case "Suomi":
+            return `Enintään ${count} vierasta`;
+
+        default:
+            return `Up to ${count} guests`;
+    }
+}
 
 export default function PropertyCard({
                                          property,
@@ -48,15 +280,6 @@ export default function PropertyCard({
     const roomFeatures =
         firstRoom?.features ?? [];
 
-    /*
-     * Old mock rooms already contain the unit,
-     * for example "20–25 m²".
-     *
-     * New rooms created by Admin contain only
-     * the numeric value, for example 30.
-     *
-     * Therefore we add m² only for numeric values.
-     */
     const formattedRoomSize =
         firstRoom &&
         firstRoom.size !== undefined &&
@@ -91,7 +314,10 @@ export default function PropertyCard({
 
                     <div className="property-rating-box">
                         <span className="property-rating-label">
-                            Excellent
+                            {getTranslation(
+                                language,
+                                "excellent"
+                            )}
                         </span>
 
                         <span className="property-rating">
@@ -108,7 +334,10 @@ export default function PropertyCard({
 
                         <p>
                             {firstRoom.guests
-                                ? `Up to ${firstRoom.guests} guests`
+                                ? getGuestsText(
+                                    firstRoom.guests,
+                                    language
+                                )
                                 : ""}
 
                             {formattedRoomSize && (
@@ -121,7 +350,10 @@ export default function PropertyCard({
                             {firstRoom.bed && (
                                 <>
                                     {" · "}
-                                    {firstRoom.bed}
+                                    {getLocalizedBedType(
+                                        firstRoom.bed,
+                                        language
+                                    )}
                                 </>
                             )}
                         </p>
@@ -137,7 +369,11 @@ export default function PropertyCard({
                                             <span className="checkmark">
                                                 ✓
                                             </span>
-                                            {feature}
+
+                                            {getLocalizedRoomFeature(
+                                                feature,
+                                                language
+                                            )}
                                         </span>
                                     ))}
                             </div>
@@ -154,7 +390,11 @@ export default function PropertyCard({
                                 <span className="checkmark">
                                     ✓
                                 </span>
-                                Free cancellation
+
+                                {getTranslation(
+                                    language,
+                                    "freeCancellation"
+                                )}
                             </span>
                         )}
 
@@ -165,27 +405,41 @@ export default function PropertyCard({
                                 <span className="checkmark">
                                     ✓
                                 </span>
-                                No prepayment needed
+
+                                {getTranslation(
+                                    language,
+                                    "noPrepayment"
+                                )}
                             </span>
                         )}
                     </div>
 
                     <div className="property-price-box">
-                        <span className="property-price">
-                            {selectedCurrency.symbol}
-                            {Math.round(
-                                convertedPrice
-                            ).toLocaleString()}
-                        </span>
+                        <div className="property-price-main">
+        <span className="property-price">
+            {selectedCurrency.symbol}
+            {Math.round(
+                convertedPrice
+            ).toLocaleString()}
+        </span>
 
-                        <span className="property-price-label">
-                            /{" "}
+                            <span className="property-price-label">
+            /{" "}
+                                {getTranslation(
+                                    language,
+                                    "perNight"
+                                )}
+        </span>
+                        </div>
+
+                        <small className="property-taxes">
                             {getTranslation(
                                 language,
-                                "perNight"
+                                "taxesAndFees"
                             )}
-                        </span>
+                        </small>
                     </div>
+                    
                 </div>
             </div>
         </Link>

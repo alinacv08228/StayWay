@@ -1,191 +1,189 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { useSettings } from "../context/SettingsContext";
+import { getStayUiTranslation } from "../data/translations";
 
 type PhotoGalleryProps = {
-    photos: string[];
     hotelName: string;
+    photos: string[];
 };
 
 export default function PhotoGallery({
-                                         photos,
                                          hotelName,
+                                         photos,
                                      }: PhotoGalleryProps) {
+    const { language } = useSettings();
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedPhoto, setSelectedPhoto] = useState(0);
 
-    const openPhoto = (index: number) => {
-        setSelectedPhoto(index);
-        setIsOpen(true);
-    };
+    const validPhotos = photos.filter(Boolean);
 
-    const closePhoto = () => {
-        setIsOpen(false);
-    };
+    const galleryPhotos = [
+        validPhotos[0],
+        validPhotos[1] ?? validPhotos[0],
+        validPhotos[2] ?? validPhotos[0],
+        validPhotos[3] ?? validPhotos[0],
+    ];
 
-    const previousPhoto = () => {
-        setSelectedPhoto((current) =>
-            current === 0 ? photos.length - 1 : current - 1
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener(
+            "keydown",
+            handleKeyDown
         );
-    };
 
-    const nextPhoto = () => {
-        setSelectedPhoto((current) =>
-            current === photos.length - 1 ? 0 : current + 1
-        );
-    };
+        return () => {
+            document.removeEventListener(
+                "keydown",
+                handleKeyDown
+            );
+        };
+    }, [isOpen]);
 
-    const visiblePhotos = photos.slice(0, 5);
+    if (validPhotos.length === 0) {
+        return null;
+    }
 
     return (
         <>
             <div className="stay-gallery">
-                {/* MAIN PHOTO */}
-                <div
+                <button
+                    type="button"
                     className="gallery-main gallery-clickable"
-                    onClick={() => openPhoto(0)}
+                    onClick={() => setIsOpen(true)}
+                    aria-label={
+                        getStayUiTranslation(
+                            language,
+                            "allPhotos"
+                        )
+                    }
                 >
                     <img
-                        src={photos[0]}
-                        alt={`${hotelName} main photo`}
+                        src={galleryPhotos[0]}
+                        alt={hotelName}
                     />
+                </button>
+
+                <div className="gallery-small">
+                    <button
+                        type="button"
+                        className="gallery-clickable"
+                        onClick={() => setIsOpen(true)}
+                    >
+                        <img
+                            src={galleryPhotos[1]}
+                            alt={`${hotelName} view`}
+                        />
+                    </button>
+
+                    <button
+                        type="button"
+                        className="gallery-clickable"
+                        onClick={() => setIsOpen(true)}
+                    >
+                        <img
+                            src={galleryPhotos[2]}
+                            alt={`${hotelName} interior`}
+                        />
+                    </button>
                 </div>
 
-                {/* SECOND COLUMN */}
                 <div className="gallery-small">
-                    {visiblePhotos[1] && (
+                    <button
+                        type="button"
+                        className="gallery-clickable"
+                        onClick={() => setIsOpen(true)}
+                    >
                         <img
-                            src={visiblePhotos[1]}
-                            alt={`${hotelName} photo 2`}
-                            onClick={() => openPhoto(1)}
-                            className="gallery-clickable"
+                            src={galleryPhotos[3]}
+                            alt={`${hotelName} room`}
                         />
-                    )}
-
-                    {visiblePhotos[2] && (
-                        <img
-                            src={visiblePhotos[2]}
-                            alt={`${hotelName} photo 3`}
-                            onClick={() => openPhoto(2)}
-                            className="gallery-clickable"
-                        />
-                    )}
-                </div>
-
-                {/* THIRD COLUMN */}
-                <div className="gallery-small">
-                    {visiblePhotos[3] && (
-                        <img
-                            src={visiblePhotos[3]}
-                            alt={`${hotelName} photo 4`}
-                            onClick={() => openPhoto(3)}
-                            className="gallery-clickable"
-                        />
-                    )}
+                    </button>
 
                     <button
                         type="button"
                         className="gallery-more"
-                        onClick={() => openPhoto(4)}
+                        onClick={() => setIsOpen(true)}
                     >
-                        {visiblePhotos[4] && (
-                            <img
-                                src={visiblePhotos[4]}
-                                alt={`${hotelName} photo 5`}
-                            />
-                        )}
+                        <img
+                            src={galleryPhotos[0]}
+                            alt={`${hotelName} hotel`}
+                        />
 
                         <span>
-                            View all photos
+                            {getStayUiTranslation(
+                                language,
+                                "viewAllPhotos"
+                            )}
                         </span>
                     </button>
                 </div>
             </div>
 
-            {/* ALL PHOTOS */}
             {isOpen && (
                 <div
                     className="photo-modal"
-                    onClick={closePhoto}
-                >
-                    <div
-                        className="photo-modal-content"
-                        onClick={(event) =>
-                            event.stopPropagation()
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={getStayUiTranslation(
+                        language,
+                        "allPhotos"
+                    )}
+                    onMouseDown={(event) => {
+                        if (
+                            event.target ===
+                            event.currentTarget
+                        ) {
+                            setIsOpen(false);
                         }
-                    >
+                    }}
+                >
+                    <div className="photo-modal-content">
                         <div className="photo-modal-header">
                             <h2>
-                                {hotelName} — Photos
+                                {getStayUiTranslation(
+                                    language,
+                                    "allPhotos"
+                                )}
                             </h2>
 
                             <button
                                 type="button"
                                 className="photo-modal-close"
-                                onClick={closePhoto}
-                                aria-label="Close"
+                                onClick={() =>
+                                    setIsOpen(false)
+                                }
+                                aria-label={getStayUiTranslation(
+                                    language,
+                                    "close"
+                                )}
                             >
                                 ×
                             </button>
                         </div>
 
-                        {/* LARGE PHOTO */}
-                        <div className="photo-viewer">
-                            <button
-                                type="button"
-                                className="photo-arrow photo-arrow-left"
-                                onClick={previousPhoto}
-                                aria-label="Previous photo"
-                            >
-                                ‹
-                            </button>
-
-                            <img
-                                src={photos[selectedPhoto]}
-                                alt={`${hotelName} photo ${
-                                    selectedPhoto + 1
-                                }`}
-                                className="photo-viewer-image"
-                            />
-
-                            <button
-                                type="button"
-                                className="photo-arrow photo-arrow-right"
-                                onClick={nextPhoto}
-                                aria-label="Next photo"
-                            >
-                                ›
-                            </button>
-                        </div>
-
-                        {/* COUNTER */}
-                        <div className="photo-counter">
-                            {selectedPhoto + 1} / {photos.length}
-                        </div>
-
-                        {/* THUMBNAILS */}
-                        <div className="photo-thumbnails">
-                            {photos.map((photo, index) => (
-                                <button
-                                    type="button"
-                                    key={`${photo}-${index}`}
-                                    className={`photo-thumbnail ${
-                                        selectedPhoto === index
-                                            ? "active"
-                                            : ""
-                                    }`}
-                                    onClick={() =>
-                                        setSelectedPhoto(index)
-                                    }
-                                >
+                        <div className="photo-modal-grid">
+                            {validPhotos.map(
+                                (photo, index) => (
                                     <img
+                                        key={`${photo}-${index}`}
                                         src={photo}
-                                        alt={`${hotelName} thumbnail ${
+                                        alt={`${hotelName} ${
                                             index + 1
                                         }`}
                                     />
-                                </button>
-                            ))}
+                                )
+                            )}
                         </div>
                     </div>
                 </div>

@@ -27,6 +27,17 @@ import {
 } from "../../services/destinationService";
 
 import {
+    useSettings,
+} from "../../context/SettingsContext";
+
+import {
+    getTranslation,
+    getDestinationUiTranslation,
+    getLocalizedCountryName,
+    getLocalizedCityName,
+} from "../../data/translations";
+
+import {
     Destination,
     Property,
 } from "../../types/types";
@@ -34,6 +45,7 @@ import {
 import DestinationCard from "../../components/DestinationCard";
 
 export default function DestinationsPage() {
+    const { language } = useSettings();
     const [
         destinations,
         setDestinations,
@@ -143,14 +155,21 @@ export default function DestinationsPage() {
             const filtered =
                 availableDestinations.filter(
                     (destination) => {
+                        const localizedCity = getLocalizedCityName(
+                            destination.name,
+                            language
+                        );
+                        const localizedCountry = getLocalizedCountryName(
+                            destination.country,
+                            language
+                        );
+
                         const matchesSearch =
                             query === "" ||
-                            destination.name
-                                .toLowerCase()
-                                .includes(query) ||
-                            destination.country
-                                .toLowerCase()
-                                .includes(query);
+                            destination.name.toLowerCase().includes(query) ||
+                            localizedCity.toLowerCase().includes(query) ||
+                            destination.country.toLowerCase().includes(query) ||
+                            localizedCountry.toLowerCase().includes(query);
 
                         const matchesCountry =
                             countryFilter ===
@@ -174,8 +193,8 @@ export default function DestinationsPage() {
                         sortBy ===
                         "az"
                     ) {
-                        return a.name.localeCompare(
-                            b.name
+                        return getLocalizedCityName(a.name, language).localeCompare(
+                            getLocalizedCityName(b.name, language)
                         );
                     }
 
@@ -186,8 +205,8 @@ export default function DestinationsPage() {
                         sortBy ===
                         "za"
                     ) {
-                        return b.name.localeCompare(
-                            a.name
+                        return getLocalizedCityName(b.name, language).localeCompare(
+                            getLocalizedCityName(a.name, language)
                         );
                     }
 
@@ -199,8 +218,8 @@ export default function DestinationsPage() {
                         "countryAz"
                     ) {
                         const countryCompare =
-                            a.country.localeCompare(
-                                b.country
+                            getLocalizedCountryName(a.country, language).localeCompare(
+                                getLocalizedCountryName(b.country, language)
                             );
 
                         if (
@@ -223,8 +242,8 @@ export default function DestinationsPage() {
                         "countryZa"
                     ) {
                         const countryCompare =
-                            b.country.localeCompare(
-                                a.country
+                            getLocalizedCountryName(b.country, language).localeCompare(
+                                getLocalizedCountryName(a.country, language)
                             );
 
                         if (
@@ -239,8 +258,8 @@ export default function DestinationsPage() {
                         );
                     }
 
-                    return a.name.localeCompare(
-                        b.name
+                    return getLocalizedCityName(a.name, language).localeCompare(
+                        getLocalizedCityName(b.name, language)
                     );
                 }
             );
@@ -249,6 +268,7 @@ export default function DestinationsPage() {
             search,
             countryFilter,
             sortBy,
+            language,
         ]);
 
     const hasActiveFilters =
@@ -272,11 +292,11 @@ export default function DestinationsPage() {
                         </p>
 
                         <h1>
-                            Destinations
+                            {getTranslation(language, "destinations")}
                         </h1>
 
                         <p className="admin-description">
-                            Loading destinations...
+                            {getDestinationUiTranslation(language, "loadingDestinations")}
                         </p>
                     </div>
                 </section>
@@ -335,13 +355,14 @@ export default function DestinationsPage() {
                         </p>
 
                         <h1>
-                            Destinations
+                            {getTranslation(language, "destinations")}
                         </h1>
 
                         <p className="admin-description">
-                            Explore cities and
-                            discover comfortable
-                            places to stay.
+                            {getDestinationUiTranslation(
+                                language,
+                                "exploreCities"
+                            )}
                         </p>
                     </div>
 
@@ -355,15 +376,17 @@ export default function DestinationsPage() {
                             }}
                         >
                             <h2>
-                                No destinations
-                                available
+                                {getDestinationUiTranslation(
+                                    language,
+                                    "noDestinationsAvailable"
+                                )}
                             </h2>
 
                             <p>
-                                There are currently
-                                no destinations
-                                with available
-                                properties.
+                                {getDestinationUiTranslation(
+                                    language,
+                                    "noDestinationsWithProperties"
+                                )}
                             </p>
                         </div>
                     ) : (
@@ -371,11 +394,12 @@ export default function DestinationsPage() {
                             {/* SEARCH + FILTERS */}
 
                             <div
+                                className="destinations-filters"
                                 style={{
                                     display:
                                         "grid",
                                     gridTemplateColumns:
-                                        "minmax(280px, 1fr) minmax(190px, 220px) minmax(190px, 220px) auto",
+                                        "minmax(280px, 1fr) 200px 200px 76px",
                                     gap: "12px",
                                     alignItems:
                                         "stretch",
@@ -390,6 +414,7 @@ export default function DestinationsPage() {
                                 {/* SEARCH */}
 
                                 <div
+                                    className="destination-search-control"
                                     style={{
                                         display:
                                             "flex",
@@ -397,6 +422,10 @@ export default function DestinationsPage() {
                                             "center",
                                         minHeight:
                                             "58px",
+                                        minWidth:
+                                            0,
+                                        overflow:
+                                            "hidden",
                                         background:
                                             "#ffffff",
                                         border:
@@ -435,11 +464,13 @@ export default function DestinationsPage() {
                                                     .value
                                             )
                                         }
-                                        placeholder="Search destinations..."
-                                        aria-label="Search destinations"
+                                        placeholder={getDestinationUiTranslation(language, "destinationSearch")}
+                                        aria-label={getDestinationUiTranslation(language, "destinationSearch")}
                                         style={{
+                                            flex: 1,
+                                            minWidth: 0,
                                             width:
-                                                "100%",
+                                                "auto",
                                             height:
                                                 "56px",
                                             border:
@@ -467,7 +498,7 @@ export default function DestinationsPage() {
                                                     ""
                                                 )
                                             }
-                                            aria-label="Clear search"
+                                            aria-label={getDestinationUiTranslation(language, "clearSearch")}
                                             style={{
                                                 display:
                                                     "flex",
@@ -501,6 +532,7 @@ export default function DestinationsPage() {
                                 {/* COUNTRY FILTER */}
 
                                 <div
+                                    className="destination-filter-control"
                                     style={{
                                         display:
                                             "flex",
@@ -546,7 +578,7 @@ export default function DestinationsPage() {
                                                     .value
                                             )
                                         }
-                                        aria-label="Filter by country"
+                                        aria-label={getDestinationUiTranslation(language, "filterByCountry")}
                                         style={{
                                             width:
                                                 "100%",
@@ -569,7 +601,7 @@ export default function DestinationsPage() {
                                         }}
                                     >
                                         <option value="All">
-                                            All countries
+                                            {getDestinationUiTranslation(language, "allCountries")}
                                         </option>
 
                                         {availableCountries.map(
@@ -584,9 +616,10 @@ export default function DestinationsPage() {
                                                         country
                                                     }
                                                 >
-                                                    {
-                                                        country
-                                                    }
+                                                    {getLocalizedCountryName(
+                                                        country,
+                                                        language
+                                                    )}
                                                 </option>
                                             )
                                         )}
@@ -596,6 +629,7 @@ export default function DestinationsPage() {
                                 {/* SORT */}
 
                                 <div
+                                    className="destination-filter-control"
                                     style={{
                                         display:
                                             "flex",
@@ -640,7 +674,7 @@ export default function DestinationsPage() {
                                                     .value
                                             )
                                         }
-                                        aria-label="Sort destinations"
+                                        aria-label={getDestinationUiTranslation(language, "sortDestinations")}
                                         style={{
                                             width:
                                                 "100%",
@@ -663,19 +697,19 @@ export default function DestinationsPage() {
                                         }}
                                     >
                                         <option value="az">
-                                            City: A–Z
+                                            {getDestinationUiTranslation(language, "cityAZ")}
                                         </option>
 
                                         <option value="za">
-                                            City: Z–A
+                                            {getDestinationUiTranslation(language, "cityZA")}
                                         </option>
 
                                         <option value="countryAz">
-                                            Country: A–Z
+                                            {getDestinationUiTranslation(language, "countryAZ")}
                                         </option>
 
                                         <option value="countryZa">
-                                            Country: Z–A
+                                            {getDestinationUiTranslation(language, "countryZA")}
                                         </option>
                                     </select>
                                 </div>
@@ -684,6 +718,7 @@ export default function DestinationsPage() {
 
                                 <button
                                     type="button"
+                                    className="destination-clear-button"
                                     onClick={
                                         clearFilters
                                     }
@@ -696,13 +731,11 @@ export default function DestinationsPage() {
                                         padding:
                                             "0 22px",
                                         border:
-                                            "1px solid #ddd8ec",
+                                            "none",
                                         borderRadius:
-                                            "16px",
+                                            "0",
                                         background:
-                                            hasActiveFilters
-                                                ? "#ffffff"
-                                                : "#f7f5fb",
+                                            "transparent",
                                         color:
                                             hasActiveFilters
                                                 ? "#5b526b"
@@ -716,16 +749,17 @@ export default function DestinationsPage() {
                                                 ? "pointer"
                                                 : "default",
                                         boxShadow:
-                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                            "none",
                                     }}
                                 >
-                                    Clear
+                                    {getDestinationUiTranslation(language, "clear")}
                                 </button>
                             </div>
 
                             {/* RESULTS COUNT */}
 
                             <div
+                                className="destinations-results-count"
                                 style={{
                                     display:
                                         "flex",
@@ -742,7 +776,7 @@ export default function DestinationsPage() {
                                 }}
                             >
                                 <span>
-                                    Showing{" "}
+                                    {getDestinationUiTranslation(language, "showing")}{" "}
                                     <strong
                                         style={{
                                             color:
@@ -753,7 +787,7 @@ export default function DestinationsPage() {
                                             filteredDestinations.length
                                         }
                                     </strong>{" "}
-                                    of{" "}
+                                    {getDestinationUiTranslation(language, "of")}{" "}
                                     <strong
                                         style={{
                                             color:
@@ -764,7 +798,7 @@ export default function DestinationsPage() {
                                             availableDestinations.length
                                         }
                                     </strong>{" "}
-                                    destinations
+                                    {getDestinationUiTranslation(language, "destinationsLower")}
                                 </span>
                             </div>
 
@@ -780,15 +814,17 @@ export default function DestinationsPage() {
                                     }}
                                 >
                                     <h2>
-                                        No destinations
-                                        found
+                                        {getDestinationUiTranslation(
+                                            language,
+                                            "noDestinationsFound"
+                                        )}
                                     </h2>
 
                                     <p>
-                                        Try another
-                                        search term or
-                                        change the
-                                        filters.
+                                        {getDestinationUiTranslation(
+                                            language,
+                                            "tryAnotherSearch"
+                                        )}
                                     </p>
                                 </div>
                             ) : (
@@ -810,9 +846,17 @@ export default function DestinationsPage() {
                                                 }}
                                             >
                                                 <DestinationCard
-                                                    destination={
-                                                        destination
-                                                    }
+                                                    destination={{
+                                                        ...destination,
+                                                        name: getLocalizedCityName(
+                                                            destination.name,
+                                                            language
+                                                        ),
+                                                        country: getLocalizedCountryName(
+                                                            destination.country,
+                                                            language
+                                                        ),
+                                                    }}
                                                 />
                                             </div>
                                         )
