@@ -2195,7 +2195,32 @@ export default function ReviewSection({
 
     useEffect(() => {
         loadReviews();
-    }, [propertyId]);
+
+        const handleReviewsStorageChange = (
+            event: StorageEvent
+        ) => {
+            if (
+                event.key === "stayway_reviews"
+            ) {
+                loadReviews();
+            }
+        };
+
+        window.addEventListener(
+            "storage",
+            handleReviewsStorageChange
+        );
+
+        return () => {
+            window.removeEventListener(
+                "storage",
+                handleReviewsStorageChange
+            );
+        };
+    }, [
+        propertyId,
+        currentUser?.id,
+    ]);
 
 
     const averageRating = useMemo(() => {
