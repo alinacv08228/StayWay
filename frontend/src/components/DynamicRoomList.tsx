@@ -66,7 +66,11 @@ export default function DynamicRoomList({
                     room.size !== undefined &&
                     room.size !== null &&
                     room.size !== ""
-                        ? `${room.size} m²`
+                        ? typeof room.size === "number"
+                            ? `${room.size} m²`
+                            : String(room.size).trim().endsWith("m²")
+                                ? String(room.size).trim()
+                                : `${String(room.size).trim()} m²`
                         : "";
 
                 return (
@@ -89,18 +93,18 @@ export default function DynamicRoomList({
                             </p>
 
                             <div className="room-meta">
-                                <span>
-                                    👤{" "}
-                                    {getTranslation(
-                                        language,
-                                        "upToGuests"
-                                    )}{" "}
-                                    {room.guests}{" "}
-                                    {getTranslation(
-                                        language,
-                                        "guests"
-                                    ).toLowerCase()}
-                                </span>
+                               <span>
+    👤{" "}
+                                   {getTranslation(
+                                       language,
+                                       "upToGuests"
+                                   )}{" "}
+                                   {room.guests}{" "}
+                                   {getTranslation(
+                                       language,
+                                       "guests"
+                                   ).toLowerCase()}
+</span>
 
                                 {formattedRoomSize && (
                                     <span>

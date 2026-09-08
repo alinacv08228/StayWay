@@ -3335,8 +3335,9 @@ export function getTranslation(
     return (
         dictionary[key] ??
         stayPageTranslations[languageName]?.[key] ??
-        stayPageTranslations.English[key] ??
-        translations.English[key]
+        stayPageTranslations.English?.[key] ??
+        translations.English[key] ??
+        key
     );
 }
 

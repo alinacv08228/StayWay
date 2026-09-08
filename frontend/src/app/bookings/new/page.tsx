@@ -1458,23 +1458,32 @@ function getBookingText(
     key: BookingPageKey,
     values?: Record<string, string | number>
 ): string {
-    const languageName = language.split("|")[0];
+    const languageName =
+        language.split("|")[0];
+
     const dictionary =
-        bookingPageTranslations[languageName as keyof typeof bookingPageTranslations] ??
+        bookingPageTranslations[
+            languageName as keyof typeof bookingPageTranslations
+            ] ??
         bookingPageTranslations.English;
 
-    let text = dictionary[key] ?? bookingPageTranslations.English[key];
+    let text: string =
+        dictionary[key] ??
+        bookingPageTranslations.English[key];
 
     if (values) {
-        Object.entries(values).forEach(([name, value]) => {
-            text = text.replace(`{${name}}`, String(value));
-        });
+        Object.entries(values).forEach(
+            ([name, value]) => {
+                text = text.replace(
+                    `{${name}}`,
+                    String(value)
+                );
+            }
+        );
     }
 
     return text;
 }
-
-
 
 
 function getTodayDate(): string {
@@ -1677,7 +1686,11 @@ function NewBookingForm() {
         selectedRoom.size !== undefined &&
         selectedRoom.size !== null &&
         selectedRoom.size !== ""
-            ? `${selectedRoom.size} m²`
+            ? typeof selectedRoom.size === "number"
+                ? `${selectedRoom.size} m²`
+                : String(selectedRoom.size).trim().endsWith("m²")
+                    ? String(selectedRoom.size).trim()
+                    : `${String(selectedRoom.size).trim()} m²`
             : "";
 
 
@@ -2254,7 +2267,7 @@ function NewBookingForm() {
 
                                             {getLocalizedBedType(
                                                 selectedRoom.bed,
-                                                language
+                                                language as keyof typeof bookingPageTranslations
                                             )}
                                         </p>
 
@@ -2638,7 +2651,7 @@ function NewBookingForm() {
 
                                             {getLocalizedBedType(
                                                 selectedRoom.bed,
-                                                language
+                                                language as keyof typeof bookingPageTranslations
                                             )}
                                         </p>
 

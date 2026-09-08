@@ -95,21 +95,33 @@ export function getProperties(): Property[] {
 /* =========================================================
    CREATE
    ========================================================= */
-
 export function createProperty(
     property: Omit<Property, "id">
 ): Property {
     const currentProperties =
         getProperties();
 
-    const newId =
+    const ID_KEY =
+        "stayway_next_property_id";
+
+    const savedNextId =
+        localStorage.getItem(ID_KEY);
+
+    const maxExistingId =
         currentProperties.length > 0
             ? Math.max(
-            ...currentProperties.map(
-                (item) => item.id
+                ...currentProperties.map(
+                    (item) => item.id
+                )
             )
-        ) + 1
-            : 1;
+            : 0;
+
+    const newId = savedNextId
+        ? Math.max(
+            Number(savedNextId),
+            maxExistingId + 1
+        )
+        : maxExistingId + 1;
 
     const newProperty: Property = {
         id: newId,
@@ -123,9 +135,13 @@ export function createProperty(
 
     saveProperties(updatedProperties);
 
+    localStorage.setItem(
+        ID_KEY,
+        String(newId + 1)
+    );
+
     return newProperty;
 }
-
 
 /* =========================================================
    UPDATE

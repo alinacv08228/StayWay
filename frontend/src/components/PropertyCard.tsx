@@ -285,7 +285,11 @@ export default function PropertyCard({
         firstRoom.size !== undefined &&
         firstRoom.size !== null &&
         firstRoom.size !== ""
-            ? `${firstRoom.size} m²`
+            ? typeof firstRoom.size === "number"
+                ? `${firstRoom.size} m²`
+                : String(firstRoom.size).trim().endsWith("m²")
+                    ? String(firstRoom.size).trim()
+                    : `${String(firstRoom.size).trim()} m²`
             : "";
 
     return (
