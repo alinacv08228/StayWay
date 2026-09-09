@@ -236,15 +236,15 @@ export default function StaysPage() {
     const [maxPrice, setMaxPrice] =
         useState("");
 
-    const [minRating, setMinRating] =
-        useState("0");
+    const [hotelSearch, setHotelSearch] =
+        useState("");
 
     const [sortBy, setSortBy] =
         useState("default");
 
     // =========================================
-// INITIAL DESTINATION FILTER
-// =========================================
+    // INITIAL DESTINATION FILTER
+    // =========================================
 
     useEffect(() => {
         if (selectedDestination) {
@@ -370,6 +370,22 @@ export default function StaysPage() {
                     );
             }
 
+            // Hotel name search
+            if (hotelSearch.trim()) {
+                const normalizedHotelSearch =
+                    hotelSearch.trim().toLowerCase();
+
+                result =
+                    result.filter(
+                        (property) =>
+                            property.name
+                                .toLowerCase()
+                                .includes(
+                                    normalizedHotelSearch
+                                )
+                    );
+            }
+
             // Country
             if (selectedCountry) {
                 const countryDestinationIds =
@@ -434,16 +450,6 @@ export default function StaysPage() {
                     );
             }
 
-            // Rating
-            if (minRating !== "0") {
-                result =
-                    result.filter(
-                        (property) =>
-                            property.rating >=
-                            Number(minRating)
-                    );
-            }
-
             // Sort
             if (sortBy === "price-low") {
                 result.sort(
@@ -461,19 +467,21 @@ export default function StaysPage() {
                 );
             }
 
-            if (sortBy === "rating-high") {
+            // Minimum stars
+            if (sortBy === "stars-low") {
                 result.sort(
                     (a, b) =>
-                        b.rating -
-                        a.rating
+                        a.stars -
+                        b.stars
                 );
             }
 
-            if (sortBy === "rating-low") {
+            // Maximum stars
+            if (sortBy === "stars-high") {
                 result.sort(
                     (a, b) =>
-                        a.rating -
-                        b.rating
+                        b.stars -
+                        a.stars
                 );
             }
 
@@ -486,7 +494,7 @@ export default function StaysPage() {
             selectedCity,
             minPrice,
             maxPrice,
-            minRating,
+            hotelSearch,
             sortBy,
             selectedCurrencyInfo.rate,
         ]);
@@ -501,7 +509,7 @@ export default function StaysPage() {
             setSelectedCity("");
             setMinPrice("");
             setMaxPrice("");
-            setMinRating("0");
+            setHotelSearch("");
             setSortBy("default");
         }, []);
 
@@ -589,8 +597,10 @@ export default function StaysPage() {
                     </h1>
 
                     <p className="admin-description stays-title-animation">
-                        Discover comfortable places to stay
-                        in your favorite destinations.
+                        {getTranslation(
+                            language,
+                            "staysDescription"
+                        )}
                     </p>
 
                     {destinationName && (
@@ -605,6 +615,34 @@ export default function StaysPage() {
                     {/* FILTERS */}
 
                     <div className="stays-filters">
+
+                        {/* HOTEL NAME SEARCH */}
+
+                        <div className="filter-group">
+                            <label htmlFor="hotel-search">
+                                {getTranslation(
+                                    language,
+                                    "hotelName"
+                                )}
+                            </label>
+
+                            <input
+                                id="hotel-search"
+                                type="text"
+                                placeholder={getTranslation(
+                                    language,
+                                    "searchByHotelName"
+                                )}
+                                value={
+                                    hotelSearch
+                                }
+                                onChange={(event) =>
+                                    setHotelSearch(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
 
                         {/* COUNTRY */}
 
@@ -748,52 +786,6 @@ export default function StaysPage() {
                             />
                         </div>
 
-                        {/* RATING */}
-
-                        <div className="filter-group">
-                            <label htmlFor="rating">
-                                {getFilterTranslation(
-                                    language,
-                                    "minimumRating"
-                                )}
-                            </label>
-
-                            <select
-                                id="rating"
-                                value={
-                                    minRating
-                                }
-                                onChange={(event) =>
-                                    setMinRating(
-                                        event.target.value
-                                    )
-                                }
-                            >
-                                <option value="0">
-                                    {getFilterTranslation(
-                                        language,
-                                        "anyRating"
-                                    )}
-                                </option>
-
-                                <option value="3">
-                                    3+
-                                </option>
-
-                                <option value="4">
-                                    4+
-                                </option>
-
-                                <option value="4.5">
-                                    4.5+
-                                </option>
-
-                                <option value="4.8">
-                                    4.8+
-                                </option>
-                            </select>
-                        </div>
-
                         {/* SORT */}
 
                         <div className="filter-group">
@@ -836,17 +828,17 @@ export default function StaysPage() {
                                     )}
                                 </option>
 
-                                <option value="rating-high">
-                                    {getFilterTranslation(
+                                <option value="stars-low">
+                                    {getTranslation(
                                         language,
-                                        "ratingHigh"
+                                        "minimumStars"
                                     )}
                                 </option>
 
-                                <option value="rating-low">
-                                    {getFilterTranslation(
+                                <option value="stars-high">
+                                    {getTranslation(
                                         language,
-                                        "ratingLow"
+                                        "maximumStars"
                                     )}
                                 </option>
                             </select>
@@ -895,9 +887,9 @@ export default function StaysPage() {
                                         className="stay-card-animation"
                                         style={{
                                             animationDelay: `${
-                                                index *
-                                                0.08
-                                            }s`,
+    index *
+    0.08
+}s`,
                                         }}
                                         key={
                                             property.id
@@ -942,3 +934,4 @@ export default function StaysPage() {
         </main>
     );
 }
+    
