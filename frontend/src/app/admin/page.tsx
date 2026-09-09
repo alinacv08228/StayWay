@@ -2351,8 +2351,16 @@ export default function AdminPage() {
                         </span>
 
                                             <span>
-                            {room.size}
-                        </span>
+    {room.size !== undefined &&
+    room.size !== null &&
+    room.size !== ""
+        ? typeof room.size === "number"
+            ? `${room.size} m²`
+            : String(room.size).trim().endsWith("m²")
+                ? String(room.size).trim()
+                : `${String(room.size).trim()} m²`
+        : ""}
+</span>
 
                                             <span>
                             {formatPrice(

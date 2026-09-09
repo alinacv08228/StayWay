@@ -50,6 +50,51 @@ export default function Home() {
         currencyInfo["Euro"];
 
     // =========================================
+    // HOME CAROUSEL
+    // =========================================
+
+    const carouselImages = [
+        "/carousel/carousel-1.png",
+        "/carousel/carousel-2.png",
+        "/carousel/carousel-3.png",
+        "/carousel/carousel-4.png",
+        "/carousel/carousel-5.png",
+        "/carousel/carousel-6.png",
+        "/carousel/carousel-7.png",
+        "/carousel/carousel-8.png",
+    ];
+
+    const [
+        currentCarouselIndex,
+        setCurrentCarouselIndex,
+    ] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentCarouselIndex((current) =>
+                (current + 1) %
+                carouselImages.length
+            );
+        }, 3500);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const goToPreviousCarouselImage = () => {
+        setCurrentCarouselIndex((current) =>
+            (current - 1 + carouselImages.length) %
+            carouselImages.length
+        );
+    };
+
+    const goToNextCarouselImage = () => {
+        setCurrentCarouselIndex((current) =>
+            (current + 1) %
+            carouselImages.length
+        );
+    };
+
+    // =========================================
     // PROPERTIES
     // =========================================
 
@@ -326,9 +371,10 @@ export default function Home() {
     return (
         <main className="home-page page-enter">
 
+
             {/* =================================================
-                HERO
-            ================================================= */}
+    HERO
+================================================= */}
 
             <section className="home-hero">
 
@@ -337,6 +383,8 @@ export default function Home() {
                 <div className="hero-glow hero-glow-two"></div>
 
                 <div className="container home-hero-inner">
+
+                    {/* HERO CONTENT */}
 
                     <div className="hero-content">
 
@@ -348,8 +396,8 @@ export default function Home() {
                             FIND YOUR
                             <br />
                             <span>
-                                PERFECT STAY.
-                            </span>
+                    PERFECT STAY.
+                </span>
                         </h1>
 
                         <p className="hero-subtitle">
@@ -371,8 +419,8 @@ export default function Home() {
                                 </strong>
 
                                 <span>
-                                    Unique stays
-                                </span>
+                        Unique stays
+                    </span>
                             </div>
 
                             {/* COUNTRIES */}
@@ -385,8 +433,8 @@ export default function Home() {
                                 </strong>
 
                                 <span>
-                                    Available countries
-                                </span>
+                        Available countries
+                    </span>
                             </div>
 
                             {/* RATING */}
@@ -397,29 +445,165 @@ export default function Home() {
                                 </strong>
 
                                 <span>
-                                    Guest rating
-                                </span>
+                        Guest rating
+                    </span>
                             </div>
 
                         </div>
 
                     </div>
 
+                    {/* HOME MAP */}
+
+                    <div className="home-hero-map">
+
+                        <img
+                            src="/map-home/map.png"
+                            alt="StayWay travel map"
+                        />
+
+                    </div>
+
                     {/* SEARCH */}
 
                     <div className="home-search-wrapper">
+
                         <SearchBar />
+
                     </div>
 
                 </div>
 
                 <div className="hero-scroll">
 
-                    <span>
-                        SCROLL TO EXPLORE
-                    </span>
+                </div>
 
-                    <div className="scroll-line"></div>
+            </section>
+            
+            {/* =================================================
+                TRAVEL CAROUSEL
+            ================================================= */}
+
+            <section
+                className="home-carousel"
+            >
+
+                <div className="container">
+
+                    <div className="home-carousel-track">
+
+                        {carouselImages.map(
+                            (image, index) => {
+
+                                const position =
+                                    (
+                                        index -
+                                        currentCarouselIndex +
+                                        carouselImages.length
+                                    ) %
+                                    carouselImages.length;
+
+                                let positionClass =
+                                    "carousel-hidden";
+
+                                if (
+                                    position === 0
+                                ) {
+                                    positionClass =
+                                        "carousel-center";
+                                } else if (
+                                    position === 1
+                                ) {
+                                    positionClass =
+                                        "carousel-right";
+                                } else if (
+                                    position ===
+                                    carouselImages.length -
+                                    1
+                                ) {
+                                    positionClass =
+                                        "carousel-left";
+                                }
+
+                                return (
+                                    <button
+                                        type="button"
+                                        key={image}
+                                        className={`home-carousel-slide ${positionClass}`}
+                                        onClick={() =>
+                                            setCurrentCarouselIndex(
+                                                index
+                                            )
+                                        }
+                                        aria-label={`View travel image ${
+                                            index + 1
+                                        }`}
+                                    >
+                                        <img
+                                            src={image}
+                                            alt={`StayWay travel ${
+                                                index + 1
+                                            }`}
+                                        />
+                                    </button>
+                                );
+                            }
+                        )}
+
+                    </div>
+
+                    <div className="home-carousel-controls">
+
+                        <button
+                            type="button"
+                            className="home-carousel-arrow"
+                            onClick={
+                                goToPreviousCarouselImage
+                            }
+                            aria-label="Previous image"
+                        >
+                            ←
+                        </button>
+
+                        <div className="home-carousel-dots">
+
+                            {carouselImages.map(
+                                (_, index) => (
+                                    <button
+                                        type="button"
+                                        key={index}
+                                        className={
+                                            index ===
+                                            currentCarouselIndex
+                                                ? "active"
+                                                : ""
+                                        }
+                                        onClick={() =>
+                                            setCurrentCarouselIndex(
+                                                index
+                                            )
+                                        }
+                                        aria-label={`Go to image ${
+                                            index + 1
+                                        }`}
+                                    />
+                                )
+                            )}
+
+                        </div>
+
+                        <button
+                            type="button"
+                            className="home-carousel-arrow"
+                            onClick={
+                                goToNextCarouselImage
+                            }
+                            aria-label="Next image"
+                        >
+                            →
+                        </button>
+
+                    </div>
 
                 </div>
 
