@@ -311,6 +311,17 @@ export default function Header() {
                     </Link>
 
                     <Link
+                        href="/transfers"
+                        className={`nav-link ${
+                            isActive("/transfers")
+                                ? "active"
+                                : ""
+                        }`}
+                    >
+                        Transfers
+                    </Link>
+
+                    <Link
                         href="/bookings"
                         className={`nav-link ${
     isActive("/bookings")

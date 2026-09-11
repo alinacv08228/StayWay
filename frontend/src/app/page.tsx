@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import {
     useEffect,
@@ -285,7 +286,7 @@ export default function Home() {
 
     if (isLoading) {
         return (
-            <main className="home-page page-enter">
+            <main className="home-page page-enter home-animated">
 
                 <section className="home-hero">
                     <div className="container home-hero-inner">
@@ -304,7 +305,7 @@ export default function Home() {
                                 </span>
                             </h1>
 
-                            <p className="hero-subtitle">
+                            <p className="hero-subtitle home-hero-subtitle-animated">
                                 Loading StayWay...
                             </p>
 
@@ -369,14 +370,14 @@ export default function Home() {
     }
 
     return (
-        <main className="home-page page-enter">
+        <main className="home-page page-enter home-animated">
 
 
             {/* =================================================
     HERO
 ================================================= */}
 
-            <section className="home-hero">
+            <section className="home-hero home-animate home-animate-1">
 
                 <div className="hero-glow hero-glow-one"></div>
 
@@ -388,11 +389,11 @@ export default function Home() {
 
                     <div className="hero-content">
 
-                        <div className="hero-badge">
+                        <div className="hero-badge home-hero-item home-hero-item-1">
                             ✦ YOUR JOURNEY STARTS HERE
                         </div>
 
-                        <h1>
+                        <h1 className="home-hero-item home-hero-item-2">
                             FIND YOUR
                             <br />
                             <span>
@@ -400,14 +401,14 @@ export default function Home() {
                 </span>
                         </h1>
 
-                        <p className="hero-subtitle">
+                        <p className="hero-subtitle home-hero-subtitle-animated">
                             Discover beautiful places,
                             unforgettable stays
                             and destinations worth
                             exploring.
                         </p>
 
-                        <div className="hero-stats">
+                        <div className="hero-stats home-hero-item home-hero-item-4">
 
                             {/* UNIQUE STAYS */}
 
@@ -485,7 +486,7 @@ export default function Home() {
             ================================================= */}
 
             <section
-                className="home-carousel"
+                className="home-carousel home-animate home-animate-2"
             >
 
                 <div className="container">
@@ -536,14 +537,14 @@ export default function Home() {
                                             )
                                         }
                                         aria-label={`View travel image ${
-                                            index + 1
-                                        }`}
+    index + 1
+}`}
                                     >
                                         <img
                                             src={image}
                                             alt={`StayWay travel ${
-                                                index + 1
-                                            }`}
+    index + 1
+}`}
                                         />
                                     </button>
                                 );
@@ -584,8 +585,8 @@ export default function Home() {
                                             )
                                         }
                                         aria-label={`Go to image ${
-                                            index + 1
-                                        }`}
+    index + 1
+}`}
                                     />
                                 )
                             )}
@@ -614,7 +615,7 @@ export default function Home() {
                 COUNTRIES
             ================================================= */}
 
-            <section className="home-destinations">
+            <section className="home-destinations home-animate home-animate-3">
 
                 <div className="container">
 
@@ -677,8 +678,11 @@ export default function Home() {
                                     <Link
                                         href="/destinations"
                                         className={`home-destination-card destination-card-${
-                                            index + 1
-                                        }`}
+    index + 1
+}`}
+                                        style={{
+                                            "--card-index": index,
+                                        } as CSSProperties}
                                         key={
                                             destination.country
                                         }
@@ -749,7 +753,7 @@ export default function Home() {
                 FEATURED STAYS
             ================================================= */}
 
-            <section className="home-stays">
+            <section className="home-stays home-animate home-animate-4">
 
                 <div className="container">
 
@@ -808,6 +812,9 @@ export default function Home() {
                                     <Link
                                         href={`/stays/${property.id}`}
                                         className="home-property-card"
+                                        style={{
+                                            "--card-index": featuredProperties.indexOf(property),
+                                        } as CSSProperties}
                                         key={
                                             property.id
                                         }
@@ -901,7 +908,7 @@ export default function Home() {
                 CTA
             ================================================= */}
 
-            <section className="home-cta">
+            <section className="home-cta home-animate home-animate-5">
 
                 <div className="home-cta-shape home-cta-shape-one"></div>
 
@@ -990,6 +997,100 @@ export default function Home() {
                 </div>
 
             </section>
+
+            <style jsx>{`
+    .home-animated .home-animate {
+    opacity: 0;
+    animation: homeFadeUp 0.8s ease both;
+}
+
+.home-animated .home-animate-1 {
+    animation-delay: 0s;
+}
+
+.home-animated .home-animate-2 {
+    animation-delay: 0.12s;
+}
+
+.home-animated .home-animate-3 {
+    animation-delay: 0.18s;
+}
+
+.home-animated .home-animate-4 {
+    animation-delay: 0.24s;
+}
+
+.home-animated .home-animate-5 {
+    animation-delay: 0.30s;
+}
+
+.home-animated .home-destination-card,
+.home-animated .home-property-card {
+    opacity: 0;
+    animation: homeFadeUp 0.7s ease both;
+}
+
+.home-animated .home-destination-card {
+    animation-delay: calc(0.22s + (var(--card-index, 0) * 0.08s));
+}
+
+.home-animated .home-property-card {
+    animation-delay: calc(0.22s + (var(--card-index, 0) * 0.08s));
+}
+
+@keyframes homeFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.home-animated .home-hero-item {
+    opacity: 0;
+    animation: homeFadeUp 0.8s ease both;
+}
+
+.home-animated .home-hero-item-1 {
+    animation-delay: 0.04s;
+}
+
+.home-animated .home-hero-item-2 {
+    animation-delay: 0.08s;
+}
+
+.home-animated .home-hero-subtitle-animated {
+    opacity: 0;
+    animation: homeFadeUp 0.8s ease both;
+    animation-delay: 0.12s;
+}
+
+.home-animated .home-hero-item-4 {
+    animation-delay: 0.16s;
+}
+
+.home-animated .home-hero-item-5 {
+    animation-delay: 0.20s;
+}
+
+.home-animated .home-hero-item-6 {
+    animation-delay: 0.24s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.home-animated .home-hero-subtitle-animated,
+.home-animated .home-animate,
+.home-animated .home-destination-card,
+.home-animated .home-property-card,
+.home-animated .home-hero-item {
+        opacity: 1;
+        animation: none;
+    }
+}
+`}</style>
 
         </main>
     );

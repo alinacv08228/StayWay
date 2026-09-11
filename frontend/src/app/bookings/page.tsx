@@ -15,6 +15,8 @@ import {
     Search,
     SlidersHorizontal,
     X,
+    Phone,
+    Clock3,
 } from "lucide-react";
 
 import {
@@ -32,7 +34,13 @@ import { useUser } from "../../context/UserContext";
 import { currencyInfo } from "../../data/currency";
 import { getTranslation } from "../../data/translations";
 
+import {
+    getTransferBookings,
+    type TransferBooking,
+} from "../../services/transferService";
 
+import { getTransferVehicleById } from "../../services/transferVehicleService";
+import { getTransferDriverById } from "../../services/transferDriverService";
 
 
 /* =========================================================
@@ -110,22 +118,24 @@ function formatDate(date: string) {
     return `${day}.${month}.${year}`;
 }
 
-export default function BookingsPage() {
-    return (
-        <ProtectedRoute>
-            <BookingsContent />
-        </ProtectedRoute>
-    );
+function formatTransferDate(date: string) {
+    if (!date || date === "—") {
+        return "—";
+    }
+
+    return formatDate(date);
 }
-
-
 
 function BookingsContent() {
     const { language, currency } = useSettings();
     const { currentUser } = useUser();
 
     const [userBookings, setUserBookings] = useState<Booking[]>([]);
+    const [transferBookings, setTransferBookings] =
+        useState<TransferBooking[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [activeBookingTab, setActiveBookingTab] =
+        useState<"stays" | "transfers">("stays");
 
     /*
      * IMPORTANT:
@@ -204,6 +214,19 @@ function BookingsContent() {
                 );
 
         setUserBookings(visibleBookings);
+
+        const savedTransferBookings = getTransferBookings();
+
+        const visibleTransferBookings =
+            currentUser.role === "admin"
+                ? savedTransferBookings
+                : savedTransferBookings.filter(
+                    (booking) =>
+                        booking.email === currentUser.email
+                );
+
+        setTransferBookings(visibleTransferBookings);
+
         setIsLoaded(true);
     }, [currentUser]);
 
@@ -212,8 +235,8 @@ function BookingsContent() {
             price * selectedCurrency.rate;
 
         return `${selectedCurrency.symbol}${Math.round(
-            convertedPrice
-        ).toLocaleString()}`;
+    convertedPrice
+).toLocaleString()}`;
     };
 
     const getStatusText = (status: string) => {
@@ -254,25 +277,25 @@ function BookingsContent() {
                 booking.infants ?? 0;
 
             return `${adults} ${
-                adults === 1
-                    ? getBookingPageText(language, "adult")
-                    : getBookingPageText(language, "adults")
-            } · ${children} ${
-                children === 1
-                    ? getBookingPageText(language, "child")
-                    : getBookingPageText(language, "children")
-            } · ${infants} ${
-                infants === 1
-                    ? getBookingPageText(language, "infant")
-                    : getBookingPageText(language, "infants")
-            }`;
+    adults === 1
+        ? getBookingPageText(language, "adult")
+        : getBookingPageText(language, "adults")
+} · ${children} ${
+    children === 1
+        ? getBookingPageText(language, "child")
+        : getBookingPageText(language, "children")
+} · ${infants} ${
+    infants === 1
+        ? getBookingPageText(language, "infant")
+        : getBookingPageText(language, "infants")
+}`;
         }
 
         return `${booking.guests} ${
-            booking.guests === 1
-                ? getBookingPageText(language, "guest")
-                : getBookingPageText(language, "guestsWord")
-        }`;
+    booking.guests === 1
+        ? getBookingPageText(language, "guest")
+        : getBookingPageText(language, "guestsWord")
+}`;
     };
 
     const filteredBookings = useMemo(() => {
@@ -514,6 +537,159 @@ function BookingsContent() {
 
     return (
         <main>
+            <style jsx global>{`
+    .bookings-page {
+    width: 100%;
+    min-width: 0;
+}
+
+.bookings-tabs {
+    max-width: 100%;
+}
+
+.bookings-tab {
+    flex: 0 1 auto;
+}
+
+.bookings-filters > * {
+    min-width: 0;
+}
+
+.bookings-clear-button {
+    justify-self: stretch;
+}
+
+.booking-card,
+.bookings-transfer-card {
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.booking-content,
+.bookings-transfer-card {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) {
+.bookings-page {
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+
+.bookings-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+.bookings-filters > *:first-child {
+        grid-column: 1 / -1;
+    }
+
+.bookings-clear-button {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 700px) {
+.bookings-page {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+.bookings-tabs {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        box-sizing: border-box;
+        gap: 4px !important;
+    }
+
+.bookings-tab {
+        min-width: 0 !important;
+        width: 100%;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        white-space: nowrap;
+    }
+
+.bookings-filters {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 24px !important;
+    }
+
+.bookings-filters > *:first-child {
+        grid-column: auto;
+    }
+
+.bookings-filters > * {
+        width: 100%;
+    }
+
+        .booking-card {
+        padding: 22px 18px !important;
+        border-radius: 18px !important;
+    }
+
+.booking-content,
+.booking-info {
+        width: 100%;
+    }
+
+.bookings-transfer-card {
+        padding: 20px 16px !important;
+        border-radius: 18px !important;
+    }
+
+.bookings-transfer-card > div:first-child {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+.bookings-transfer-card > div:first-child > div:last-child {
+        text-align: left !important;
+    }
+
+.bookings-transfer-card > div:nth-child(2),
+.bookings-transfer-card > div:nth-child(3) {
+        grid-template-columns: 1fr !important;
+    }
+
+.bookings-transfer-card > div:last-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+}
+
+@media (max-width: 430px) {
+.bookings-page {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+.bookings-tabs {
+        border-radius: 16px !important;
+        padding: 4px !important;
+    }
+
+.bookings-tab {
+        min-height: 46px !important;
+        font-size: 14px !important;
+        gap: 6px !important;
+    }
+
+.bookings-tab span[aria-hidden="true"] {
+        width: 27px !important;
+        height: 27px !important;
+        border-radius: 9px !important;
+        font-size: 14px !important;
+    }
+
+.booking-card,
+.bookings-transfer-card {
+        padding: 18px 14px !important;
+    }
+}
+`}</style>
             <section className="section">
                 <div className="container bookings-page">
 
@@ -527,147 +703,412 @@ function BookingsContent() {
                         {getBookingPageText(language, "title")}
                     </h1>
 
-                    {/* SEARCH + FILTERS */}
-
                     <div
-                        className="bookings-filters"
+                        className="bookings-tabs"
                         style={{
-                            display: "grid",
-                            gridTemplateColumns:
-                                currentUser?.role ===
-                                "admin"
-                                    ? "minmax(420px, 1fr) 190px 190px 210px 100px"
-                                    : "minmax(420px, 1fr) 220px 220px 100px",
-                            gap: "12px",
-                            alignItems:
-                                "stretch",
-                            marginBottom:
-                                "32px",
-                            animation:
-                                "heroFadeUp 0.8s ease 0.16s both",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            padding: "5px",
+                            marginBottom: "30px",
+                            borderRadius: "18px",
+                            background: "rgba(255, 255, 255, 0.58)",
+                            border: "1px solid rgba(108, 92, 231, 0.12)",
+                            boxShadow: "0 8px 28px rgba(78, 64, 125, 0.07)",
+                            backdropFilter: "blur(12px)",
+                            WebkitBackdropFilter: "blur(12px)",
                         }}
                     >
-
-                        {/* SEARCH */}
-
-                        <div
+                        <button
+                            type="button"
+                            className={`bookings-tab ${
+    activeBookingTab === "stays"
+        ? "active"
+        : ""
+}`}
                             style={{
-                                position:
-                                    "relative",
-                                display:
-                                    "flex",
-                                alignItems:
-                                    "center",
+                                position: "relative",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "9px",
+                                minWidth: "172px",
+                                minHeight: "48px",
+                                padding: "0 22px",
+                                border: "0",
+                                borderRadius: "14px",
                                 background:
-                                    "#ffffff",
-                                border:
-                                    "1px solid #ddd8ec",
-                                borderRadius:
-                                    "16px",
-                                minHeight:
-                                    "58px",
+                                    activeBookingTab === "stays"
+                                        ? "#ffffff"
+                                        : "transparent",
+                                color:
+                                    activeBookingTab === "stays"
+                                        ? "#5f4bd8"
+                                        : "#817b91",
+                                fontSize: "15px",
+                                fontWeight: 800,
+                                letterSpacing: "-0.01em",
+                                cursor: "pointer",
                                 boxShadow:
-                                    "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    activeBookingTab === "stays"
+                                        ? "0 7px 20px rgba(78, 64, 125, 0.11), inset 0 0 0 1px rgba(108, 92, 231, 0.08)"
+                                        : "none",
                                 transition:
-                                    "border-color 0.2s ease, box-shadow 0.2s ease",
+                                    "background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease",
                             }}
+                            onClick={() =>
+                                setActiveBookingTab("stays")
+                            }
                         >
-                            <Search
-                                size={20}
+                            <span
+                                aria-hidden="true"
                                 style={{
-                                    marginLeft:
-                                        "18px",
-                                    color:
-                                        "#6c5ce7",
-                                    flexShrink:
-                                        0,
-                                }}
-                            />
-
-                            <input
-                                type="text"
-                                value={
-                                    search
-                                }
-                                onChange={(
-                                    event
-                                ) =>
-                                    setSearch(
-                                        event
-                                            .target
-                                            .value
-                                    )
-                                }
-                                placeholder={
-                                    currentUser?.role ===
-                                    "admin"
-                                        ? getBookingPageText(language, "searchAdmin")
-                                        : getBookingPageText(language, "searchUser")
-                                }
-                                aria-label={getBookingPageText(language, "searchBookings")}
-                                style={{
-                                    width:
-                                        "100%",
-                                    height:
-                                        "56px",
-                                    border:
-                                        "none",
-                                    outline:
-                                        "none",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "30px",
+                                    height: "30px",
+                                    borderRadius: "10px",
                                     background:
-                                        "transparent",
-                                    padding:
-                                        "0 16px 0 12px",
-                                    fontSize:
-                                        "15px",
-                                    color:
-                                        "#302d3a",
-                                    boxSizing:
-                                        "border-box",
+                                        activeBookingTab === "stays"
+                                            ? "#f0edff"
+                                            : "rgba(108, 92, 231, 0.07)",
+                                    fontSize: "15px",
+                                    transition: "background 0.22s ease",
                                 }}
-                            />
-
-                            {search && (
-                                <button
-                                    type="button"
-                                    onClick={
-                                        clearSearch
-                                    }
-                                    aria-label={getBookingPageText(language, "clearSearch")}
+                            >
+                                🏨
+                            </span>
+                            <span>{getTranslation(language, "stays")}</span>
+                            {activeBookingTab === "stays" && (
+                                <span
+                                    aria-hidden="true"
                                     style={{
-                                        border:
-                                            "none",
-                                        background:
-                                            "transparent",
-                                        cursor:
-                                            "pointer",
-                                        marginRight:
-                                            "12px",
-                                        padding:
-                                            "6px",
-                                        color:
-                                            "#777184",
+                                        position: "absolute",
+                                        left: "24px",
+                                        right: "24px",
+                                        bottom: "-5px",
+                                        height: "3px",
+                                        borderRadius: "999px",
+                                        background: "linear-gradient(90deg, #6c5ce7, #8b7cf6)",
+                                    }}
+                                />
+                            )}
+                        </button>
+
+                        <button
+                            type="button"
+                            className={`bookings-tab ${
+    activeBookingTab === "transfers"
+        ? "active"
+        : ""
+}`}
+                            style={{
+                                position: "relative",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "9px",
+                                minWidth: "172px",
+                                minHeight: "48px",
+                                padding: "0 22px",
+                                border: "0",
+                                borderRadius: "14px",
+                                background:
+                                    activeBookingTab === "transfers"
+                                        ? "#ffffff"
+                                        : "transparent",
+                                color:
+                                    activeBookingTab === "transfers"
+                                        ? "#5f4bd8"
+                                        : "#817b91",
+                                fontSize: "15px",
+                                fontWeight: 800,
+                                letterSpacing: "-0.01em",
+                                cursor: "pointer",
+                                boxShadow:
+                                    activeBookingTab === "transfers"
+                                        ? "0 7px 20px rgba(78, 64, 125, 0.11), inset 0 0 0 1px rgba(108, 92, 231, 0.08)"
+                                        : "none",
+                                transition:
+                                    "background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease",
+                            }}
+                            onClick={() =>
+                                setActiveBookingTab("transfers")
+                            }
+                        >
+                            <span
+                                aria-hidden="true"
+                                style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "30px",
+                                    height: "30px",
+                                    borderRadius: "10px",
+                                    background:
+                                        activeBookingTab === "transfers"
+                                            ? "#f0edff"
+                                            : "rgba(108, 92, 231, 0.07)",
+                                    fontSize: "15px",
+                                    transition: "background 0.22s ease",
+                                }}
+                            >
+                                🚘
+                            </span>
+                            <span>{getTranslation(language, "transfers")}</span>
+                            {activeBookingTab === "transfers" && (
+                                <span
+                                    aria-hidden="true"
+                                    style={{
+                                        position: "absolute",
+                                        left: "24px",
+                                        right: "24px",
+                                        bottom: "-5px",
+                                        height: "3px",
+                                        borderRadius: "999px",
+                                        background: "linear-gradient(90deg, #6c5ce7, #8b7cf6)",
+                                    }}
+                                />
+                            )}
+                        </button>
+                    </div>
+
+                    {activeBookingTab === "stays" && (
+                        <>
+                            {/* SEARCH + FILTERS */}
+
+                            <div
+                                className="bookings-filters"
+                                style={{
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                        "repeat(auto-fit, minmax(180px, 1fr))",
+                                    gap: "12px",
+                                    alignItems:
+                                        "stretch",
+                                    marginBottom:
+                                        "32px",
+                                    animation:
+                                        "heroFadeUp 0.8s ease 0.16s both",
+                                }}
+                            >
+
+                                {/* SEARCH */}
+
+                                <div
+                                    style={{
+                                        position:
+                                            "relative",
                                         display:
                                             "flex",
                                         alignItems:
                                             "center",
-                                        justifyContent:
-                                            "center",
+                                        background:
+                                            "#ffffff",
+                                        border:
+                                            "1px solid #ddd8ec",
+                                        borderRadius:
+                                            "16px",
+                                        minHeight:
+                                            "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                        transition:
+                                            "border-color 0.2s ease, box-shadow 0.2s ease",
                                     }}
                                 >
-                                    <X
-                                        size={
-                                            18
-                                        }
+                                    <Search
+                                        size={20}
+                                        style={{
+                                            marginLeft:
+                                                "18px",
+                                            color:
+                                                "#6c5ce7",
+                                            flexShrink:
+                                                0,
+                                        }}
                                     />
-                                </button>
-                            )}
-                        </div>
 
-                        {/* USER FILTER — ADMIN ONLY */}
+                                    <input
+                                        type="text"
+                                        value={
+                                            search
+                                        }
+                                        onChange={(
+                                            event
+                                        ) =>
+                                            setSearch(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                        placeholder={
+                                            currentUser?.role ===
+                                            "admin"
+                                                ? getBookingPageText(language, "searchAdmin")
+                                                : getBookingPageText(language, "searchUser")
+                                        }
+                                        aria-label={getBookingPageText(language, "searchBookings")}
+                                        style={{
+                                            width:
+                                                "100%",
+                                            height:
+                                                "56px",
+                                            border:
+                                                "none",
+                                            outline:
+                                                "none",
+                                            background:
+                                                "transparent",
+                                            padding:
+                                                "0 16px 0 12px",
+                                            fontSize:
+                                                "15px",
+                                            color:
+                                                "#302d3a",
+                                            boxSizing:
+                                                "border-box",
+                                        }}
+                                    />
 
-                        {currentUser?.role ===
-                            "admin" && (
+                                    {search && (
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                clearSearch
+                                            }
+                                            aria-label={getBookingPageText(language, "clearSearch")}
+                                            style={{
+                                                border:
+                                                    "none",
+                                                background:
+                                                    "transparent",
+                                                cursor:
+                                                    "pointer",
+                                                marginRight:
+                                                    "12px",
+                                                padding:
+                                                    "6px",
+                                                color:
+                                                    "#777184",
+                                                display:
+                                                    "flex",
+                                                alignItems:
+                                                    "center",
+                                                justifyContent:
+                                                    "center",
+                                            }}
+                                        >
+                                            <X
+                                                size={
+                                                    18
+                                                }
+                                            />
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* USER FILTER — ADMIN ONLY */}
+
+                                {currentUser?.role ===
+                                    "admin" && (
+                                        <div
+                                            style={{
+                                                position:
+                                                    "relative",
+                                                display:
+                                                    "flex",
+                                                alignItems:
+                                                    "center",
+                                                background:
+                                                    "#ffffff",
+                                                border:
+                                                    "1px solid #ddd8ec",
+                                                borderRadius:
+                                                    "16px",
+                                                minHeight:
+                                                    "58px",
+                                                boxShadow:
+                                                    "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                            }}
+                                        >
+                                            <User
+                                                size={18}
+                                                style={{
+                                                    marginLeft:
+                                                        "16px",
+                                                    color:
+                                                        "#6c5ce7",
+                                                    flexShrink:
+                                                        0,
+                                                }}
+                                            />
+
+                                            <select
+                                                value={
+                                                    userFilter
+                                                }
+                                                onChange={(
+                                                    event
+                                                ) =>
+                                                    setUserFilter(
+                                                        event
+                                                            .target
+                                                            .value
+                                                    )
+                                                }
+                                                aria-label={getBookingPageText(language, "filterUser")}
+                                                style={{
+                                                    width:
+                                                        "100%",
+                                                    height:
+                                                        "56px",
+                                                    border:
+                                                        "none",
+                                                    outline:
+                                                        "none",
+                                                    background:
+                                                        "transparent",
+                                                    padding:
+                                                        "0 14px 0 10px",
+                                                    fontSize:
+                                                        "15px",
+                                                    color:
+                                                        "#302d3a",
+                                                    cursor:
+                                                        "pointer",
+                                                }}
+                                            >
+                                                <option value="All">
+                                                    {getBookingPageText(language, "allUsers")}
+                                                </option>
+
+                                                {users.map(
+                                                    (
+                                                        user
+                                                    ) => (
+                                                        <option
+                                                            key={
+                                                                user.id
+                                                            }
+                                                            value={String(
+                                                                user.id
+                                                            )}
+                                                        >
+                                                            {
+                                                                user.name
+                                                            }
+                                                        </option>
+                                                    )
+                                                )}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                {/* STATUS */}
+
                                 <div
                                     style={{
                                         position:
@@ -688,8 +1129,8 @@ function BookingsContent() {
                                             "0 8px 24px rgba(78, 64, 125, 0.06)",
                                     }}
                                 >
-                                    <User
-                                        size={18}
+                                    <Circle
+                                        size={17}
                                         style={{
                                             marginLeft:
                                                 "16px",
@@ -702,18 +1143,18 @@ function BookingsContent() {
 
                                     <select
                                         value={
-                                            userFilter
+                                            statusFilter
                                         }
                                         onChange={(
                                             event
                                         ) =>
-                                            setUserFilter(
+                                            setStatusFilter(
                                                 event
                                                     .target
                                                     .value
                                             )
                                         }
-                                        aria-label={getBookingPageText(language, "filterUser")}
+                                        aria-label={getBookingPageText(language, "filterStatus")}
                                         style={{
                                             width:
                                                 "100%",
@@ -736,271 +1177,176 @@ function BookingsContent() {
                                         }}
                                     >
                                         <option value="All">
-                                            {getBookingPageText(language, "allUsers")}
+                                            {getBookingPageText(language, "allStatuses")}
                                         </option>
 
-                                        {users.map(
-                                            (
-                                                user
-                                            ) => (
-                                                <option
-                                                    key={
-                                                        user.id
-                                                    }
-                                                    value={String(
-                                                        user.id
-                                                    )}
-                                                >
-                                                    {
-                                                        user.name
-                                                    }
-                                                </option>
-                                            )
-                                        )}
+                                        <option value="confirmed">
+                                            {getBookingPageText(language, "confirmed")}
+                                        </option>
+
+                                        <option value="cancelled">
+                                            {getBookingPageText(language, "cancelled")}
+                                        </option>
                                     </select>
                                 </div>
-                            )}
 
-                        {/* STATUS */}
+                                {/* SORT */}
 
-                        <div
-                            style={{
-                                position:
-                                    "relative",
-                                display:
-                                    "flex",
-                                alignItems:
-                                    "center",
-                                background:
-                                    "#ffffff",
-                                border:
-                                    "1px solid #ddd8ec",
-                                borderRadius:
-                                    "16px",
-                                minHeight:
-                                    "58px",
-                                boxShadow:
-                                    "0 8px 24px rgba(78, 64, 125, 0.06)",
-                            }}
-                        >
-                            <Circle
-                                size={17}
-                                style={{
-                                    marginLeft:
-                                        "16px",
-                                    color:
-                                        "#6c5ce7",
-                                    flexShrink:
-                                        0,
-                                }}
-                            />
+                                <div
+                                    style={{
+                                        position:
+                                            "relative",
+                                        display:
+                                            "flex",
+                                        alignItems:
+                                            "center",
+                                        background:
+                                            "#ffffff",
+                                        border:
+                                            "1px solid #ddd8ec",
+                                        borderRadius:
+                                            "16px",
+                                        minHeight:
+                                            "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    }}
+                                >
+                                    <SlidersHorizontal
+                                        size={18}
+                                        style={{
+                                            marginLeft:
+                                                "16px",
+                                            color:
+                                                "#6c5ce7",
+                                            flexShrink:
+                                                0,
+                                        }}
+                                    />
 
-                            <select
-                                value={
-                                    statusFilter
-                                }
-                                onChange={(
-                                    event
-                                ) =>
-                                    setStatusFilter(
-                                        event
-                                            .target
-                                            .value
-                                    )
-                                }
-                                aria-label={getBookingPageText(language, "filterStatus")}
-                                style={{
-                                    width:
-                                        "100%",
-                                    height:
-                                        "56px",
-                                    border:
-                                        "none",
-                                    outline:
-                                        "none",
-                                    background:
-                                        "transparent",
-                                    padding:
-                                        "0 14px 0 10px",
-                                    fontSize:
-                                        "15px",
-                                    color:
-                                        "#302d3a",
-                                    cursor:
-                                        "pointer",
-                                }}
-                            >
-                                <option value="All">
-                                    {getBookingPageText(language, "allStatuses")}
-                                </option>
+                                    <select
+                                        value={
+                                            sortBy
+                                        }
+                                        onChange={(
+                                            event
+                                        ) =>
+                                            setSortBy(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                        aria-label={getBookingPageText(language, "sortBookings")}
+                                        style={{
+                                            width:
+                                                "100%",
+                                            height:
+                                                "56px",
+                                            border:
+                                                "none",
+                                            outline:
+                                                "none",
+                                            background:
+                                                "transparent",
+                                            padding:
+                                                "0 0px 0 10px",
+                                            fontSize:
+                                                "15px",
+                                            color:
+                                                "#302d3a",
+                                            cursor:
+                                                "pointer",
+                                        }}
+                                    >
+                                        <option value="newest">
+                                            {getBookingPageText(language, "checkIn")}: newest
+                                        </option>
 
-                                <option value="confirmed">
-                                    {getBookingPageText(language, "confirmed")}
-                                </option>
+                                        <option value="oldest">
+                                            {getBookingPageText(language, "checkIn")}: oldest
+                                        </option>
 
-                                <option value="cancelled">
-                                    {getBookingPageText(language, "cancelled")}
-                                </option>
-                            </select>
-                        </div>
+                                        <option value="totalHigh">
+                                            {getBookingPageText(language, "totalHigh")}
+                                        </option>
 
-                        {/* SORT */}
+                                        <option value="totalLow">
+                                            {getBookingPageText(language, "totalLow")}
+                                        </option>
+                                    </select>
+                                </div>
 
-                        <div
-                            style={{
-                                position:
-                                    "relative",
-                                display:
-                                    "flex",
-                                alignItems:
-                                    "center",
-                                background:
-                                    "#ffffff",
-                                border:
-                                    "1px solid #ddd8ec",
-                                borderRadius:
-                                    "16px",
-                                minHeight:
-                                    "58px",
-                                boxShadow:
-                                    "0 8px 24px rgba(78, 64, 125, 0.06)",
-                            }}
-                        >
-                            <SlidersHorizontal
-                                size={18}
-                                style={{
-                                    marginLeft:
-                                        "16px",
-                                    color:
-                                        "#6c5ce7",
-                                    flexShrink:
-                                        0,
-                                }}
-                            />
+                                {/* CLEAR */}
 
-                            <select
-                                value={
-                                    sortBy
-                                }
-                                onChange={(
-                                    event
-                                ) =>
-                                    setSortBy(
-                                        event
-                                            .target
-                                            .value
-                                    )
-                                }
-                                aria-label={getBookingPageText(language, "sortBookings")}
-                                style={{
-                                    width:
-                                        "100%",
-                                    height:
-                                        "56px",
-                                    border:
-                                        "none",
-                                    outline:
-                                        "none",
-                                    background:
-                                        "transparent",
-                                    padding:
-                                        "0 0px 0 10px",
-                                    fontSize:
-                                        "15px",
-                                    color:
-                                        "#302d3a",
-                                    cursor:
-                                        "pointer",
-                                }}
-                            >
-                                <option value="newest">
-                                    {getBookingPageText(language, "checkIn")}: newest
-                                </option>
+                                <button
+                                    type="button"
+                                    className="bookings-clear-button"
+                                    onClick={
+                                        clearFilters
+                                    }
+                                    disabled={
+                                        !hasActiveFilters
+                                    }
+                                    aria-label={getBookingPageText(language, "clear")}
+                                    style={{
+                                        minHeight:
+                                            "58px",
+                                        width:
+                                            "160px",
+                                        padding:
+                                            "0 18px",
+                                        border:
+                                            "1px solid #ddd8ec",
+                                        borderRadius:
+                                            "16px",
+                                        background:
+                                            hasActiveFilters
+                                                ? "#ffffff"
+                                                : "#f7f5fb",
+                                        color:
+                                            hasActiveFilters
+                                                ? "#5b526b"
+                                                : "#aaa4b4",
+                                        fontSize:
+                                            "15px",
+                                        fontWeight:
+                                            700,
+                                        cursor:
+                                            hasActiveFilters
+                                                ? "pointer"
+                                                : "default",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    }}
+                                >
+                                    {getBookingPageText(language, "clear")}
+                                </button>
+                            </div>
 
-                                <option value="oldest">
-                                    {getBookingPageText(language, "checkIn")}: oldest
-                                </option>
+                            {/* RESULTS COUNT */}
 
-                                <option value="totalHigh">
-                                    {getBookingPageText(language, "totalHigh")}
-                                </option>
-
-                                <option value="totalLow">
-                                    {getBookingPageText(language, "totalLow")}
-                                </option>
-                            </select>
-                        </div>
-
-                        {/* CLEAR */}
-
-                        <button
-                            type="button"
-                            className="bookings-clear-button"
-                            onClick={
-                                clearFilters
-                            }
-                            disabled={
-                                !hasActiveFilters
-                            }
-                            aria-label={getBookingPageText(language, "clear")}
-                            style={{
-                                minHeight:
-                                    "58px",
-                                width:
-                                    "160px",
-                                padding:
-                                    "0 18px",
-                                border:
-                                    "1px solid #ddd8ec",
-                                borderRadius:
-                                    "16px",
-                                background:
-                                    hasActiveFilters
-                                        ? "#ffffff"
-                                        : "#f7f5fb",
-                                color:
-                                    hasActiveFilters
-                                        ? "#5b526b"
-                                        : "#aaa4b4",
-                                fontSize:
-                                    "15px",
-                                fontWeight:
-                                    700,
-                                cursor:
-                                    hasActiveFilters
-                                        ? "pointer"
-                                        : "default",
-                                boxShadow:
-                                    "0 8px 24px rgba(78, 64, 125, 0.06)",
-                            }}
-                        >
-                            {getBookingPageText(language, "clear")}
-                        </button>
-                    </div>
-
-                    {/* RESULTS COUNT */}
-
-                    {userBookings.length >
-                        0 && (
-                            <div
-                                style={{
-                                    display:
-                                        "flex",
-                                    alignItems:
-                                        "center",
-                                    justifyContent:
-                                        "space-between",
-                                    gap: "12px",
-                                    marginBottom:
-                                        "18px",
-                                    color:
-                                        "#777184",
-                                    fontSize:
-                                        "14px",
-                                    animation:
-                                        "heroFadeUp 0.7s ease 0.24s both",
-                                }}
-                            >
+                            {userBookings.length >
+                                0 && (
+                                    <div
+                                        style={{
+                                            display:
+                                                "flex",
+                                            alignItems:
+                                                "center",
+                                            justifyContent:
+                                                "space-between",
+                                            gap: "12px",
+                                            marginBottom:
+                                                "18px",
+                                            color:
+                                                "#777184",
+                                            fontSize:
+                                                "14px",
+                                            animation:
+                                                "heroFadeUp 0.7s ease 0.24s both",
+                                        }}
+                                    >
                             <span>
                                 {getBookingPageText(language, "showing")}{" "}
                                 <strong
@@ -1026,154 +1372,154 @@ function BookingsContent() {
                                 </strong>{" "}
                                 bookings
                             </span>
-                            </div>
-                        )}
+                                    </div>
+                                )}
 
-                    {/* NO BOOKINGS */}
+                            {/* NO BOOKINGS */}
 
-                    {userBookings.length ===
-                    0 ? (
-                        <p
-                            className="bookings-description-animation"
-                            style={{
-                                animation:
-                                    "heroFadeUp 0.8s ease 0.16s both",
-                            }}
-                        >
-                            {getTranslation(
-                                language,
-                                "noBookings"
-                            )}
-                        </p>
-                    ) : filteredBookings.length ===
-                    0 ? (
-                        <div
-                            className="home-empty-state"
-                            style={{
-                                animation:
-                                    "heroFadeUp 0.7s ease both",
-                            }}
-                        >
-                            <h3>
-                                {getBookingPageText(language, "noFound")}
-                            </h3>
+                            {userBookings.length ===
+                            0 ? (
+                                <p
+                                    className="bookings-description-animation"
+                                    style={{
+                                        animation:
+                                            "heroFadeUp 0.8s ease 0.16s both",
+                                    }}
+                                >
+                                    {getTranslation(
+                                        language,
+                                        "noBookings"
+                                    )}
+                                </p>
+                            ) : filteredBookings.length ===
+                            0 ? (
+                                <div
+                                    className="home-empty-state"
+                                    style={{
+                                        animation:
+                                            "heroFadeUp 0.7s ease both",
+                                    }}
+                                >
+                                    <h3>
+                                        {getBookingPageText(language, "noFound")}
+                                    </h3>
 
-                            <p>
-                                {getBookingPageText(language, "tryFilters")}
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="bookings-list">
+                                    <p>
+                                        {getBookingPageText(language, "tryFilters")}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="bookings-list">
 
-                            {filteredBookings.map(
-                                (
-                                    booking,
-                                    index
-                                ) => {
+                                    {filteredBookings.map(
+                                        (
+                                            booking,
+                                            index
+                                        ) => {
 
-                                    const user =
-                                        users.find(
-                                            (
-                                                item
-                                            ) =>
-                                                item.id ===
-                                                booking.userId
-                                        );
+                                            const user =
+                                                users.find(
+                                                    (
+                                                        item
+                                                    ) =>
+                                                        item.id ===
+                                                        booking.userId
+                                                );
 
-                                    /*
-                                     * IMPORTANT:
-                                     * Dynamic property lookup.
-                                     */
-                                    const property =
-                                        allProperties.find(
-                                            (
-                                                item
-                                            ) =>
-                                                item.id ===
-                                                booking.propertyId
-                                        );
+                                            /*
+                                             * IMPORTANT:
+                                             * Dynamic property lookup.
+                                             */
+                                            const property =
+                                                allProperties.find(
+                                                    (
+                                                        item
+                                                    ) =>
+                                                        item.id ===
+                                                        booking.propertyId
+                                                );
 
-                                    /*
-                                     * IMPORTANT:
-                                     * Dynamic room lookup.
-                                     */
-                                    const room =
-                                        allRooms.find(
-                                            (
-                                                item
-                                            ) =>
-                                                item.id ===
-                                                booking.roomId &&
-                                                item.propertyId ===
-                                                booking.propertyId
-                                        );
+                                            /*
+                                             * IMPORTANT:
+                                             * Dynamic room lookup.
+                                             */
+                                            const room =
+                                                allRooms.find(
+                                                    (
+                                                        item
+                                                    ) =>
+                                                        item.id ===
+                                                        booking.roomId &&
+                                                        item.propertyId ===
+                                                        booking.propertyId
+                                                );
 
-                                    const isConfirmed =
-                                        booking.status ===
-                                        "confirmed";
+                                            const isConfirmed =
+                                                booking.status ===
+                                                "confirmed";
 
-                                    return (
-                                        <div
-                                            className="booking-card"
-                                            key={
-                                                booking.id
-                                            }
-                                            style={{
-                                                animation:
-                                                    "heroFadeUp 0.7s ease both",
-                                                animationDelay:
-                                                    `${0.12 + index * 0.1}s`,
-                                            }}
-                                        >
-                                            <div className="booking-content">
-
-                                                <h2>
-                                                    {
-                                                        property?.name
+                                            return (
+                                                <div
+                                                    className="booking-card"
+                                                    key={
+                                                        booking.id
                                                     }
-                                                </h2>
+                                                    style={{
+                                                        animation:
+                                                            "heroFadeUp 0.7s ease both",
+                                                        animationDelay:
+                                                            `${0.12 + index * 0.1}s`,
+                                                    }}
+                                                >
+                                                    <div className="booking-content">
 
-                                                <div className="booking-info">
+                                                        <h2>
+                                                            {
+                                                                property?.name
+                                                            }
+                                                        </h2>
 
-                                                    {/* PROPERTY */}
+                                                        <div className="booking-info">
 
-                                                    <div className="booking-info-row">
-                                                        <Building2 className="booking-info-icon" />
+                                                            {/* PROPERTY */}
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "property"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                            <div className="booking-info-row">
+                                                                <Building2 className="booking-info-icon" />
 
-                                                            <span>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "property"
+                                                                            )
+                                                                        }
+                                                                    </strong>
+
+                                                                    <span>
                                                                 {
                                                                     property?.name
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* ROOM */}
+                                                            {/* ROOM */}
 
-                                                    <div className="booking-info-row">
-                                                        <DoorOpen className="booking-info-icon" />
+                                                            <div className="booking-info-row">
+                                                                <DoorOpen className="booking-info-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "room"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "room"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span>
+                                                                    <span>
                                                                 {
                                                                     room?.name ??
                                                                     getTranslation(
@@ -1182,211 +1528,711 @@ function BookingsContent() {
                                                                     )
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* USER */}
+                                                            {/* USER */}
 
-                                                    <div className="booking-info-row">
-                                                        <User className="booking-info-icon" />
+                                                            <div className="booking-info-row">
+                                                                <User className="booking-info-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "user"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "user"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span>
+                                                                    <span>
                                                                 {
                                                                     user?.name ??
                                                                     getBookingPageText(language, "unknownUser")
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* CHECK-IN */}
+                                                            {/* CHECK-IN */}
 
-                                                    <div className="booking-info-row">
-                                                        <CalendarDays className="booking-info-icon" />
+                                                            <div className="booking-info-row">
+                                                                <CalendarDays className="booking-info-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "checkIn"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "checkIn"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span>
+                                                                    <span>
                                                                 {
                                                                     formatDate(
                                                                         booking.checkIn
                                                                     )
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* CHECK-OUT */}
+                                                            {/* CHECK-OUT */}
 
-                                                    <div className="booking-info-row">
-                                                        <CalendarDays className="booking-info-icon" />
+                                                            <div className="booking-info-row">
+                                                                <CalendarDays className="booking-info-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "checkOut"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "checkOut"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span>
+                                                                    <span>
                                                                 {
                                                                     formatDate(
                                                                         booking.checkOut
                                                                     )
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* GUESTS */}
+                                                            {/* GUESTS */}
 
-                                                    <div className="booking-info-row">
-                                                        <Users className="booking-info-icon" />
+                                                            <div className="booking-info-row">
+                                                                <Users className="booking-info-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "guests"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "guests"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span>
+                                                                    <span>
                                                                 {
                                                                     getGuestText(
                                                                         booking
                                                                     )
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* TOTAL */}
+                                                            {/* TOTAL */}
 
-                                                    <div className="booking-info-row">
-                                                        <Tag className="booking-info-icon" />
+                                                            <div className="booking-info-row">
+                                                                <Tag className="booking-info-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "total"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "total"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span>
+                                                                    <span>
                                                                 {
                                                                     formatPrice(
                                                                         booking.totalPrice
                                                                     )
                                                                 }
                                                             </span>
-                                                        </div>
-                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                    {/* STATUS */}
+                                                            {/* STATUS */}
 
-                                                    <div className="booking-info-row">
-                                                        <Circle className="booking-info-icon status-icon" />
+                                                            <div className="booking-info-row">
+                                                                <Circle className="booking-info-icon status-icon" />
 
-                                                        <div>
-                                                            <strong>
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "status"
-                                                                    )
-                                                                }
-                                                            </strong>
+                                                                <div>
+                                                                    <strong>
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "status"
+                                                                            )
+                                                                        }
+                                                                    </strong>
 
-                                                            <span
-                                                                className={
-                                                                    isConfirmed
-                                                                        ? "booking-status status-confirmed"
-                                                                        : "booking-status status-cancelled"
-                                                                }
-                                                            >
+                                                                    <span
+                                                                        className={
+                                                                            isConfirmed
+                                                                                ? "booking-status status-confirmed"
+                                                                                : "booking-status status-cancelled"
+                                                                        }
+                                                                    >
                                                                 {
                                                                     getStatusText(
                                                                         booking.status
                                                                     )
                                                                 }
                                                             </span>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div className="booking-actions">
+
+                                                            {property && (
+                                                                <Link
+                                                                    href={`/stays/${property.id}`}
+                                                                    className="button"
+                                                                >
+                                                                    {
+                                                                        getTranslation(
+                                                                            language,
+                                                                            "viewProperty"
+                                                                        )
+                                                                    }
+                                                                </Link>
+                                                            )}
+
+                                                            {booking.status !==
+                                                                "cancelled" && (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="cancel-button"
+                                                                        onClick={() =>
+                                                                            handleCancelBooking(
+                                                                                booking.id
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            getTranslation(
+                                                                                language,
+                                                                                "cancelBooking"
+                                                                            )
+                                                                        }
+                                                                    </button>
+                                                                )}
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+
+                                </div>
+                            )}
+
+                        </>
+                    )}
+
+                    {activeBookingTab === "transfers" && (
+                        <section className="bookings-transfers-section">
+                            <div
+                                className="bookings-transfers-header"
+                                style={{
+                                    marginBottom: "24px",
+                                    animation: "heroFadeUp 0.7s ease both",
+                                }}
+                            >
+                                <span
+                                    className="bookings-transfers-eyebrow"
+                                    style={{
+                                        display: "inline-block",
+                                        marginBottom: "8px",
+                                        color: "#6c5ce7",
+                                        fontSize: "12px",
+                                        fontWeight: 800,
+                                        letterSpacing: "0.12em",
+                                    }}
+                                >
+                                    STAYWAY TRANSFERS
+                                </span>
+
+                                <h2
+                                    style={{
+                                        margin: 0,
+                                        fontSize: "28px",
+                                        fontWeight: 800,
+                                        color: "#302d3a",
+                                    }}
+                                >
+                                    {getTranslation(language, "transfers")}
+                                </h2>
+                            </div>
+
+                            {transferBookings.length === 0 ? (
+                                <div
+                                    className="bookings-empty"
+                                    style={{
+                                        padding: "48px 24px",
+                                        borderRadius: "20px",
+                                        background: "#ffffff",
+                                        border: "1px solid #e4dff0",
+                                        textAlign: "center",
+                                        boxShadow: "0 10px 30px rgba(78, 64, 125, 0.06)",
+                                        animation: "heroFadeUp 0.7s ease both",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            width: "64px",
+                                            height: "64px",
+                                            margin: "0 auto 16px",
+                                            borderRadius: "18px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            background: "#f1edff",
+                                            fontSize: "28px",
+                                        }}
+                                    >
+                                        🚘
+                                    </div>
+
+                                    <h3
+                                        style={{
+                                            margin: "0 0 8px",
+                                            fontSize: "20px",
+                                            fontWeight: 800,
+                                            color: "#302d3a",
+                                        }}
+                                    >
+                                        {getTranslation(language, "noBookings")}
+                                    </h3>
+
+                                    <p
+                                        style={{
+                                            margin: "0 0 22px",
+                                            color: "#777184",
+                                        }}
+                                    >
+                                        {getTranslation(language, "searchTransfers")}
+                                    </p>
+
+                                    <Link
+                                        href="/transfers"
+                                        className="button"
+                                    >
+                                        {getTranslation(language, "searchTransfers")}
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div
+                                    className="bookings-transfers-list"
+                                    style={{
+                                        display: "grid",
+                                        gap: "18px",
+                                    }}
+                                >
+                                    {transferBookings.map(
+                                        (booking, index) => {
+                                            const isReturn =
+                                                booking.transferType === "return";
+
+                                            const passengerLabel =
+                                                getTranslation(language, "passengers");
+
+                                            const transferVehicle = booking.vehicleId
+                                                ? getTransferVehicleById(booking.vehicleId)
+                                                : undefined;
+
+                                            const transferDriver = booking.driverId
+                                                ? getTransferDriverById(booking.driverId)
+                                                : transferVehicle?.driverId
+                                                    ? getTransferDriverById(transferVehicle.driverId)
+                                                    : undefined;
+
+                                            const vehicleImage =
+                                                (booking as TransferBooking & {
+                                                    vehicleImage?: string;
+                                                }).vehicleImage ||
+                                                transferVehicle?.image;
+
+                                            const vehicleName =
+                                                booking.vehicleName ||
+                                                transferVehicle?.name;
+
+                                            const licensePlate =
+                                                booking.licensePlate ||
+                                                transferVehicle?.licensePlate;
+
+                                            const driverName =
+                                                booking.driverName ||
+                                                transferDriver?.name;
+                                            
+                                            return (
+                                                <article
+                                                    key={booking.id}
+                                                    className="bookings-transfer-card"
+                                                    style={{
+                                                        padding: "28px",
+                                                        borderRadius: "24px",
+                                                        background: "#ffffff",
+                                                        border: "1px solid #e8e2f4",
+                                                        boxShadow: "0 14px 38px rgba(78, 64, 125, 0.08)",
+                                                        animation: "heroFadeUp 0.7s ease both",
+                                                        animationDelay: `${0.08 + index * 0.08}s`,
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "flex-start",
+                                                            justifyContent: "space-between",
+                                                            gap: "24px",
+                                                            marginBottom: "24px",
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                gap: "18px",
+                                                                minWidth: 0,
+                                                            }}
+                                                        >
+                                                            {vehicleImage ? (
+                                                                <img
+                                                                    src={vehicleImage}
+                                                                    alt={vehicleName || booking.optionTitle}
+                                                                    style={{
+                                                                        width: "138px",
+                                                                        height: "92px",
+                                                                        borderRadius: "18px",
+                                                                        objectFit: "cover",
+                                                                        display: "block",
+                                                                        flexShrink: 0,
+                                                                        background: "#f1edff",
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <span
+                                                                    style={{
+                                                                        width: "138px",
+                                                                        height: "92px",
+                                                                        borderRadius: "18px",
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        justifyContent: "center",
+                                                                        background: "#f1edff",
+                                                                        fontSize: "34px",
+                                                                        flexShrink: 0,
+                                                                    }}
+                                                                >
+                                                                    🚘
+                                                                </span>
+                                                            )}
+
+                                                            <div style={{ minWidth: 0 }}>
+                                                                <div
+                                                                    style={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        gap: "10px",
+                                                                        flexWrap: "wrap",
+                                                                        marginBottom: "7px",
+                                                                    }}
+                                                                >
+                                                                    <h3
+                                                                        style={{
+                                                                            margin: 0,
+                                                                            color: "#272333",
+                                                                            fontSize: "22px",
+                                                                            lineHeight: 1.2,
+                                                                            fontWeight: 850,
+                                                                        }}
+                                                                    >
+                                                                        {booking.optionTitle}
+                                                                    </h3>
+                                                                    <span
+                                                                        style={{
+                                                                            display: "inline-flex",
+                                                                            alignItems: "center",
+                                                                            padding: "7px 12px",
+                                                                            borderRadius: "999px",
+                                                                            background: "#f0ebff",
+                                                                            color: "#6751dc",
+                                                                            fontSize: "12px",
+                                                                            fontWeight: 800,
+                                                                        }}
+                                                                    >
+                                                                        {isReturn ? getTranslation(language, "return") : getTranslation(language, "oneWay")}
+                                                                    </span>
+                                                                </div>
+
+                                                                {vehicleName && (
+                                                                    <div
+                                                                        style={{
+                                                                            color: "#3d3949",
+                                                                            fontSize: "15px",
+                                                                            fontWeight: 800,
+                                                                            lineHeight: 1.45,
+                                                                        }}
+                                                                    >
+                                                                        {vehicleName}{licensePlate ? ` · ${licensePlate}` : ""}
+                                                                    </div>
+                                                                )}
+
+                                                                {driverName && (
+                                                                    <div
+                                                                        style={{
+                                                                            display: "flex",
+                                                                            alignItems: "center",
+                                                                            flexWrap: "wrap",
+                                                                            gap: "9px",
+                                                                            marginTop: "10px",
+                                                                            color: "#716b7d",
+                                                                            fontSize: "13px",
+                                                                            fontWeight: 650,
+                                                                        }}
+                                                                    >
+                                                                        <span
+                                                                            style={{
+                                                                                width: "28px",
+                                                                                height: "28px",
+                                                                                borderRadius: "9px",
+                                                                                display: "inline-flex",
+                                                                                alignItems: "center",
+                                                                                justifyContent: "center",
+                                                                                background: "#f1edff",
+                                                                                color: "#7055e8",
+                                                                                flexShrink: 0,
+                                                                            }}
+                                                                        >
+                                                                            <User size={15} strokeWidth={2.4} />
+                                                                        </span>
+                                                                        <span>Driver: {driverName}</span>
+                                                                        {transferDriver?.phone && (
+                                                                            <>
+                                                                                <span style={{ color: "#c9c3d5" }}>•</span>
+                                                                                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                                                                                    <Phone size={14} strokeWidth={2.3} />
+                                                                                    {transferDriver.phone}
+                                                                                </span>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            style={{
+                                                                flexShrink: 0,
+                                                                minWidth: "118px",
+                                                                padding: "13px 18px",
+                                                                borderRadius: "18px",
+                                                                background: "#faf7ff",
+                                                                textAlign: "center",
+                                                            }}
+                                                        >
+                                                            <span style={{ display: "block", marginBottom: "3px", color: "#817a91", fontSize: "12px", fontWeight: 700 }}>
+                                                                {getTranslation(language, "total")}
+                                                            </span>
+                                                            <strong style={{ color: "#6c5ce7", fontSize: "25px", lineHeight: 1.1, fontWeight: 900 }}>
+                                                                {formatPrice(booking.price)}
+                                                            </strong>
                                                         </div>
                                                     </div>
 
-                                                </div>
+                                                    <div
+                                                        style={{
+                                                            display: "grid",
+                                                            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr) minmax(160px, 0.7fr)",
+                                                            gap: 0,
+                                                            padding: "4px 0",
+                                                            borderRadius: "20px",
+                                                            background: "linear-gradient(135deg, #faf8ff 0%, #f5f1ff 100%)",
+                                                            border: "1px solid #eee9f8",
+                                                            overflow: "hidden",
+                                                        }}
+                                                    >
+                                                        <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "20px", borderRight: "1px solid #e7e1f2" }}>
+                                                            <span style={{ width: "48px", height: "48px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0ebff", color: "#7055e8", flexShrink: 0 }}>
+                                                                <Building2 size={23} strokeWidth={2.2} />
+                                                            </span>
+                                                            <div style={{ minWidth: 0 }}>
+                                                                <span style={{ display: "block", marginBottom: "5px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                    {getTranslation(language, "pickupLocation")}
+                                                                </span>
+                                                                <strong style={{ display: "block", color: "#302d3a", fontSize: "14px", lineHeight: 1.4 }}>
+                                                                    {booking.pickup}
+                                                                </strong>
+                                                            </div>
+                                                        </div>
 
-                                                <div className="booking-actions">
+                                                        <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "20px", borderRight: "1px solid #e7e1f2" }}>
+                                                            <span style={{ width: "48px", height: "48px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0ebff", color: "#7055e8", flexShrink: 0 }}>
+                                                                <Building2 size={23} strokeWidth={2.2} />
+                                                            </span>
+                                                            <div style={{ minWidth: 0 }}>
+                                                                <span style={{ display: "block", marginBottom: "5px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                    {getTranslation(language, "destination")}
+                                                                </span>
+                                                                <strong style={{ display: "block", color: "#302d3a", fontSize: "14px", lineHeight: 1.4 }}>
+                                                                    {booking.destination}
+                                                                </strong>
+                                                            </div>
+                                                        </div>
 
-                                                    {property && (
-                                                        <Link
-                                                            href={`/stays/${property.id}`}
-                                                            className="button"
-                                                        >
-                                                            {
-                                                                getTranslation(
-                                                                    language,
-                                                                    "viewProperty"
-                                                                )
-                                                            }
-                                                        </Link>
-                                                    )}
+                                                        <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "20px" }}>
+                                                            <span style={{ width: "48px", height: "48px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0ebff", color: "#7055e8", flexShrink: 0 }}>
+                                                                <Users size={23} strokeWidth={2.2} />
+                                                            </span>
+                                                            <div>
+                                                                <span style={{ display: "block", marginBottom: "5px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                    {getTranslation(language, "passengers")}
+                                                                </span>
+                                                                <strong style={{ display: "block", color: "#302d3a", fontSize: "14px" }}>
+                                                                    {booking.passengers} {passengerLabel}
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                                    {booking.status !==
-                                                        "cancelled" && (
-                                                            <button
-                                                                type="button"
-                                                                className="cancel-button"
-                                                                onClick={() =>
-                                                                    handleCancelBooking(
-                                                                        booking.id
-                                                                    )
-                                                                }
-                                                            >
-                                                                {
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "cancelBooking"
-                                                                    )
-                                                                }
-                                                            </button>
+                                                    <div
+                                                        style={{
+                                                            display: "grid",
+                                                            gridTemplateColumns: isReturn ? "repeat(4, minmax(0, 1fr))" : "repeat(2, minmax(0, 1fr))",
+                                                            gap: "12px",
+                                                            marginTop: "14px",
+                                                        }}
+                                                    >
+                                                        <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "17px 18px", borderRadius: "18px", border: "1px solid #ebe6f7", background: "#ffffff" }}>
+                                                            <span style={{ width: "44px", height: "44px", borderRadius: "13px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f0ff", color: "#7055e8", flexShrink: 0 }}>
+                                                                <CalendarDays size={21} strokeWidth={2.2} />
+                                                            </span>
+                                                            <div>
+                                                                <span style={{ display: "block", marginBottom: "4px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                    {getTranslation(language, "date")}
+                                                                </span>
+                                                                <strong style={{ color: "#302d3a", fontSize: "14px" }}>{formatTransferDate(booking.date)}</strong>
+                                                            </div>
+                                                        </div>
+
+                                                        <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "17px 18px", borderRadius: "18px", border: "1px solid #ebe6f7", background: "#ffffff" }}>
+                                                            <span style={{ width: "44px", height: "44px", borderRadius: "13px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f0ff", color: "#7055e8", flexShrink: 0 }}>
+                                                                <Clock3 size={21} strokeWidth={2.2} />
+                                                            </span>
+                                                            <div>
+                                                                <span style={{ display: "block", marginBottom: "4px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                    {getTranslation(language, "time")}
+                                                                </span>
+                                                                <strong style={{ color: "#302d3a", fontSize: "14px" }}>{booking.time}</strong>
+                                                            </div>
+                                                        </div>
+
+                                                        {isReturn && (
+                                                            <>
+                                                                <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "17px 18px", borderRadius: "18px", border: "1px solid #ebe6f7", background: "#ffffff" }}>
+                                                                    <span style={{ width: "44px", height: "44px", borderRadius: "13px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f0ff", color: "#7055e8", flexShrink: 0 }}>
+                                                                        <CalendarDays size={21} strokeWidth={2.2} />
+                                                                    </span>
+                                                                    <div>
+                                                                        <span style={{ display: "block", marginBottom: "4px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                            {getTranslation(language, "returnDate")}
+                                                                        </span>
+                                                                        <strong style={{ color: "#302d3a", fontSize: "14px" }}>{formatTransferDate(booking.returnDate ?? "—")}</strong>
+                                                                    </div>
+                                                                </div>
+                                                                <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "17px 18px", borderRadius: "18px", border: "1px solid #ebe6f7", background: "#ffffff" }}>
+                                                                    <span style={{ width: "44px", height: "44px", borderRadius: "13px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f0ff", color: "#7055e8", flexShrink: 0 }}>
+                                                                        <Clock3 size={21} strokeWidth={2.2} />
+                                                                    </span>
+                                                                    <div>
+                                                                        <span style={{ display: "block", marginBottom: "4px", color: "#8b8498", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                                            {getTranslation(language, "returnTime")}
+                                                                        </span>
+                                                                        <strong style={{ color: "#302d3a", fontSize: "14px" }}>{booking.returnTime ?? "—"}</strong>
+                                                                    </div>
+                                                                </div>
+                                                            </>
                                                         )}
+                                                    </div>
 
-                                                </div>
+                                                    <div
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "space-between",
+                                                            gap: "16px",
+                                                            marginTop: "18px",
+                                                            paddingTop: "16px",
+                                                            borderTop: "1px solid #eeeaf5",
+                                                        }}
+                                                    >
+                                                        <span
+                                                            style={{
+                                                                display: "inline-flex",
+                                                                alignItems: "center",
+                                                                gap: "8px",
+                                                                padding: "9px 14px",
+                                                                borderRadius: "999px",
+                                                                background: "#e9f9ef",
+                                                                color: "#238657",
+                                                                fontSize: "13px",
+                                                                fontWeight: 800,
+                                                            }}
+                                                        >
+                                                            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#2d9b67" }} />
+                                                            {getTranslation(language, "confirmed")}
+                                                        </span>
 
-                                            </div>
-                                        </div>
-                                    );
-                                }
+                                                        <span
+                                                            style={{
+                                                                display: "inline-flex",
+                                                                alignItems: "center",
+                                                                gap: "8px",
+                                                                padding: "8px 12px 8px 9px",
+                                                                borderRadius: "14px",
+                                                                background: "#faf8ff",
+                                                                border: "1px solid #eee9f8",
+                                                                color: "#777084",
+                                                                fontSize: "13px",
+                                                                fontWeight: 650,
+                                                            }}
+                                                        >
+                                                            <span
+                                                                style={{
+                                                                    width: "28px",
+                                                                    height: "28px",
+                                                                    borderRadius: "9px",
+                                                                    display: "inline-flex",
+                                                                    alignItems: "center",
+                                                                    justifyContent: "center",
+                                                                    background: "#f0ebff",
+                                                                    color: "#7055e8",
+                                                                    flexShrink: 0,
+                                                                }}
+                                                            >
+                                                                <User size={14} strokeWidth={2.4} />
+                                                            </span>
+                                                            <span>
+                                                                {getTranslation(language, "user")} {booking.firstName} {booking.lastName}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </article>
+                                            );
+
+                                        }
+                                    )}
+                                </div>
                             )}
-
-                        </div>
+                        </section>
                     )}
 
                 </div>
@@ -1395,4 +2241,11 @@ function BookingsContent() {
     );
 }
 
-
+export default function BookingsPage() {
+    return (
+        <ProtectedRoute>
+            <BookingsContent />
+        </ProtectedRoute>
+    );
+}
+ 

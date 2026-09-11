@@ -80,6 +80,19 @@ const bookingPageTranslations = {
         capacity: "This room can accommodate up to {n} adults and children.",
         loggedIn: "You must be logged in to make a booking.",
         propertyMissing: "Property not found.",
+        passengerDetails: "Passenger details",
+        whoIsTravelling: "Who is travelling?",
+        firstName: "First name",
+        lastName: "Last name",
+        emailAddress: "Email address",
+        phoneNumber: "Phone number",
+        specialRequests: "Special requests",
+        specialRequestsPlaceholder: "Anything we should know about your stay?",
+        bookingReviewNote: "Your booking details will be reviewed before the reservation is confirmed.",
+        confirmBooking: "Confirm booking",
+        backToBooking: "Back to booking details",
+        requiredFields: "Please fill in all required fields.",
+        invalidEmail: "Please enter a valid email address.",
     },
     "Română": {
         backToProperty: "Înapoi la proprietate",
@@ -116,6 +129,19 @@ const bookingPageTranslations = {
         capacity: "Această cameră poate găzdui până la {n} adulți și copii.",
         loggedIn: "Trebuie să fii autentificat pentru a face o rezervare.",
         propertyMissing: "Proprietatea nu a fost găsită.",
+        passengerDetails: "Datele pasagerului",
+        whoIsTravelling: "Cine călătorește?",
+        firstName: "Prenume",
+        lastName: "Nume",
+        emailAddress: "Adresă de email",
+        phoneNumber: "Număr de telefon",
+        specialRequests: "Solicitări speciale",
+        specialRequestsPlaceholder: "Este ceva ce ar trebui să știm despre șederea ta?",
+        bookingReviewNote: "Datele rezervării vor fi verificate înainte ca rezervarea să fie confirmată.",
+        confirmBooking: "Confirmă rezervarea",
+        backToBooking: "Înapoi la detaliile rezervării",
+        requiredFields: "Completează toate câmpurile obligatorii.",
+        invalidEmail: "Introdu o adresă de email validă.",
     },
     "Русский": {
         backToProperty: "Назад к объекту",
@@ -1468,7 +1494,7 @@ function getBookingText(
         bookingPageTranslations.English;
 
     let text: string =
-        dictionary[key] ??
+        (dictionary as Partial<typeof bookingPageTranslations.English>)[key] ??
         bookingPageTranslations.English[key];
 
     if (values) {
@@ -1669,6 +1695,40 @@ function NewBookingForm() {
     ] =
         useState("");
 
+    /* =====================================================
+       PASSENGER DETAILS
+       ===================================================== */
+
+    const [
+        firstName,
+        setFirstName,
+    ] =
+        useState("");
+
+    const [
+        lastName,
+        setLastName,
+    ] =
+        useState("");
+
+    const [
+        email,
+        setEmail,
+    ] =
+        useState("");
+
+    const [
+        phone,
+        setPhone,
+    ] =
+        useState("");
+
+    const [
+        specialRequests,
+        setSpecialRequests,
+    ] =
+        useState("");
+
 
     /* =====================================================
        SELECTED ROOM
@@ -1791,129 +1851,71 @@ function NewBookingForm() {
 
     const handleBooking =
         () => {
+            setError("");
+
+            if (!checkIn || !checkOut) {
+                setError(getBookingText(language, "selectDates"));
+                return false;
+            }
+
+            const today = getTodayDate();
+
+            if (checkIn < today) {
+                setError(getBookingText(language, "checkInPast"));
+                return false;
+            }
+
+            if (checkOut < today) {
+                setError(getBookingText(language, "checkOutPast"));
+                return false;
+            }
+
+            if (checkOut <= checkIn) {
+                setError(getBookingText(language, "checkOutAfter"));
+                return false;
+            }
+
+            if (adults < 1) {
+                setError(getBookingText(language, "adultRequired"));
+                return false;
+            }
+
+            if (selectedRoom && adults + children > selectedRoom.guests) {
+                setError(
+                    getBookingText(language, "capacity", {
+                        n: selectedRoom.guests,
+                    })
+                );
+                return false;
+            }
+
+            if (!currentUser) {
+                setError(getBookingText(language, "loggedIn"));
+                return false;
+            }
+
+            if (!property) {
+                setError(getBookingText(language, "propertyMissing"));
+                return false;
+            }
+
+            return true;
+        };
+
+
+    /* =====================================================
+       CONFIRM BOOKING
+       ===================================================== */
+
+    const handleConfirmBooking =
+        () => {
+            if (!handleBooking()) {
+                return;
+            }
 
             setError("");
 
-
-            /* ---------------------------------------------
-               DATES REQUIRED
-               --------------------------------------------- */
-
-            if (
-                !checkIn ||
-                !checkOut
-            ) {
-
-                setError(
-                    getBookingText(language, "selectDates")
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               TODAY
-               --------------------------------------------- */
-
-            const today =
-                getTodayDate();
-
-
-            /* ---------------------------------------------
-               CHECK-IN CANNOT BE IN THE PAST
-               --------------------------------------------- */
-
-            if (
-                checkIn <
-                today
-            ) {
-
-                setError(
-                    getBookingText(language, "checkInPast")
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               CHECK-OUT CANNOT BE IN THE PAST
-               --------------------------------------------- */
-
-            if (
-                checkOut <
-                today
-            ) {
-
-                setError(
-                    getBookingText(language, "checkOutPast")
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               CHECK-OUT MUST BE AFTER CHECK-IN
-               --------------------------------------------- */
-
-            if (
-                checkOut <=
-                checkIn
-            ) {
-
-                setError(
-                    getBookingText(language, "checkOutAfter")
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               ADULT REQUIRED
-               --------------------------------------------- */
-
-            if (
-                adults < 1
-            ) {
-
-                setError(
-                    getBookingText(language, "adultRequired")
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               ROOM CAPACITY
-               --------------------------------------------- */
-
-            if (
-                selectedRoom &&
-                adults +
-                children >
-                selectedRoom.guests
-            ) {
-
-                setError(
-                    getBookingText(language, "capacity", { n: selectedRoom.guests })
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               USER REQUIRED
-               --------------------------------------------- */
-
-            if (
-                !currentUser
-            ) {
-
+            if (!currentUser) {
                 setError(
                     getBookingText(language, "loggedIn")
                 );
@@ -1921,15 +1923,7 @@ function NewBookingForm() {
                 return;
             }
 
-
-            /* ---------------------------------------------
-               PROPERTY REQUIRED
-               --------------------------------------------- */
-
-            if (
-                !property
-            ) {
-
+            if (!property) {
                 setError(
                     getBookingText(language, "propertyMissing")
                 );
@@ -1937,13 +1931,45 @@ function NewBookingForm() {
                 return;
             }
 
+            if (
+                !firstName.trim() ||
+                !lastName.trim() ||
+                !email.trim() ||
+                !phone.trim()
+            ) {
+                setError(
+                    getBookingText(
+                        language,
+                        "requiredFields"
+                    )
+                );
+
+                return;
+            }
+
+            const emailIsValid =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                    email.trim()
+                );
+
+            if (
+                !emailIsValid
+            ) {
+                setError(
+                    getBookingText(
+                        language,
+                        "invalidEmail"
+                    )
+                );
+
+                return;
+            }
 
             /* ---------------------------------------------
                CREATE BOOKING
                --------------------------------------------- */
 
             const newBooking = {
-
                 id:
                     Date.now(),
 
@@ -1980,6 +2006,21 @@ function NewBookingForm() {
 
                 status:
                     "confirmed" as const,
+
+                firstName:
+                    firstName.trim(),
+
+                lastName:
+                    lastName.trim(),
+
+                email:
+                    email.trim(),
+
+                phone:
+                    phone.trim(),
+
+                specialRequests:
+                    specialRequests.trim(),
             };
 
 
@@ -2238,52 +2279,185 @@ function NewBookingForm() {
                             <div className="booking-form">
 
 
-                                <h2>
-                                    {property.name}
-                                </h2>
-
-
-                                <p>
-                                    {property.address}
-                                </p>
-
-
-                                {/* SELECTED ROOM */}
-
-                                {selectedRoom && (
-
-                                    <div className="selected-room-info">
-
-                                        <strong>
-                                            {
-                                                selectedRoom.name
-                                            }
-                                        </strong>
-
-                                        <p>
-                                            {formattedRoomSize}
-
-                                            {" · "}
-
-                                            {getLocalizedBedType(
-                                                selectedRoom.bed,
-                                                language as keyof typeof bookingPageTranslations
-                                            )}
+                                <div
+                                    style={{
+                                        marginTop: "0",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            marginBottom: "22px",
+                                        }}
+                                    >
+                                        <p
+                                            style={{
+                                                margin: "0 0 8px",
+                                                color: "#7055e8",
+                                                fontSize: "12px",
+                                                fontWeight: 800,
+                                                letterSpacing: "1.5px",
+                                                textTransform: "uppercase",
+                                            }}
+                                        >
+                                            {getBookingText(language, "passengerDetails")}
                                         </p>
-
-                                        <p>
-                                            {
-                                                formatPrice(
-                                                    selectedRoom.pricePerNight
-                                                )
-                                            }
-
-                                            {` / ${getBookingText(language, "night")}`}
-                                        </p>
-
+                                        <h2
+                                            style={{
+                                                margin: 0,
+                                                fontSize: "26px",
+                                                lineHeight: 1.2,
+                                            }}
+                                        >
+                                            {getBookingText(language, "whoIsTravelling")}
+                                        </h2>
                                     </div>
 
-                                )}
+                                    <div
+                                        style={{
+                                            display: "grid",
+                                            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                                            gap: "16px",
+                                        }}
+                                    >
+                                        <label>
+                                            {getBookingText(language, "firstName")}
+                                            <input
+                                                type="text"
+                                                value={firstName}
+                                                placeholder="Your first name"
+                                                onChange={(event) =>
+                                                    setFirstName(event.target.value)
+                                                }
+                                                autoComplete="given-name"
+                                            />
+                                        </label>
+
+                                        <label>
+                                            {getBookingText(language, "lastName")}
+                                            <input
+                                                type="text"
+                                                value={lastName}
+                                                placeholder="Your last name"
+                                                onChange={(event) =>
+                                                    setLastName(event.target.value)
+                                                }
+                                                autoComplete="family-name"
+                                            />
+                                        </label>
+
+                                        <label>
+                                            {getBookingText(language, "emailAddress")}
+                                            <input
+                                                type="email"
+                                                value={email}
+                                                placeholder="you@example.com"
+                                                onChange={(event) =>
+                                                    setEmail(event.target.value)
+                                                }
+                                                autoComplete="email"
+                                            />
+                                        </label>
+
+                                        <label>
+                                            {getBookingText(language, "phoneNumber")}
+                                            <input
+                                                type="tel"
+                                                value={phone}
+                                                placeholder="Enter your phone number"
+                                                onChange={(event) =>
+                                                    setPhone(event.target.value)
+                                                }
+                                                autoComplete="tel"
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <label
+                                        style={{
+                                            display: "block",
+                                            marginTop: "18px",
+                                        }}
+                                    >
+                                            <span
+                                                style={{
+                                                    display: "block",
+                                                    marginBottom: "8px",
+                                                    fontWeight: 700,
+                                                    color: "#373241",
+                                                }}
+                                            >
+                                                {getBookingText(language, "specialRequests")}
+                                            </span>
+
+                                        <textarea
+                                            value={specialRequests}
+                                            placeholder={getBookingText(
+                                                language,
+                                                "specialRequestsPlaceholder"
+                                            )}
+                                            onChange={(event) =>
+                                                setSpecialRequests(event.target.value)
+                                            }
+                                            rows={4}
+                                            style={{
+                                                display: "block",
+                                                width: "100%",
+                                                minHeight: "112px",
+                                                padding: "14px 16px",
+                                                border: "1px solid #e3ddf1",
+                                                borderRadius: "14px",
+                                                background: "#fff",
+                                                color: "#373241",
+                                                fontSize: "14px",
+                                                lineHeight: 1.5,
+                                                resize: "vertical",
+                                                boxSizing: "border-box",
+                                                outline: "none",
+                                            }}
+                                        />
+                                    </label>
+
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "10px",
+                                            marginTop: "18px",
+                                            marginBottom: "22px",
+                                            padding: "14px 16px",
+                                            borderRadius: "14px",
+                                            background: "#f7f3ff",
+                                            color: "#625b73",
+                                            fontSize: "13px",
+                                            lineHeight: 1.5,
+                                        }}
+                                    >
+                                            <span
+                                                style={{
+                                                    display: "inline-flex",
+                                                    width: "22px",
+                                                    height: "22px",
+                                                    flex: "0 0 22px",
+                                                    borderRadius: "50%",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    background: "#7055e8",
+                                                    color: "#fff",
+                                                    fontWeight: 800,
+                                                }}
+                                            >
+                                                ✓
+                                            </span>
+
+                                        <span>
+                                                {getBookingText(
+                                                    language,
+                                                    "bookingReviewNote"
+                                                )}
+                                            </span>
+                                    </div>
+
+                                </div>
 
 
                                 {/* =================================================
@@ -2576,29 +2750,23 @@ function NewBookingForm() {
                                 {/* ERROR */}
 
                                 {error && (
-
                                     <p className="booking-error">
-
-                                        {
-                                            error
-                                        }
-
+                                        {error}
                                     </p>
-
                                 )}
-
-
-                                {/* CONFIRM */}
 
                                 <button
                                     type="button"
                                     className="primary-button"
-                                    onClick={
-                                        handleBooking
-                                    }
+                                    onClick={handleConfirmBooking}
+                                    style={{
+                                        marginTop: "22px",
+                                        width: "100%",
+                                    }}
                                 >
-                                    {getBookingText(language, "confirm")}
+                                    {getBookingText(language, "confirmBooking")}
                                 </button>
+
 
                             </div>
 
