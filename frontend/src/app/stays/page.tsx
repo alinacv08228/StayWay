@@ -552,7 +552,8 @@ export default function StaysPage() {
             <main>
                 <section className="section">
                     <div className="container">
-                        <div className="no-stays">
+
+                        <div className="no-stays stayway-load-in stayway-load-1">
                             <h2>
                                 Something went wrong
                             </h2>
@@ -572,6 +573,7 @@ export default function StaysPage() {
                                 Try again
                             </button>
                         </div>
+
                     </div>
                 </section>
             </main>
@@ -585,18 +587,27 @@ export default function StaysPage() {
 
                     {/* PAGE TITLE */}
 
-                    <p className="admin-label stays-title-animation">
+                    <p className="admin-label stayway-load-in stayway-load-1">
                         STAYWAY
                     </p>
 
-                    <h1 className="page-title stays-title-animation">
+                    <h1
+                        className="page-title stayway-load-in stayway-load-2"
+                        style={{
+                            fontSize: "42px",
+                            lineHeight: 1.1,
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            margin: 0,
+                        }}
+                    >
                         {getTranslation(
                             language,
                             "findYourPerfectStay"
                         )}
                     </h1>
 
-                    <p className="admin-description stays-title-animation">
+                    <p className="admin-description stayway-load-in stayway-load-3">
                         {getTranslation(
                             language,
                             "staysDescription"
@@ -604,7 +615,7 @@ export default function StaysPage() {
                     </p>
 
                     {destinationName && (
-                        <p className="stays-search-result">
+                        <p className="stays-search-result stayway-load-in stayway-load-4">
                             Search results for:{" "}
                             <strong>
                                 {destinationName}
@@ -614,7 +625,7 @@ export default function StaysPage() {
 
                     {/* FILTERS */}
 
-                    <div className="stays-filters">
+                    <div className="stays-filters stayway-load-in stayway-load-5">
 
                         {/* HOTEL NAME SEARCH */}
 
@@ -862,7 +873,7 @@ export default function StaysPage() {
 
                     {/* RESULTS */}
 
-                    <p className="stays-results-count">
+                    <p className="stays-results-count stayway-load-in stayway-load-6">
                         {
                             filteredProperties.length
                         }{" "}
@@ -877,20 +888,13 @@ export default function StaysPage() {
 
                     {filteredProperties.length >
                     0 ? (
-                        <div className="property-grid">
+                        <div className="property-grid stayway-load-in stayway-load-7">
+
                             {filteredProperties.map(
                                 (
-                                    property,
-                                    index
+                                    property
                                 ) => (
                                     <div
-                                        className="stay-card-animation"
-                                        style={{
-                                            animationDelay: `${
-    index *
-    0.08
-}s`,
-                                        }}
                                         key={
                                             property.id
                                         }
@@ -903,9 +907,11 @@ export default function StaysPage() {
                                     </div>
                                 )
                             )}
+
                         </div>
                     ) : (
-                        <div className="no-stays">
+                        <div className="no-stays stayway-load-in stayway-load-7">
+
                             <h2>
                                 No stays found
                             </h2>
@@ -927,6 +933,7 @@ export default function StaysPage() {
                                     "resetFilters"
                                 )}
                             </button>
+
                         </div>
                     )}
                 </div>
@@ -934,4 +941,3 @@ export default function StaysPage() {
         </main>
     );
 }
-    

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -909,94 +910,246 @@ export default function Home() {
             ================================================= */}
 
             <section className="home-cta home-animate home-animate-5">
+                <div
+                    className="home-cta-shape home-cta-shape-one"
+                    aria-hidden="true"
+                />
+                <div
+                    className="home-cta-shape home-cta-shape-two"
+                    aria-hidden="true"
+                />
 
-                <div className="home-cta-shape home-cta-shape-one"></div>
-
-                <div className="home-cta-shape home-cta-shape-two"></div>
-
-                <div className="container home-cta-inner">
-
-                    <div className="home-cta-title">
-
-                        <span className="home-eyebrow">
+                <div
+                    className="container home-cta-inner"
+                    style={{
+                        position: "relative",
+                        zIndex: 2,
+                    }}
+                >
+                    {/* LEFT — MESSAGE */}
+                    <div
+                        className="home-cta-title"
+                        style={{
+                            position: "relative",
+                            zIndex: 2,
+                        }}
+                    >
+                        <span
+                            className="home-eyebrow"
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "9px",
+                                color: "rgba(255,255,255,0.68)",
+                                fontSize: "11px",
+                                fontWeight: 800,
+                                letterSpacing: "0.14em",
+                                marginBottom: "18px",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    width: "7px",
+                                    height: "7px",
+                                    borderRadius: "50%",
+                                    background: "#ffffff",
+                                    boxShadow: "0 0 0 6px rgba(255,255,255,0.10)",
+                                }}
+                            />
                             YOUR NEXT ADVENTURE
                         </span>
 
-                        <h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                color: "#ffffff",
+                                fontSize: "clamp(38px, 4.5vw, 64px)",
+                                lineHeight: 0.98,
+                                fontWeight: 700,
+                                letterSpacing: "-0.045em",
+                            }}
+                        >
                             READY TO
                             <br />
-                            <span>
+                            <span
+                                style={{
+                                    color: "#ffffff",
+                                }}
+                            >
                                 GET AWAY?
                             </span>
                         </h2>
 
+                        <p
+                            style={{
+                                maxWidth: "360px",
+                                margin: "18px 0 0",
+                                color: "rgba(255,255,255,0.72)",
+                                fontSize: "14px",
+                                lineHeight: 1.6,
+                            }}
+                        >
+                            Find your next stay and turn your plans into
+                            something worth remembering.
+                        </p>
                     </div>
 
-
-                    <div className="home-cta-stats">
-
-                        {/* STAYS */}
-
-                        <div>
-
-                            <strong>
-                                {
-                                    availableProperties.length
-                                }
+                    {/* CENTER — QUICK STATS */}
+                    <div
+                        className="home-cta-stats"
+                        style={{
+                            display: "flex",
+                            alignItems: "stretch",
+                            justifyContent: "center",
+                            gap: 0,
+                            padding: "0 10px",
+                        }}
+                    >
+                        <div
+                            style={{
+                                minWidth: "105px",
+                                padding: "8px 22px",
+                                borderLeft: "1px solid rgba(255,255,255,0.16)",
+                            }}
+                        >
+                            <strong
+                                style={{
+                                    display: "block",
+                                    color: "#ffffff",
+                                    fontSize: "30px",
+                                    lineHeight: 1,
+                                    fontWeight: 700,
+                                    letterSpacing: "-0.03em",
+                                }}
+                            >
+                                {availableProperties.length}
                             </strong>
-
-                            <span>
+                            <span
+                                style={{
+                                    display: "block",
+                                    marginTop: "8px",
+                                    color: "rgba(255,255,255,0.62)",
+                                    fontSize: "10px",
+                                    fontWeight: 800,
+                                    letterSpacing: "0.12em",
+                                }}
+                            >
                                 STAYS
                             </span>
-
                         </div>
 
-
-                        {/* COUNTRIES */}
-
-                        <div>
-
-                            <strong>
-                                {
-                                    visibleCountries.length
-                                }
+                        <div
+                            style={{
+                                minWidth: "105px",
+                                padding: "8px 22px",
+                                borderLeft: "1px solid rgba(255,255,255,0.16)",
+                            }}
+                        >
+                            <strong
+                                style={{
+                                    display: "block",
+                                    color: "#ffffff",
+                                    fontSize: "30px",
+                                    lineHeight: 1,
+                                    fontWeight: 700,
+                                    letterSpacing: "-0.03em",
+                                }}
+                            >
+                                {visibleCountries.length}
                             </strong>
-
-                            <span>
+                            <span
+                                style={{
+                                    display: "block",
+                                    marginTop: "8px",
+                                    color: "rgba(255,255,255,0.62)",
+                                    fontSize: "10px",
+                                    fontWeight: 800,
+                                    letterSpacing: "0.12em",
+                                }}
+                            >
                                 COUNTRIES
                             </span>
-
                         </div>
 
-
-                        {/* RATING */}
-
-                        <div>
-
-                            <strong>
+                        <div
+                            style={{
+                                minWidth: "125px",
+                                padding: "8px 22px",
+                                borderLeft: "1px solid rgba(255,255,255,0.16)",
+                                borderRight: "1px solid rgba(255,255,255,0.16)",
+                            }}
+                        >
+                            <strong
+                                style={{
+                                    display: "block",
+                                    color: "#ffffff",
+                                    fontSize: "30px",
+                                    lineHeight: 1,
+                                    fontWeight: 700,
+                                    letterSpacing: "-0.03em",
+                                }}
+                            >
                                 4.8
                             </strong>
-
-                            <span>
+                            <span
+                                style={{
+                                    display: "block",
+                                    marginTop: "8px",
+                                    color: "rgba(255,255,255,0.62)",
+                                    fontSize: "10px",
+                                    fontWeight: 800,
+                                    letterSpacing: "0.12em",
+                                }}
+                            >
                                 GUEST RATING
                             </span>
-
                         </div>
-
                     </div>
 
-
+                    {/* RIGHT — CTA */}
                     <Link
                         href="/stays"
                         className="home-cta-button"
+                        style={{
+                            position: "relative",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "20px",
+                            minWidth: "205px",
+                            padding: "15px 17px 15px 20px",
+                            borderRadius: "999px",
+                            background: "#ffffff",
+                            color: "#292532",
+                            textDecoration: "none",
+                            fontSize: "12px",
+                            fontWeight: 900,
+                            letterSpacing: "0.04em",
+                            boxShadow: "0 14px 34px rgba(40,28,110,0.18)",
+                            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                        }}
                     >
-                        EXPLORE ALL STAYS
-                        <span>↗</span>
+                        <span>EXPLORE ALL STAYS</span>
+                        <span
+                            style={{
+                                width: "34px",
+                                height: "34px",
+                                borderRadius: "50%",
+                                display: "grid",
+                                placeItems: "center",
+                                background: "#7059e8",
+                                color: "#ffffff",
+                                fontSize: "17px",
+                                lineHeight: 1,
+                                flexShrink: 0,
+                            }}
+                        >
+                            ↗
+                        </span>
                     </Link>
-
                 </div>
-
             </section>
+
 
             <style jsx>{`
     .home-animated .home-animate {
@@ -1080,6 +1233,115 @@ export default function Home() {
     animation-delay: 0.24s;
 }
 
+.home-cta {
+    position: relative;
+    overflow: visible;
+    background: #f6f1ff;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0 0 0;
+    margin-bottom: 0;
+}
+
+.home-cta::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -64px;
+    height: 64px;
+    background: #f6f1ff;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.home-cta .home-cta-inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: 34px;
+    background:
+        radial-gradient(circle at 82% 22%, rgba(176, 158, 255, 0.34), transparent 28%),
+    linear-gradient(120deg, #6955df 0%, #745fe8 50%, #8070eb 100%);
+    box-shadow: 0 28px 60px rgba(78, 64, 125, 0.18);
+    padding-top: 72px;
+    padding-bottom: 72px;
+}
+
+.home-cta .home-cta-inner::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 33px;
+    border: 1px solid rgba(255,255,255,0.16);
+    pointer-events: none;
+}
+
+.home-cta .home-cta-inner::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    right: 6%;
+    top: -175px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    filter: blur(2px);
+    pointer-events: none;
+}
+
+.home-cta .home-cta-shape-one,
+.home-cta .home-cta-shape-two {
+    display: none;
+}
+
+@media (max-width: 1050px) {
+.home-cta-inner {
+        grid-template-columns: 1fr;
+        gap: 26px;
+    }
+
+.home-cta-stats {
+        justify-content: flex-start !important;
+        padding: 0 !important;
+    }
+
+.home-cta-button {
+        justify-self: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+.home-cta {
+        padding-bottom: 56px;
+    }
+
+.home-cta .home-cta-inner {
+        border-radius: 26px;
+        padding-top: 52px;
+        padding-bottom: 52px;
+    }
+
+.home-cta .home-cta-inner::before {
+        border-radius: 25px;
+    }
+
+.home-cta-stats {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+.home-cta-stats > div {
+        min-width: 95px !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+.home-cta-button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
 .home-animated .home-hero-subtitle-animated,
 .home-animated .home-animate,
@@ -1095,3 +1357,4 @@ export default function Home() {
         </main>
     );
 }
+

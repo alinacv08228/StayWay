@@ -11,28 +11,28 @@ export default function TransferConfirmationPage() {
 
                     <div className="transfer-confirmation-card">
 
-                        <div className="transfer-confirmation-icon">
+                        <div className="transfer-confirmation-icon stayway-load-in stayway-load-1">
                             ✓
                         </div>
 
-                        <span className="transfers-eyebrow">
+                        <span className="transfers-eyebrow stayway-load-in stayway-load-2">
                             STAYWAY TRANSFERS
                         </span>
 
-                        <h1>
+                        <h1 className="stayway-load-in stayway-load-3">
                             Transfer booked
                             <br />
                             <span>successfully.</span>
                         </h1>
 
-                        <p>
+                        <p className="stayway-load-in stayway-load-4">
                             Your transfer has been confirmed.
                             We hope you have a comfortable journey.
                         </p>
 
                         <Link
                             href="/transfers"
-                            className="transfer-confirmation-button"
+                            className="transfer-confirmation-button stayway-load-in stayway-load-5"
                         >
                             Back to transfers
                         </Link>

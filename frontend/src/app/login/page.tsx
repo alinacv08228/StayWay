@@ -1,3 +1,4 @@
+
 "use client";
 
 import { FormEvent, useState } from "react";
@@ -360,12 +361,17 @@ export default function LoginPage() {
         <main className="login-page">
             <div className="login-card">
 
-                <div className="login-header">
+                <div className="login-header stayway-load-in stayway-load-1">
                     <span className="login-logo">
                         ✦
                     </span>
 
-                    <h1>
+                    <h1
+                        style={{
+                            fontWeight: 800,
+                            letterSpacing: "-0.02em",
+                        }}
+                    >
                         {text.welcome}
                     </h1>
 
@@ -375,7 +381,7 @@ export default function LoginPage() {
                 </div>
 
                 <form
-                    className="login-form"
+                    className="login-form stayway-load-in stayway-load-2"
                     onSubmit={handleSubmit}
                     noValidate
                 >
@@ -432,7 +438,7 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className="login-demo">
+                <div className="login-demo stayway-load-in stayway-load-3">
                     <strong>
                         {text.demoAccounts}
                     </strong>

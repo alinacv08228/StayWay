@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -443,7 +444,12 @@ export default function ErrorPage({
                         ERROR {code}
                     </p>
 
-                    <h1>
+                    <h1
+                        style={{
+                            fontWeight: 800,
+                            letterSpacing: "-0.02em",
+                        }}
+                    >
                         {text.titles[code]}
                     </h1>
 
@@ -474,3 +480,4 @@ export default function ErrorPage({
         </main>
     );
 }
+

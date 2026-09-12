@@ -1,9 +1,9 @@
-
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+
 import {
     getTransferBookings,
     saveTransferBooking,
@@ -14,94 +14,191 @@ import {
     getTransferDriversByCity,
 } from "@/services/transferDriverService";
 
-import { getTransferLocations } from "@/services/transferLocationService";
+import {
+    getTransferLocations,
+} from "@/services/transferLocationService";
+
 import {
     getTransferVehiclesByCity,
 } from "@/services/transferVehicleService";
 
-export default function TransferCheckoutPage() {
-    const searchParams = useSearchParams();
+import {
+    isAuthenticated,
+} from "@/services/authService";
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
-    const [specialRequests, setSpecialRequests] = useState("");
+export default function TransferCheckoutPage() {
+    const searchParams =
+        useSearchParams();
+
+    const [
+        firstName,
+        setFirstName,
+    ] = useState("");
+
+    const [
+        lastName,
+        setLastName,
+    ] = useState("");
+
+    const [
+        email,
+        setEmail,
+    ] = useState("");
+
+    const [
+        phone,
+        setPhone,
+    ] = useState("");
+
+    const [
+        specialRequests,
+        setSpecialRequests,
+    ] = useState("");
+
+    /*
+     * =========================================
+     * TRANSFER DATA
+     * =========================================
+     */
 
     const transferType =
-        searchParams.get("transferType") || "one-way";
+        searchParams.get(
+            "transferType"
+        ) || "one-way";
 
     const optionId =
-        searchParams.get("optionId") || "";
+        searchParams.get(
+            "optionId"
+        ) || "";
 
     const optionTitle =
-        searchParams.get("optionTitle") || "Private transfer";
+        searchParams.get(
+            "optionTitle"
+        ) || "Private transfer";
 
     const price =
-        searchParams.get("price") || "32";
+        searchParams.get(
+            "price"
+        ) || "32";
 
     const pickup =
-        searchParams.get("pickup") || "—";
+        searchParams.get(
+            "pickup"
+        ) || "—";
 
     const destination =
-        searchParams.get("destination") || "—";
+        searchParams.get(
+            "destination"
+        ) || "—";
 
     const date =
-        searchParams.get("date") || "—";
+        searchParams.get(
+            "date"
+        ) || "—";
 
     const time =
-        searchParams.get("time") || "—";
+        searchParams.get(
+            "time"
+        ) || "—";
 
     const passengers =
-        searchParams.get("passengers") || "2";
+        searchParams.get(
+            "passengers"
+        ) || "2";
 
     const returnDate =
-        searchParams.get("returnDate") || "—";
+        searchParams.get(
+            "returnDate"
+        ) || "—";
 
     const returnTime =
-        searchParams.get("returnTime") || "—";
-
-    const backToBooking = `/transfers/booking?transferType=${encodeURIComponent(
-        transferType
-    )}&optionTitle=${encodeURIComponent(
-    optionTitle
-)}&price=${encodeURIComponent(
-    price
-)}&pickup=${encodeURIComponent(
-    pickup
-)}&destination=${encodeURIComponent(
-    destination
-)}&date=${encodeURIComponent(
-    date
-)}&time=${encodeURIComponent(
-    time
-)}&passengers=${encodeURIComponent(
-    passengers
-)}&returnDate=${encodeURIComponent(
-    returnDate
-)}&returnTime=${encodeURIComponent(
-    returnTime
-)}`;
+        searchParams.get(
+            "returnTime"
+        ) || "—";
 
 
-    const getTransferDuration = (title: string) => {
-        return title.toLowerCase().includes("family")
+    /*
+     * =========================================
+     * AUTHENTICATION
+     * =========================================
+     *
+     * If somebody manually opens checkout
+     * while logged out, send them to 401.
+     *
+     * The main authentication check should
+     * ALSO happen on "Select transfer" in
+     * transfers/page.tsx.
+     */
+
+    useEffect(() => {
+        if (!isAuthenticated()) {
+            window.location.href =
+                `/401?from=${encodeURIComponent(
+                    window.location.pathname +
+                    window.location.search
+                )}`;
+        }
+    }, []);
+
+
+    /*
+     * =========================================
+     * BACK URL
+     * =========================================
+     */
+
+    const backToTransfers =
+        `/transfers`;
+
+
+    /*
+     * =========================================
+     * TRANSFER DURATION
+     * =========================================
+     */
+
+    const getTransferDuration = (
+        title: string
+    ) => {
+        return title
+            .toLowerCase()
+            .includes("family")
             ? 40
             : 35;
     };
 
-    const getTransferBookingsForVehicle = (vehicleId: string) => {
+
+    /*
+     * =========================================
+     * VEHICLE BOOKINGS
+     * =========================================
+     */
+
+    const getTransferBookingsForVehicle = (
+        vehicleId: string
+    ) => {
         return getTransferBookings().filter(
-            (booking) => booking.vehicleId === vehicleId
+            (booking) =>
+                booking.vehicleId ===
+                vehicleId
         );
     };
+
+
+    /*
+     * =========================================
+     * AVAILABILITY
+     * =========================================
+     */
 
     const isTransferAvailable = (
         bookings: {
             date: string;
             time: string;
             optionTitle: string;
-            transferType: "one-way" | "return";
+            transferType:
+                | "one-way"
+                | "return";
             returnDate?: string;
             returnTime?: string;
         }[],
@@ -109,318 +206,558 @@ export default function TransferCheckoutPage() {
         bookingTime: string,
         bookingDuration: number
     ) => {
-        const requestedStart = new Date(
-            `${bookingDate}T${bookingTime}`
-        ).getTime();
+        const requestedStart =
+            new Date(
+                `${bookingDate}T${bookingTime}`
+            ).getTime();
 
-        if (Number.isNaN(requestedStart)) {
+        if (
+            Number.isNaN(
+                requestedStart
+            )
+        ) {
             return false;
         }
 
         const requestedEnd =
             requestedStart +
-            bookingDuration * 60 * 1000;
+            bookingDuration *
+            60 *
+            1000;
 
-        return !bookings.some((booking) => {
-            const existingStart = new Date(
-                `${booking.date}T${booking.time}`
-            ).getTime();
+        return !bookings.some(
+            (booking) => {
+                const existingStart =
+                    new Date(
+                        `${booking.date}T${booking.time}`
+                    ).getTime();
 
-            if (Number.isNaN(existingStart)) {
-                return false;
-            }
-
-            const existingDuration =
-                getTransferDuration(booking.optionTitle);
-
-            const existingEnd =
-                existingStart +
-                existingDuration * 60 * 1000;
-
-            if (
-                requestedStart < existingEnd &&
-                requestedEnd > existingStart
-            ) {
-                return true;
-            }
-
-            if (
-                booking.transferType === "return" &&
-                booking.returnDate &&
-                booking.returnTime
-            ) {
-                const returnStart = new Date(
-                    `${booking.returnDate}T${booking.returnTime}`
-                ).getTime();
-
-                if (Number.isNaN(returnStart)) {
+                if (
+                    Number.isNaN(
+                        existingStart
+                    )
+                ) {
                     return false;
                 }
 
-                const returnEnd =
-                    returnStart +
-                    existingDuration * 60 * 1000;
+                const existingDuration =
+                    getTransferDuration(
+                        booking.optionTitle
+                    );
 
-                return (
-                    requestedStart < returnEnd &&
-                    requestedEnd > returnStart
-                );
+                const existingEnd =
+                    existingStart +
+                    existingDuration *
+                    60 *
+                    1000;
+
+                if (
+                    requestedStart <
+                    existingEnd &&
+                    requestedEnd >
+                    existingStart
+                ) {
+                    return true;
+                }
+
+                if (
+                    booking.transferType ===
+                    "return" &&
+                    booking.returnDate &&
+                    booking.returnTime
+                ) {
+                    const returnStart =
+                        new Date(
+                            `${booking.returnDate}T${booking.returnTime}`
+                        ).getTime();
+
+                    if (
+                        Number.isNaN(
+                            returnStart
+                        )
+                    ) {
+                        return false;
+                    }
+
+                    const returnEnd =
+                        returnStart +
+                        existingDuration *
+                        60 *
+                        1000;
+
+                    return (
+                        requestedStart <
+                        returnEnd &&
+                        requestedEnd >
+                        returnStart
+                    );
+                }
+
+                return false;
             }
-
-            return false;
-        });
+        );
     };
 
-    const handleConfirmTransfer = () => {
-        if (!firstName || !lastName || !email || !phone) {
-            alert(
-                "Please complete all required passenger details."
-            );
-            return;
-        }
 
-        if (
-            !date ||
-            date === "—" ||
-            !time ||
-            time === "—"
-        ) {
-            alert(
-                "Please select a valid transfer date and time."
-            );
-            return;
-        }
+    /*
+     * =========================================
+     * CONFIRM TRANSFER
+     * =========================================
+     */
 
-        if (
-            transferType === "return" &&
-            (
-                !returnDate ||
-                returnDate === "—" ||
-                !returnTime ||
-                returnTime === "—"
-            )
-        ) {
-            alert(
-                "Please select a valid return date and time."
-            );
-            return;
-        }
+    const handleConfirmTransfer =
+        () => {
 
-        const transferLocations = getTransferLocations();
+            /*
+             * DOUBLE CHECK AUTHENTICATION
+             */
 
-        const pickupLocation = transferLocations.find(
-            (location) =>
-                location.name.toLowerCase() ===
-                pickup.toLowerCase()
-        );
+            if (!isAuthenticated()) {
+                window.location.href =
+                    `/401?from=${encodeURIComponent(
+                        window.location.pathname +
+                        window.location.search
+                    )}`;
 
-        const city = pickupLocation?.cityName || "";
-
-        if (!city) {
-            alert(
-                "We could not determine the transfer city."
-            );
-            return;
-        }
-
-        const duration = getTransferDuration(optionTitle);
-
-        const requiredCategory =
-            optionTitle.toLowerCase().includes("family")
-                ? "Family"
-                : optionTitle.toLowerCase().includes("comfort")
-                    ? "Comfort"
-                    : "Private";
-
-        const vehicles = getTransferVehiclesByCity(city);
-        const drivers = getTransferDriversByCity(city);
-
-        // A vehicle and its assigned driver must always be available together.
-        const availableVehicle = vehicles.find((vehicle) => {
-            if (vehicle.category !== requiredCategory) {
-                return false;
+                return;
             }
 
-            if (vehicle.passengers < Number(passengers)) {
-                return false;
-            }
 
-            if (!vehicle.driverId) {
-                return false;
-            }
-
-            const assignedDriver = drivers.find(
-                (driver) => driver.id === vehicle.driverId
-            );
-
-            if (!assignedDriver || assignedDriver.status !== "available") {
-                return false;
-            }
-
-            const vehicleBookings =
-                getTransferBookingsForVehicle(vehicle.id);
+            /*
+             * PASSENGER DETAILS
+             */
 
             if (
-                !isTransferAvailable(
-                    vehicleBookings,
-                    date,
-                    time,
-                    duration
-                )
+                !firstName ||
+                !lastName ||
+                !email ||
+                !phone
             ) {
-                return false;
+                alert(
+                    "Please complete all required passenger details."
+                );
+
+                return;
             }
 
-            const driverBookings =
-                getTransferDriverBookings(vehicle.driverId);
+
+            /*
+             * DATE AND TIME
+             */
 
             if (
-                !isTransferAvailable(
-                    driverBookings,
-                    date,
-                    time,
-                    duration
+                !date ||
+                date === "—" ||
+                !time ||
+                time === "—"
+            ) {
+                alert(
+                    "Please select a valid transfer date and time."
+                );
+
+                return;
+            }
+
+
+            /*
+             * RETURN DATE AND TIME
+             */
+
+            if (
+                transferType ===
+                "return" &&
+                (
+                    !returnDate ||
+                    returnDate === "—" ||
+                    !returnTime ||
+                    returnTime === "—"
                 )
             ) {
-                return false;
+                alert(
+                    "Please select a valid return date and time."
+                );
+
+                return;
             }
 
-            if (transferType === "return") {
-                if (
-                    !isTransferAvailable(
-                        vehicleBookings,
-                        returnDate,
-                        returnTime,
-                        duration
-                    )
-                ) {
-                    return false;
-                }
 
-                if (
-                    !isTransferAvailable(
-                        driverBookings,
-                        returnDate,
-                        returnTime,
-                        duration
-                    )
-                ) {
-                    return false;
-                }
+            /*
+             * FIND TRANSFER CITY
+             */
+
+            const transferLocations =
+                getTransferLocations();
+
+            const pickupLocation =
+                transferLocations.find(
+                    (location) =>
+                        location.name
+                            .toLowerCase() ===
+                        pickup.toLowerCase()
+                );
+
+            const city =
+                pickupLocation?.cityName ||
+                "";
+
+            if (!city) {
+                alert(
+                    "We could not determine the transfer city."
+                );
+
+                return;
             }
 
-            return true;
-        });
 
-        if (!availableVehicle) {
-            alert(
-                "No vehicle with an available assigned driver is available for the selected date and time."
+            /*
+             * TRANSFER DURATION
+             */
+
+            const duration =
+                getTransferDuration(
+                    optionTitle
+                );
+
+
+            /*
+             * REQUIRED CATEGORY
+             */
+
+            const requiredCategory =
+                optionTitle
+                    .toLowerCase()
+                    .includes("family")
+                    ? "Family"
+                    : optionTitle
+                        .toLowerCase()
+                        .includes(
+                            "comfort"
+                        )
+                        ? "Comfort"
+                        : "Private";
+
+
+            /*
+             * VEHICLES + DRIVERS
+             */
+
+            const vehicles =
+                getTransferVehiclesByCity(
+                    city
+                );
+
+            const drivers =
+                getTransferDriversByCity(
+                    city
+                );
+
+
+            /*
+             * FIND AVAILABLE VEHICLE
+             */
+
+            const availableVehicle =
+                vehicles.find(
+                    (vehicle) => {
+
+                        if (
+                            vehicle.category !==
+                            requiredCategory
+                        ) {
+                            return false;
+                        }
+
+                        if (
+                            vehicle.passengers <
+                            Number(
+                                passengers
+                            )
+                        ) {
+                            return false;
+                        }
+
+                        if (
+                            !vehicle.driverId
+                        ) {
+                            return false;
+                        }
+
+                        const assignedDriver =
+                            drivers.find(
+                                (driver) =>
+                                    driver.id ===
+                                    vehicle.driverId
+                            );
+
+                        if (
+                            !assignedDriver ||
+                            assignedDriver.status !==
+                            "available"
+                        ) {
+                            return false;
+                        }
+
+
+                        /*
+                         * VEHICLE AVAILABILITY
+                         */
+
+                        const vehicleBookings =
+                            getTransferBookingsForVehicle(
+                                vehicle.id
+                            );
+
+                        if (
+                            !isTransferAvailable(
+                                vehicleBookings,
+                                date,
+                                time,
+                                duration
+                            )
+                        ) {
+                            return false;
+                        }
+
+
+                        /*
+                         * DRIVER AVAILABILITY
+                         */
+
+                        const driverBookings =
+                            getTransferDriverBookings(
+                                vehicle.driverId
+                            );
+
+                        if (
+                            !isTransferAvailable(
+                                driverBookings,
+                                date,
+                                time,
+                                duration
+                            )
+                        ) {
+                            return false;
+                        }
+
+
+                        /*
+                         * RETURN JOURNEY
+                         */
+
+                        if (
+                            transferType ===
+                            "return"
+                        ) {
+                            if (
+                                !isTransferAvailable(
+                                    vehicleBookings,
+                                    returnDate,
+                                    returnTime,
+                                    duration
+                                )
+                            ) {
+                                return false;
+                            }
+
+                            if (
+                                !isTransferAvailable(
+                                    driverBookings,
+                                    returnDate,
+                                    returnTime,
+                                    duration
+                                )
+                            ) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+                );
+
+
+            /*
+             * NO VEHICLE
+             */
+
+            if (
+                !availableVehicle
+            ) {
+                alert(
+                    "No vehicle with an available assigned driver is available for the selected date and time."
+                );
+
+                return;
+            }
+
+
+            /*
+             * FIND DRIVER
+             */
+
+            const availableDriver =
+                drivers.find(
+                    (driver) =>
+                        driver.id ===
+                        availableVehicle.driverId
+                );
+
+            if (
+                !availableDriver
+            ) {
+                alert(
+                    "The selected vehicle does not have an assigned driver."
+                );
+
+                return;
+            }
+
+
+            /*
+             * CREATE BOOKING
+             */
+
+            const booking = {
+                id:
+                    `transfer-${Date.now()}`,
+
+                transferType:
+                    transferType ===
+                    "return"
+                        ? "return"
+                        : "one-way",
+
+                optionId,
+
+                optionTitle,
+
+                price:
+                    Number(price),
+
+                vehicleId:
+                availableVehicle.id,
+
+                vehicleName:
+                availableVehicle.name,
+
+                licensePlate:
+                availableVehicle.licensePlate,
+
+                vehicleImage:
+                availableVehicle.image,
+
+                driverId:
+                availableDriver.id,
+
+                driverName:
+                availableDriver.name,
+
+                pickup,
+
+                destination,
+
+                date,
+
+                time,
+
+                passengers:
+                    Number(
+                        passengers
+                    ),
+
+                returnDate:
+                    transferType ===
+                    "return"
+                        ? returnDate
+                        : undefined,
+
+                returnTime:
+                    transferType ===
+                    "return"
+                        ? returnTime
+                        : undefined,
+
+                firstName,
+
+                lastName,
+
+                email,
+
+                phone,
+
+                specialRequests,
+
+                createdAt:
+                    new Date().toISOString(),
+            };
+
+
+            /*
+             * SAVE
+             */
+
+            saveTransferBooking(
+                booking
             );
-            return;
-        }
 
-        const availableDriver = drivers.find(
-            (driver) => driver.id === availableVehicle.driverId
-        );
 
-        if (!availableDriver) {
-            alert(
-                "The selected vehicle does not have an assigned driver."
-            );
-            return;
-        }
+            /*
+             * CONFIRMATION
+             */
 
-        const booking = {
-            id: `transfer-${Date.now()}`,
-
-            transferType:
-                transferType === "return"
-                    ? "return"
-                    : "one-way",
-
-            optionId,
-
-            optionTitle,
-
-            price: Number(price),
-
-            vehicleId: availableVehicle.id,
-            vehicleName: availableVehicle.name,
-            licensePlate: availableVehicle.licensePlate,
-            vehicleImage: availableVehicle.image,
-
-            driverId: availableDriver.id,
-            driverName: availableDriver.name,
-
-            pickup,
-
-            destination,
-
-            date,
-
-            time,
-
-            passengers: Number(passengers),
-
-            returnDate:
-                transferType === "return"
-                    ? returnDate
-                    : undefined,
-
-            returnTime:
-                transferType === "return"
-                    ? returnTime
-                    : undefined,
-
-            firstName,
-
-            lastName,
-
-            email,
-
-            phone,
-
-            specialRequests,
-
-            createdAt: new Date().toISOString(),
+            window.location.href =
+                "/transfers/confirmation";
         };
 
-        saveTransferBooking(booking);
 
-        window.location.href =
-            "/transfers/confirmation";
-    };
+    /*
+     * =========================================
+     * RENDER
+     * =========================================
+     */
 
     return (
         <main className="transfer-checkout-page">
 
+            {/* HERO */}
+
             <section className="transfer-checkout-hero">
+
                 <div className="transfers-container">
 
-                    <span className="transfers-eyebrow">
+                    <span className="transfers-eyebrow stayway-load-in stayway-load-1">
                         STAYWAY TRANSFERS
                     </span>
 
-                    <h1>
+                    <h1 className="stayway-load-in stayway-load-2">
                         Complete your
                         <br />
-                        <span>transfer booking.</span>
+                        <span>
+                            transfer booking.
+                        </span>
                     </h1>
 
-                    <p>
-                        Enter your details to complete your transfer reservation.
+                    <p className="stayway-load-in stayway-load-3">
+                        Enter your details to complete
+                        your transfer reservation.
                     </p>
 
                 </div>
+
             </section>
 
 
+            {/* CONTENT */}
+
             <section className="transfer-checkout-content">
+
                 <div className="transfers-container">
 
                     <div className="transfer-checkout-layout">
 
-                        <div className="transfer-checkout-form-card">
+                        {/* PASSENGER DETAILS */}
+
+                        <div className="transfer-checkout-form-card stayway-load-in stayway-load-4">
 
                             <span className="transfers-eyebrow">
                                 PASSENGER DETAILS
@@ -430,9 +767,11 @@ export default function TransferCheckoutPage() {
                                 Who is travelling?
                             </h2>
 
+
                             <div className="transfer-form-grid">
 
                                 <div className="transfer-form-field">
+
                                     <label htmlFor="firstName">
                                         First name
                                     </label>
@@ -441,15 +780,25 @@ export default function TransferCheckoutPage() {
                                         id="firstName"
                                         type="text"
                                         placeholder="Your first name"
-                                        value={firstName}
-                                        onChange={(e) =>
-                                            setFirstName(e.target.value)
+                                        value={
+                                            firstName
+                                        }
+                                        onChange={(
+                                            event
+                                        ) =>
+                                            setFirstName(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
                                         }
                                     />
+
                                 </div>
 
 
                                 <div className="transfer-form-field">
+
                                     <label htmlFor="lastName">
                                         Last name
                                     </label>
@@ -458,15 +807,25 @@ export default function TransferCheckoutPage() {
                                         id="lastName"
                                         type="text"
                                         placeholder="Your last name"
-                                        value={lastName}
-                                        onChange={(e) =>
-                                            setLastName(e.target.value)
+                                        value={
+                                            lastName
+                                        }
+                                        onChange={(
+                                            event
+                                        ) =>
+                                            setLastName(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
                                         }
                                     />
+
                                 </div>
 
 
                                 <div className="transfer-form-field">
+
                                     <label htmlFor="email">
                                         Email address
                                     </label>
@@ -475,15 +834,25 @@ export default function TransferCheckoutPage() {
                                         id="email"
                                         type="email"
                                         placeholder="you@example.com"
-                                        value={email}
-                                        onChange={(e) =>
-                                            setEmail(e.target.value)
+                                        value={
+                                            email
+                                        }
+                                        onChange={(
+                                            event
+                                        ) =>
+                                            setEmail(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
                                         }
                                     />
+
                                 </div>
 
 
                                 <div className="transfer-form-field">
+
                                     <label htmlFor="phone">
                                         Phone number
                                     </label>
@@ -492,17 +861,29 @@ export default function TransferCheckoutPage() {
                                         id="phone"
                                         type="tel"
                                         placeholder="Enter your phone number"
-                                        value={phone}
-                                        onChange={(e) =>
-                                            setPhone(e.target.value)
+                                        value={
+                                            phone
+                                        }
+                                        onChange={(
+                                            event
+                                        ) =>
+                                            setPhone(
+                                                event
+                                                    .target
+                                                    .value
+                                            )
                                         }
                                     />
+
                                 </div>
 
                             </div>
 
 
+                            {/* SPECIAL REQUESTS */}
+
                             <div className="transfer-form-field transfer-form-field-full">
+
                                 <label htmlFor="requests">
                                     Special requests
                                 </label>
@@ -511,31 +892,50 @@ export default function TransferCheckoutPage() {
                                     id="requests"
                                     rows={4}
                                     placeholder="Anything we should know about your journey?"
-                                    value={specialRequests}
-                                    onChange={(e) =>
-                                        setSpecialRequests(e.target.value)
+                                    value={
+                                        specialRequests
+                                    }
+                                    onChange={(
+                                        event
+                                    ) =>
+                                        setSpecialRequests(
+                                            event
+                                                .target
+                                                .value
+                                        )
                                     }
                                 />
+
                             </div>
 
 
+                            {/* NOTE */}
+
                             <div className="transfer-checkout-note">
-                                <span>✓</span>
+
+                                <span>
+                                    ✓
+                                </span>
 
                                 <p>
-                                    Your transfer details will be reviewed before
+                                    Your transfer details
+                                    will be reviewed before
                                     the reservation is confirmed.
                                 </p>
+
                             </div>
 
                         </div>
 
 
-                        <aside className="transfer-summary-card">
+                        {/* SUMMARY */}
+
+                        <aside className="transfer-summary-card stayway-load-in stayway-load-5">
 
                             <div className="transfer-summary-header">
 
                                 <div>
+
                                     <span className="transfers-eyebrow">
                                         YOUR TRANSFER
                                     </span>
@@ -543,108 +943,159 @@ export default function TransferCheckoutPage() {
                                     <h2>
                                         {optionTitle}
                                     </h2>
+
                                 </div>
 
+
                                 <div className="transfer-summary-price">
-                                    <span>from</span>
+
+                                    <span>
+                                        from
+                                    </span>
 
                                     <strong>
                                         €{price}
                                     </strong>
+
                                 </div>
 
                             </div>
 
 
+                            {/* ROUTE */}
+
                             <div className="transfer-summary-route">
 
                                 <div>
-                                    <span>Pick-up</span>
+
+                                    <span>
+                                        Pick-up
+                                    </span>
 
                                     <strong>
                                         {pickup}
                                     </strong>
+
                                 </div>
+
 
                                 <div className="transfer-summary-arrow">
                                     →
                                 </div>
 
+
                                 <div>
-                                    <span>Destination</span>
+
+                                    <span>
+                                        Destination
+                                    </span>
 
                                     <strong>
                                         {destination}
                                     </strong>
+
                                 </div>
 
                             </div>
 
+
+                            {/* DETAILS */}
 
                             <div className="transfer-summary-details">
 
                                 <div>
-                                    <span>Date</span>
+
+                                    <span>
+                                        Date
+                                    </span>
 
                                     <strong>
                                         {date}
                                     </strong>
+
                                 </div>
 
+
                                 <div>
-                                    <span>Time</span>
+
+                                    <span>
+                                        Time
+                                    </span>
 
                                     <strong>
                                         {time}
                                     </strong>
+
                                 </div>
 
+
                                 <div>
-                                    <span>Passengers</span>
+
+                                    <span>
+                                        Passengers
+                                    </span>
 
                                     <strong>
                                         {passengers}{" "}
-                                        {passengers === "1"
+                                        {passengers ===
+                                        "1"
                                             ? "passenger"
                                             : "passengers"}
                                     </strong>
+
                                 </div>
 
                             </div>
 
 
-                            {transferType === "return" && (
-                                <div className="transfer-summary-return">
+                            {/* RETURN */}
 
-                                    <span className="transfers-eyebrow">
-                                        RETURN JOURNEY
-                                    </span>
+                            {transferType ===
+                                "return" && (
 
-                                    <div className="transfer-summary-return-details">
+                                    <div className="transfer-summary-return">
 
-                                        <div>
-                                            <span>Return date</span>
+                                        <span className="transfers-eyebrow">
+                                            RETURN JOURNEY
+                                        </span>
 
-                                            <strong>
-                                                {returnDate}
-                                            </strong>
-                                        </div>
+                                        <div className="transfer-summary-return-details">
 
-                                        <div>
-                                            <span>Return time</span>
+                                            <div>
 
-                                            <strong>
-                                                {returnTime}
-                                            </strong>
+                                                <span>
+                                                    Return date
+                                                </span>
+
+                                                <strong>
+                                                    {returnDate}
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <span>
+                                                    Return time
+                                                </span>
+
+                                                <strong>
+                                                    {returnTime}
+                                                </strong>
+
+                                            </div>
+
                                         </div>
 
                                     </div>
-
-                                </div>
-                            )}
+                                )}
 
 
                             <div className="transfer-summary-divider" />
+
+
+                            {/* TOTAL */}
 
                             <div className="transfer-summary-total">
 
@@ -659,17 +1110,23 @@ export default function TransferCheckoutPage() {
                             </div>
 
 
+                            {/* CONFIRM */}
+
                             <button
                                 type="button"
                                 className="transfer-confirm-button"
-                                onClick={handleConfirmTransfer}
+                                onClick={
+                                    handleConfirmTransfer
+                                }
                             >
                                 Confirm transfer
                             </button>
 
 
+                            {/* BACK */}
+
                             <Link
-                                href={backToBooking}
+                                href={backToTransfers}
                                 className="transfer-summary-back"
                             >
                                 ← Back to transfer details
@@ -680,6 +1137,7 @@ export default function TransferCheckoutPage() {
                     </div>
 
                 </div>
+
             </section>
 
         </main>

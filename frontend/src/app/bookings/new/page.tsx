@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -1839,8 +1840,8 @@ function NewBookingForm() {
 
             return (
                 `${selectedCurrency.symbol}${Math.round(
-                    convertedPrice
-                ).toLocaleString()}`
+    convertedPrice
+).toLocaleString()}`
             );
         };
 
@@ -2252,11 +2253,11 @@ function NewBookingForm() {
 
                     <div className="container booking-page">
 
-
                         {/* BACK */}
 
                         <Link
                             href={`/stays/${property.id}`}
+                            className="stayway-load-in stayway-load-1"
                         >
                             ← {getBookingText(language, "backToProperty")}
                         </Link>
@@ -2264,7 +2265,7 @@ function NewBookingForm() {
 
                         {/* TITLE */}
 
-                        <h1>
+                        <h1 className="stayway-load-in stayway-load-2">
                             {getBookingText(language, "bookYourStay")}
                         </h1>
 
@@ -2273,10 +2274,10 @@ function NewBookingForm() {
 
 
                             {/* =================================================
-                               FORM
-                               ================================================= */}
+                                           FORM
+                                ================================================= */}
 
-                            <div className="booking-form">
+                            <div className="booking-form stayway-load-in stayway-load-3">
 
 
                                 <div
@@ -2775,7 +2776,7 @@ function NewBookingForm() {
                                SUMMARY
                                ================================================= */}
 
-                            <div className="booking-summary">
+                            <div className="booking-summary stayway-load-in stayway-load-4">
 
 
                                 <img
@@ -2938,3 +2939,4 @@ export default function NewBookingPage() {
         </Suspense>
     );
 }
+    

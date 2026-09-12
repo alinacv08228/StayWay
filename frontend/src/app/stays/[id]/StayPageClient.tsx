@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -888,7 +889,7 @@ export default function StayPageClient({
 
             {/* HEADER */}
 
-            <section className="stay-details-header">
+            <section className="stay-details-header stayway-load-in stayway-load-1">
 
                 <div className="container">
 
@@ -948,7 +949,7 @@ export default function StayPageClient({
 
             {/* GALLERY */}
 
-            <section className="stay-gallery-section">
+            <section className="stay-gallery-section stayway-load-in stayway-load-2">
 
                 <div className="container">
 
@@ -981,7 +982,7 @@ export default function StayPageClient({
 
                         {/* ABOUT */}
 
-                        <div className="stay-info-block">
+                        <div className="stay-info-block stayway-load-in stayway-load-3">
 
                             <h2>
                                 {text.aboutProperty}
@@ -1029,7 +1030,7 @@ export default function StayPageClient({
 
                         {/* FACILITIES */}
 
-                        <div className="stay-info-block">
+                        <div className="stay-info-block stayway-load-in stayway-load-4">
 
                             <div className="rooms-heading">
 
@@ -1190,7 +1191,7 @@ export default function StayPageClient({
                         {propertyRooms.length > 0 && (
 
                             <div
-                                className="stay-info-block"
+                                className="stay-info-block stayway-load-in stayway-load-5"
                                 id="rooms"
                             >
 
@@ -1227,7 +1228,7 @@ export default function StayPageClient({
 
                         {/* REVIEWS */}
 
-                        <div className="stay-info-block">
+                        <div className="stay-info-block stayway-load-in stayway-load-6">
 
                             <ReviewSection
                                 propertyId={

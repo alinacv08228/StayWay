@@ -4077,19 +4077,9 @@ h1.bookings-title-animation {
     line-height: 1.6;
 }
 
-/* Keep existing animations */
 
-.destinations-page-header {
-    animation: heroFadeUp 0.7s ease both;
-}
 
-.destinations-page-header h1 {
-    animation: heroFadeUp 0.7s ease 0.08s both;
-}
 
-.destinations-page-header .admin-description {
-    animation: heroFadeUp 0.7s ease 0.16s both;
-}
 
 .stays-title-animation {
     animation: heroFadeUp 0.8s ease both;
@@ -4113,34 +4103,6 @@ h1.stays-title-animation {
 
 .admin-description.stays-title-animation {
     animation-delay: 0.16s;
-}
-
-.property-grid .property-card {
-    animation: heroFadeUp 0.7s ease both;
-}
-
-.property-grid .property-card:nth-child(1) {
-    animation-delay: 0.22s;
-}
-
-.property-grid .property-card:nth-child(2) {
-    animation-delay: 0.32s;
-}
-
-.property-grid .property-card:nth-child(3) {
-    animation-delay: 0.42s;
-}
-
-.property-grid .property-card:nth-child(4) {
-    animation-delay: 0.52s;
-}
-
-.property-grid .property-card:nth-child(5) {
-    animation-delay: 0.62s;
-}
-
-.property-grid .property-card:nth-child(6) {
-    animation-delay: 0.72s;
 }
 
 .home-cta-stats {
@@ -4949,77 +4911,6 @@ h1.stays-title-animation {
     }
 }
 
-/* =========================================
-   STAYS PAGE ANIMATIONS
-   ========================================= */
-
-.stays-title-animation {
-    opacity: 0;
-    animation: staysFadeUp 0.7s ease forwards;
-}
-
-.stays-title-animation:nth-child(1) {
-    animation-delay: 0.05s;
-}
-
-.stays-title-animation:nth-child(2) {
-    animation-delay: 0.15s;
-}
-
-.stays-title-animation:nth-child(3) {
-    animation-delay: 0.25s;
-}
-
-.stays-search-result {
-    opacity: 0;
-    animation: staysFadeUp 0.6s ease 0.35s forwards;
-}
-
-.stays-filters {
-    opacity: 0;
-    animation: staysFadeUp 0.7s ease 0.4s forwards;
-}
-
-.stay-card-animation {
-    opacity: 0;
-    animation: stayCardFadeUp 0.6s ease forwards;
-}
-
-@keyframes staysFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes stayCardFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .stays-title-animation,
-    .stays-search-result,
-    .stays-filters,
-    .stay-card-animation {
-        opacity: 1;
-        animation: none;
-        transform: none;
-    }
-}
-
 /* HELP CENTER */
 
 .help-page {
@@ -5088,48 +4979,6 @@ h1.stays-title-animation {
     line-height: 1.6;
 }
 
-/* HELP CENTER ANIMATIONS */
-
-.help-hero-content {
-    animation: heroFadeUp 0.7s ease both;
-}
-
-.help-section:first-child {
-    animation: heroFadeUp 0.7s ease 0.15s both;
-}
-
-.help-section:nth-child(2) {
-    animation: heroFadeUp 0.7s ease 0.3s both;
-}
-
-.faq-item {
-    animation: heroFadeUp 0.6s ease both;
-}
-
-.faq-item:nth-child(1) {
-    animation-delay: 0.25s;
-}
-
-.faq-item:nth-child(2) {
-    animation-delay: 0.35s;
-}
-
-.faq-item:nth-child(3) {
-    animation-delay: 0.45s;
-}
-
-.faq-item:nth-child(4) {
-    animation-delay: 0.55s;
-}
-
-.faq-item:nth-child(5) {
-    animation-delay: 0.65s;
-}
-
-.support-form {
-    animation: heroFadeUp 0.7s ease 0.4s both;
-}
-
 /* FAQ */
 
 .faq-list {
@@ -5193,7 +5042,7 @@ h1.stays-title-animation {
 .support-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 14px;
 
     padding: 30px;
 
@@ -5213,7 +5062,7 @@ h1.stays-title-animation {
 .form-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .form-field label {
@@ -14223,19 +14072,7 @@ html.dark .transfers-cta-card {
     position: relative;
     overflow: hidden;
     background: #f3efff;
-    padding: 68px 0 70px;
-}
-
-.transfer-checkout-hero::after {
-    content: "";
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: #e5ddff;
-    right: -95px;
-    top: -155px;
-    pointer-events: none;
+    padding: 42px 0 60px;
 }
 
 .transfer-checkout-hero h1 {
@@ -14261,7 +14098,7 @@ html.dark .transfers-cta-card {
 }
 
 .transfer-checkout-content {
-    padding: 62px 0 90px;
+    padding: 30px 0 90px;
 }
 
 .transfer-checkout-layout {
@@ -15185,5 +15022,67 @@ html.dark .transfers-cta-card {
 
     .admin-transfer-section > div[style*="grid-template-columns"] .form-group:first-child {
         grid-column: auto;
+    }
+}
+
+/* =========================================================
+   STAYWAY - STANDARD PAGE LOAD ANIMATION
+   ========================================================= */
+
+@keyframes stayWayPageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stayway-load-in {
+    opacity: 0;
+    animation: stayWayPageEnter 0.8s ease both;
+    will-change: opacity, transform;
+}
+
+.stayway-load-1 {
+    animation-delay: 0s;
+}
+
+.stayway-load-2 {
+    animation-delay: 0.12s;
+}
+
+.stayway-load-3 {
+    animation-delay: 0.18s;
+}
+
+.stayway-load-4 {
+    animation-delay: 0.24s;
+}
+
+.stayway-load-5 {
+    animation-delay: 0.30s;
+}
+
+.stayway-load-6 {
+    animation-delay: 0.36s;
+}
+
+.stayway-load-7 {
+    animation-delay: 0.44s;
+}
+
+.stayway-load-8 {
+    animation-delay: 0.52s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stayway-load-in {
+        opacity: 1 !important;
+        animation: none !important;
+        transform: none !important;
     }
 }

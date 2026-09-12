@@ -4,6 +4,7 @@ import {
     FormEvent,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 
@@ -406,6 +407,9 @@ export default function AdminPage() {
     const [selectedPropertyId, setSelectedPropertyId] =
         useState<number | null>(null);
 
+    const roomsSectionRef =
+        useRef<HTMLElement | null>(null);
+
     const [isRoomFormOpen, setIsRoomFormOpen] =
         useState(false);
 
@@ -444,6 +448,23 @@ export default function AdminPage() {
 
     const [roomError, setRoomError] =
         useState("");
+
+    useEffect(() => {
+        if (selectedPropertyId === null) {
+            return;
+        }
+
+        const timer = window.setTimeout(() => {
+            roomsSectionRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 50);
+
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [selectedPropertyId]);
 
     const [isPropertyFormOpen, setIsPropertyFormOpen] =
         useState(false);
@@ -2068,19 +2089,124 @@ export default function AdminPage() {
 
                     {/* HEADER */}
 
-                    <div className="admin-header admin-load-in admin-load-1">
-                        <p className="admin-label">
+                    <div
+                        className="admin-header admin-load-in admin-load-1"
+                        style={{
+                            position: "relative",
+                            paddingBottom: "6px",
+                        }}
+                    >
+                        <p
+                            className="admin-label"
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "9px",
+                                marginBottom: "12px",
+                                color: "#777184",
+                                fontSize: "13px",
+                                fontWeight: 900,
+                                letterSpacing: "0.12em",
+                            }}
+                        >
+                            <span
+                                aria-hidden="true"
+                                style={{
+                                    width: "9px",
+                                    height: "9px",
+                                    borderRadius: "50%",
+                                    background: "#7059e8",
+                                    boxShadow: "0 0 0 5px rgba(112, 89, 232, 0.10)",
+                                    flexShrink: 0,
+                                }}
+                            />
                             ADMIN PANEL
                         </p>
 
-                        <h1>
+                        <h1
+                            style={{
+                                margin: 0,
+                                color: "#292532",
+                                fontSize: "52px",
+                                lineHeight: 1.04,
+                                fontWeight: 800,
+                                letterSpacing: "-0.035em",
+                            }}
+                        >
                             Admin Dashboard
                         </h1>
 
-                        <p className="admin-description">
-                            Manage users, stays and
-                            bookings on StayWay.
+                        <p
+                            className="admin-description"
+                            style={{
+                                marginTop: "16px",
+                                marginBottom: 0,
+                                maxWidth: "720px",
+                                color: "#746d80",
+                                fontSize: "19px",
+                                lineHeight: 1.55,
+                                fontWeight: 500,
+                            }}
+                        >
+                            Manage users, stays and bookings on{" "}
+                            <strong
+                                style={{
+                                    color: "#654fe0",
+                                    fontWeight: 800,
+                                }}
+                            >
+                                StayWay.
+                            </strong>
                         </p>
+
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                marginTop: "18px",
+                                flexWrap: "wrap",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "7px",
+                                    minHeight: "32px",
+                                    padding: "0 12px",
+                                    borderRadius: "999px",
+                                    background: "rgba(255,255,255,0.72)",
+                                    border: "1px solid rgba(108,92,231,0.14)",
+                                    boxShadow: "0 6px 18px rgba(78,64,125,0.05)",
+                                    color: "#5f596d",
+                                    fontSize: "11px",
+                                    fontWeight: 800,
+                                }}
+                            >
+                                <span
+                                    aria-hidden="true"
+                                    style={{
+                                        width: "6px",
+                                        height: "6px",
+                                        borderRadius: "50%",
+                                        background: "#22a05a",
+                                    }}
+                                />
+                                Management overview
+                            </span>
+
+                            <span
+                                style={{
+                                    color: "#938da0",
+                                    fontSize: "12px",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                StayWay control center
+                            </span>
+                        </div>
+
                     </div>
 
                     {/* STATISTICS */}
@@ -3472,7 +3598,10 @@ export default function AdminPage() {
                             {/* ROOMS */}
 
                             {selectedPropertyId !== null && (
-                                <section className="admin-section">
+                                <section
+                                    ref={roomsSectionRef}
+                                    className="admin-section"
+                                >
 
                                     {isRoomFormOpen && (
                                         <div className="admin-room-form">

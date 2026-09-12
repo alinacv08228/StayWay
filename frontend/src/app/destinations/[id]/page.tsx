@@ -345,6 +345,7 @@ export default function DestinationPage({
                 <div className="container">
 
                     <img
+                        className="stayway-load-in stayway-load-1"
                         src={destination.image}
                         alt={localizedCity}
                     />
@@ -352,11 +353,11 @@ export default function DestinationPage({
 
                     <div>
 
-                        <h1>
+                        <h1 className="stayway-load-in stayway-load-2">
                             {localizedCity}
                         </h1>
 
-                        <p>
+                        <p className="stayway-load-in stayway-load-3">
                             {localizedCountry}
                         </p>
 
@@ -371,7 +372,7 @@ export default function DestinationPage({
 
                 <div className="container">
 
-                    <h2>
+                    <h2 className="stayway-load-in stayway-load-4">
                         {text.staysIn}{" "}
                         {localizedCity}
                     </h2>
@@ -379,7 +380,7 @@ export default function DestinationPage({
 
                     {destinationProperties.length === 0 ? (
 
-                        <div className="home-empty-state">
+                        <div className="home-empty-state stayway-load-in stayway-load-5">
 
                             <h3>
                                 {text.noStays}
@@ -393,7 +394,7 @@ export default function DestinationPage({
 
                     ) : (
 
-                        <div className="property-grid">
+                        <div className="property-grid stayway-load-in stayway-load-5">
 
                             {destinationProperties.map(
                                 (property) => (

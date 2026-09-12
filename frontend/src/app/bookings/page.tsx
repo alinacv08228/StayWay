@@ -153,6 +153,18 @@ function BookingsContent() {
     const [statusFilter, setStatusFilter] = useState("All");
     const [sortBy, setSortBy] = useState("newest");
 
+    const [transferSearch, setTransferSearch] = useState("");
+    const [transferTypeFilter, setTransferTypeFilter] =
+        useState<"all" | "one-way" | "return">("all");
+    const [transferDateFilter, setTransferDateFilter] =
+        useState<"all" | "upcoming" | "past">("all");
+    const [transferVehicleFilter, setTransferVehicleFilter] =
+        useState("all");
+    const [transferPassengersFilter, setTransferPassengersFilter] =
+        useState<"all" | "1-3" | "4-5" | "6+">("all");
+    const [transferSortBy, setTransferSortBy] =
+        useState<"newest" | "oldest" | "priceHigh" | "priceLow">("newest");
+
     const selectedCurrency =
         currencyInfo[currency] ?? currencyInfo["Euro"];
 
@@ -235,8 +247,8 @@ function BookingsContent() {
             price * selectedCurrency.rate;
 
         return `${selectedCurrency.symbol}${Math.round(
-    convertedPrice
-).toLocaleString()}`;
+            convertedPrice
+        ).toLocaleString()}`;
     };
 
     const getStatusText = (status: string) => {
@@ -277,25 +289,25 @@ function BookingsContent() {
                 booking.infants ?? 0;
 
             return `${adults} ${
-    adults === 1
-        ? getBookingPageText(language, "adult")
-        : getBookingPageText(language, "adults")
-} · ${children} ${
-    children === 1
-        ? getBookingPageText(language, "child")
-        : getBookingPageText(language, "children")
-} · ${infants} ${
-    infants === 1
-        ? getBookingPageText(language, "infant")
-        : getBookingPageText(language, "infants")
-}`;
+                adults === 1
+                    ? getBookingPageText(language, "adult")
+                    : getBookingPageText(language, "adults")
+            } · ${children} ${
+                children === 1
+                    ? getBookingPageText(language, "child")
+                    : getBookingPageText(language, "children")
+            } · ${infants} ${
+                infants === 1
+                    ? getBookingPageText(language, "infant")
+                    : getBookingPageText(language, "infants")
+            }`;
         }
 
         return `${booking.guests} ${
-    booking.guests === 1
-        ? getBookingPageText(language, "guest")
-        : getBookingPageText(language, "guestsWord")
-}`;
+            booking.guests === 1
+                ? getBookingPageText(language, "guest")
+                : getBookingPageText(language, "guestsWord")
+        }`;
     };
 
     const filteredBookings = useMemo(() => {
@@ -432,6 +444,155 @@ function BookingsContent() {
         sortBy,
     ]);
 
+    const filteredTransferBookings = useMemo(() => {
+        const query = transferSearch.trim().toLowerCase();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const filtered = transferBookings.filter((booking) => {
+            const transferVehicle = booking.vehicleId
+                ? getTransferVehicleById(booking.vehicleId)
+                : undefined;
+
+            const vehicleName =
+                booking.vehicleName ||
+                transferVehicle?.name ||
+                "";
+
+            const licensePlate =
+                booking.licensePlate ||
+                transferVehicle?.licensePlate ||
+                "";
+
+            const searchableText = [
+                booking.id,
+                booking.firstName,
+                booking.lastName,
+                booking.email,
+                booking.phone,
+                booking.optionTitle,
+                vehicleName,
+                licensePlate,
+                booking.driverName,
+                booking.pickup,
+                booking.destination,
+                booking.date,
+                booking.time,
+                booking.returnDate,
+                booking.returnTime,
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            const matchesSearch =
+                query === "" ||
+                searchableText.includes(query);
+
+            const matchesType =
+                transferTypeFilter === "all" ||
+                booking.transferType === transferTypeFilter;
+
+            const bookingDate = new Date(
+                `${booking.date}T00:00:00`
+            );
+            bookingDate.setHours(0, 0, 0, 0);
+
+            const matchesDate =
+                transferDateFilter === "all" ||
+                (transferDateFilter === "upcoming" &&
+                    !Number.isNaN(bookingDate.getTime()) &&
+                    bookingDate >= today) ||
+                (transferDateFilter === "past" &&
+                    !Number.isNaN(bookingDate.getTime()) &&
+                    bookingDate < today);
+
+            const matchesVehicle =
+                transferVehicleFilter === "all" ||
+                vehicleName === transferVehicleFilter;
+
+            const passengers = Number(booking.passengers);
+
+            const matchesPassengers =
+                transferPassengersFilter === "all" ||
+                (transferPassengersFilter === "1-3" &&
+                    passengers >= 1 &&
+                    passengers <= 3) ||
+                (transferPassengersFilter === "4-5" &&
+                    passengers >= 4 &&
+                    passengers <= 5) ||
+                (transferPassengersFilter === "6+" &&
+                    passengers >= 6);
+
+            return (
+                matchesSearch &&
+                matchesType &&
+                matchesDate &&
+                matchesVehicle &&
+                matchesPassengers
+            );
+        });
+
+        return [...filtered].sort((a, b) => {
+            if (transferSortBy === "oldest") {
+                return (
+                    new Date(a.date).getTime() -
+                    new Date(b.date).getTime()
+                );
+            }
+
+            if (transferSortBy === "priceHigh") {
+                return b.price - a.price;
+            }
+
+            if (transferSortBy === "priceLow") {
+                return a.price - b.price;
+            }
+
+            return (
+                new Date(b.date).getTime() -
+                new Date(a.date).getTime()
+            );
+        });
+    }, [
+        transferBookings,
+        transferSearch,
+        transferTypeFilter,
+        transferDateFilter,
+        transferVehicleFilter,
+        transferPassengersFilter,
+        transferSortBy,
+    ]);
+
+    const transferVehicleOptions = useMemo(() => {
+        return Array.from(
+            new Set(
+                transferBookings
+                    .map((booking) => {
+                        const transferVehicle = booking.vehicleId
+                            ? getTransferVehicleById(booking.vehicleId)
+                            : undefined;
+
+                        return (
+                            booking.vehicleName ||
+                            transferVehicle?.name ||
+                            ""
+                        );
+                    })
+                    .filter(Boolean)
+            )
+        ).sort((a, b) => a.localeCompare(b));
+    }, [transferBookings]);
+
+    const clearTransferFilters = () => {
+        setTransferSearch("");
+        setTransferTypeFilter("all");
+        setTransferDateFilter("all");
+        setTransferVehicleFilter("all");
+        setTransferPassengersFilter("all");
+        setTransferSortBy("newest");
+    };
+
     const clearFilters = () => {
         setSearch("");
         setUserFilter("All");
@@ -539,6 +700,7 @@ function BookingsContent() {
         <main>
             <style jsx global>{`
     .bookings-page {
+
     width: 100%;
     min-width: 0;
 }
@@ -589,6 +751,20 @@ function BookingsContent() {
     }
 }
 
+@media (max-width: 1100px) {
+    .bookings-transfer-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .bookings-transfer-filters > div:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .bookings-transfer-filters .bookings-clear-button {
+        width: 100% !important;
+    }
+}
+
 @media (max-width: 700px) {
 .bookings-page {
         padding-left: 16px !important;
@@ -623,6 +799,28 @@ function BookingsContent() {
 
 .bookings-filters > * {
         width: 100%;
+    }
+
+.bookings-transfer-filters {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 24px !important;
+    }
+
+.bookings-transfer-filters > div:first-child {
+        grid-column: auto;
+    }
+
+.bookings-transfer-filters > * {
+        width: 100%;
+    }
+
+.bookings-transfer-results-bar {
+        flex-wrap: wrap;
+    }
+
+.bookings-transfer-results-bar > div {
+        width: 190px !important;
     }
 
         .booking-card {
@@ -693,18 +891,42 @@ function BookingsContent() {
             <section className="section">
                 <div className="container bookings-page">
 
-                    <h1
-                        className="page-title bookings-title-animation"
+                    <div
+                        className="bookings-page-header"
                         style={{
-                            animation:
-                                "heroFadeUp 0.8s ease both",
+                            marginBottom: "28px",
                         }}
                     >
-                        {getBookingPageText(language, "title")}
-                    </h1>
+                        <span
+                            className="stayway-load-in stayway-load-1"
+                            style={{
+                                display: "inline-block",
+                                marginBottom: "10px",
+                                color: "#6c5ce7",
+                                fontSize: "12px",
+                                fontWeight: 800,
+                                letterSpacing: "0.12em",
+                            }}
+                        >
+                            STAYWAY
+                        </span>
+
+                        <h1
+                            className="page-title stayway-load-in stayway-load-2"
+                            style={{
+                                fontSize: "42px",
+                                lineHeight: 1.1,
+                                fontWeight: 800,
+                                letterSpacing: "-0.02em",
+                                margin: 0,
+                            }}
+                        >
+                            Bookings
+                        </h1>
+                    </div>
 
                     <div
-                        className="bookings-tabs"
+                        className="bookings-tabs stayway-load-in stayway-load-3"
                         style={{
                             display: "inline-flex",
                             alignItems: "center",
@@ -722,10 +944,10 @@ function BookingsContent() {
                         <button
                             type="button"
                             className={`bookings-tab ${
-    activeBookingTab === "stays"
-        ? "active"
-        : ""
-}`}
+                                activeBookingTab === "stays"
+                                    ? "active"
+                                    : ""
+                            }`}
                             style={{
                                 position: "relative",
                                 display: "inline-flex",
@@ -760,25 +982,6 @@ function BookingsContent() {
                                 setActiveBookingTab("stays")
                             }
                         >
-                            <span
-                                aria-hidden="true"
-                                style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "30px",
-                                    height: "30px",
-                                    borderRadius: "10px",
-                                    background:
-                                        activeBookingTab === "stays"
-                                            ? "#f0edff"
-                                            : "rgba(108, 92, 231, 0.07)",
-                                    fontSize: "15px",
-                                    transition: "background 0.22s ease",
-                                }}
-                            >
-                                🏨
-                            </span>
                             <span>{getTranslation(language, "stays")}</span>
                             {activeBookingTab === "stays" && (
                                 <span
@@ -799,10 +1002,10 @@ function BookingsContent() {
                         <button
                             type="button"
                             className={`bookings-tab ${
-    activeBookingTab === "transfers"
-        ? "active"
-        : ""
-}`}
+                                activeBookingTab === "transfers"
+                                    ? "active"
+                                    : ""
+                            }`}
                             style={{
                                 position: "relative",
                                 display: "inline-flex",
@@ -837,25 +1040,6 @@ function BookingsContent() {
                                 setActiveBookingTab("transfers")
                             }
                         >
-                            <span
-                                aria-hidden="true"
-                                style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "30px",
-                                    height: "30px",
-                                    borderRadius: "10px",
-                                    background:
-                                        activeBookingTab === "transfers"
-                                            ? "#f0edff"
-                                            : "rgba(108, 92, 231, 0.07)",
-                                    fontSize: "15px",
-                                    transition: "background 0.22s ease",
-                                }}
-                            >
-                                🚘
-                            </span>
                             <span>{getTranslation(language, "transfers")}</span>
                             {activeBookingTab === "transfers" && (
                                 <span
@@ -879,7 +1063,7 @@ function BookingsContent() {
                             {/* SEARCH + FILTERS */}
 
                             <div
-                                className="bookings-filters"
+                                className="bookings-filters stayway-load-in stayway-load-4"
                                 style={{
                                     display: "grid",
                                     gridTemplateColumns:
@@ -889,8 +1073,6 @@ function BookingsContent() {
                                         "stretch",
                                     marginBottom:
                                         "32px",
-                                    animation:
-                                        "heroFadeUp 0.8s ease 0.16s both",
                                 }}
                             >
 
@@ -1329,6 +1511,7 @@ function BookingsContent() {
                             {userBookings.length >
                                 0 && (
                                     <div
+                                        className="stayway-load-in stayway-load-4"
                                         style={{
                                             display:
                                                 "flex",
@@ -1343,8 +1526,6 @@ function BookingsContent() {
                                                 "#777184",
                                             fontSize:
                                                 "14px",
-                                            animation:
-                                                "heroFadeUp 0.7s ease 0.24s both",
                                         }}
                                     >
                             <span>
@@ -1380,11 +1561,7 @@ function BookingsContent() {
                             {userBookings.length ===
                             0 ? (
                                 <p
-                                    className="bookings-description-animation"
-                                    style={{
-                                        animation:
-                                            "heroFadeUp 0.8s ease 0.16s both",
-                                    }}
+                                    className="bookings-description-animation stayway-load-in stayway-load-4"
                                 >
                                     {getTranslation(
                                         language,
@@ -1394,11 +1571,7 @@ function BookingsContent() {
                             ) : filteredBookings.length ===
                             0 ? (
                                 <div
-                                    className="home-empty-state"
-                                    style={{
-                                        animation:
-                                            "heroFadeUp 0.7s ease both",
-                                    }}
+                                    className="home-empty-state stayway-load-in stayway-load-4"
                                 >
                                     <h3>
                                         {getBookingPageText(language, "noFound")}
@@ -1409,12 +1582,11 @@ function BookingsContent() {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="bookings-list">
+                                <div className="bookings-list stayway-load-in stayway-load-6">
 
                                     {filteredBookings.map(
                                         (
-                                            booking,
-                                            index
+                                            booking
                                         ) => {
 
                                             const user =
@@ -1464,12 +1636,7 @@ function BookingsContent() {
                                                     key={
                                                         booking.id
                                                     }
-                                                    style={{
-                                                        animation:
-                                                            "heroFadeUp 0.7s ease both",
-                                                        animationDelay:
-                                                            `${0.12 + index * 0.1}s`,
-                                                    }}
+                                                    style={{}}
                                                 >
                                                     <div className="booking-content">
 
@@ -1741,41 +1908,430 @@ function BookingsContent() {
                     {activeBookingTab === "transfers" && (
                         <section className="bookings-transfers-section">
                             <div
-                                className="bookings-transfers-header"
+                                className="bookings-transfer-filters stayway-load-in stayway-load-3"
                                 style={{
-                                    marginBottom: "24px",
-                                    animation: "heroFadeUp 0.7s ease both",
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                        "minmax(0, 1.8fr) repeat(4, minmax(0, 1fr)) 160px",
+                                    gap: "10px",
+                                    alignItems: "stretch",
+                                    marginBottom: "32px",
                                 }}
                             >
-                                <span
-                                    className="bookings-transfers-eyebrow"
+                                {/* SEARCH */}
+                                <div
                                     style={{
-                                        display: "inline-block",
-                                        marginBottom: "8px",
-                                        color: "#6c5ce7",
-                                        fontSize: "12px",
-                                        fontWeight: 800,
-                                        letterSpacing: "0.12em",
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        background: "#ffffff",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "16px",
+                                        minHeight: "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                        transition:
+                                            "border-color 0.2s ease, box-shadow 0.2s ease",
                                     }}
                                 >
-                                    STAYWAY TRANSFERS
-                                </span>
+                                    <Search
+                                        size={20}
+                                        style={{
+                                            marginLeft: "18px",
+                                            color: "#6c5ce7",
+                                            flexShrink: 0,
+                                        }}
+                                    />
 
-                                <h2
+                                    <input
+                                        id="transfer-search"
+                                        type="text"
+                                        value={transferSearch}
+                                        onChange={(event) =>
+                                            setTransferSearch(event.target.value)
+                                        }
+                                        placeholder="Search by route, vehicle or driver..."
+                                        aria-label="Search transfers"
+                                        style={{
+                                            width: "100%",
+                                            height: "56px",
+                                            border: "none",
+                                            outline: "none",
+                                            background: "transparent",
+                                            padding: "0 8px 0 12px",
+                                            fontSize: "14px",
+                                            color: "#302d3a",
+                                            boxSizing: "border-box",
+                                            minWidth: 0,
+                                        }}
+                                    />
+
+                                    {transferSearch && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setTransferSearch("")}
+                                            aria-label="Clear transfer search"
+                                            style={{
+                                                border: "none",
+                                                background: "transparent",
+                                                cursor: "pointer",
+                                                marginRight: "10px",
+                                                padding: "6px",
+                                                color: "#777184",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            <X size={18} />
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* TRANSFER TYPE */}
+                                <div
                                     style={{
-                                        margin: 0,
-                                        fontSize: "28px",
-                                        fontWeight: 800,
-                                        color: "#302d3a",
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        background: "#ffffff",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "16px",
+                                        minHeight: "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
                                     }}
                                 >
-                                    {getTranslation(language, "transfers")}
-                                </h2>
+                                    <Tag
+                                        size={18}
+                                        style={{
+                                            marginLeft: "16px",
+                                            color: "#6c5ce7",
+                                            flexShrink: 0,
+                                        }}
+                                    />
+
+                                    <select
+                                        id="transfer-type-filter"
+                                        value={transferTypeFilter}
+                                        onChange={(event) =>
+                                            setTransferTypeFilter(
+                                                event.target.value as typeof transferTypeFilter
+                                            )
+                                        }
+                                        aria-label="Filter by transfer type"
+                                        style={{
+                                            width: "100%",
+                                            height: "56px",
+                                            border: "none",
+                                            outline: "none",
+                                            background: "transparent",
+                                            padding: "0 8px 0 8px",
+                                            fontSize: "14px",
+                                            color: "#302d3a",
+                                            cursor: "pointer",
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <option value="all">All types</option>
+                                        <option value="one-way">One way</option>
+                                        <option value="return">Return</option>
+                                    </select>
+                                </div>
+
+                                {/* DATE */}
+                                <div
+                                    style={{
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        background: "#ffffff",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "16px",
+                                        minHeight: "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    }}
+                                >
+                                    <CalendarDays
+                                        size={18}
+                                        style={{
+                                            marginLeft: "16px",
+                                            color: "#6c5ce7",
+                                            flexShrink: 0,
+                                        }}
+                                    />
+
+                                    <select
+                                        id="transfer-date-filter"
+                                        value={transferDateFilter}
+                                        onChange={(event) =>
+                                            setTransferDateFilter(
+                                                event.target.value as typeof transferDateFilter
+                                            )
+                                        }
+                                        aria-label="Filter by transfer date"
+                                        style={{
+                                            width: "100%",
+                                            height: "56px",
+                                            border: "none",
+                                            outline: "none",
+                                            background: "transparent",
+                                            padding: "0 8px 0 8px",
+                                            fontSize: "14px",
+                                            color: "#302d3a",
+                                            cursor: "pointer",
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <option value="all">All dates</option>
+                                        <option value="upcoming">Upcoming</option>
+                                        <option value="past">Past</option>
+                                    </select>
+                                </div>
+
+                                {/* VEHICLE */}
+                                <div
+                                    style={{
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        background: "#ffffff",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "16px",
+                                        minHeight: "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    }}
+                                >
+                                    <Tag
+                                        size={18}
+                                        style={{
+                                            marginLeft: "16px",
+                                            color: "#6c5ce7",
+                                            flexShrink: 0,
+                                        }}
+                                    />
+
+                                    <select
+                                        id="transfer-vehicle-filter"
+                                        value={transferVehicleFilter}
+                                        onChange={(event) =>
+                                            setTransferVehicleFilter(event.target.value)
+                                        }
+                                        aria-label="Filter by vehicle"
+                                        style={{
+                                            width: "100%",
+                                            height: "56px",
+                                            border: "none",
+                                            outline: "none",
+                                            background: "transparent",
+                                            padding: "0 8px 0 8px",
+                                            fontSize: "14px",
+                                            color: "#302d3a",
+                                            cursor: "pointer",
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <option value="all">All vehicles</option>
+                                        {transferVehicleOptions.map((vehicle) => (
+                                            <option key={vehicle} value={vehicle}>
+                                                {vehicle}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* PASSENGERS */}
+                                <div
+                                    style={{
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        background: "#ffffff",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "16px",
+                                        minHeight: "58px",
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    }}
+                                >
+                                    <Users
+                                        size={18}
+                                        style={{
+                                            marginLeft: "16px",
+                                            color: "#6c5ce7",
+                                            flexShrink: 0,
+                                        }}
+                                    />
+
+                                    <select
+                                        id="transfer-passengers-filter"
+                                        value={transferPassengersFilter}
+                                        onChange={(event) =>
+                                            setTransferPassengersFilter(
+                                                event.target.value as typeof transferPassengersFilter
+                                            )
+                                        }
+                                        aria-label="Filter by passengers"
+                                        style={{
+                                            width: "100%",
+                                            height: "56px",
+                                            border: "none",
+                                            outline: "none",
+                                            background: "transparent",
+                                            padding: "0 8px 0 8px",
+                                            fontSize: "14px",
+                                            color: "#302d3a",
+                                            cursor: "pointer",
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <option value="all">Any passengers</option>
+                                        <option value="1-3">1–3</option>
+                                        <option value="4-5">4–5</option>
+                                        <option value="6+">6+</option>
+                                    </select>
+                                </div>
+
+                                {/* CLEAR */}
+                                <button
+                                    type="button"
+                                    className="bookings-clear-button"
+                                    onClick={clearTransferFilters}
+                                    disabled={
+                                        transferSearch.trim() === "" &&
+                                        transferTypeFilter === "all" &&
+                                        transferDateFilter === "all" &&
+                                        transferVehicleFilter === "all" &&
+                                        transferPassengersFilter === "all" &&
+                                        transferSortBy === "newest"
+                                    }
+                                    aria-label="Clear transfer filters"
+                                    style={{
+                                        minHeight: "58px",
+                                        width: "160px",
+                                        padding: "0 18px",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "16px",
+                                        background:
+                                            transferSearch.trim() !== "" ||
+                                            transferTypeFilter !== "all" ||
+                                            transferDateFilter !== "all" ||
+                                            transferVehicleFilter !== "all" ||
+                                            transferPassengersFilter !== "all" ||
+                                            transferSortBy !== "newest"
+                                                ? "#ffffff"
+                                                : "#f7f5fb",
+                                        color:
+                                            transferSearch.trim() !== "" ||
+                                            transferTypeFilter !== "all" ||
+                                            transferDateFilter !== "all" ||
+                                            transferVehicleFilter !== "all" ||
+                                            transferPassengersFilter !== "all" ||
+                                            transferSortBy !== "newest"
+                                                ? "#5b526b"
+                                                : "#aaa4b5",
+                                        cursor:
+                                            transferSearch.trim() !== "" ||
+                                            transferTypeFilter !== "all" ||
+                                            transferDateFilter !== "all" ||
+                                            transferVehicleFilter !== "all" ||
+                                            transferPassengersFilter !== "all" ||
+                                            transferSortBy !== "newest"
+                                                ? "pointer"
+                                                : "default",
+                                        fontSize: "15px",
+                                        fontWeight: 700,
+                                        boxShadow:
+                                            "0 8px 24px rgba(78, 64, 125, 0.06)",
+                                    }}
+                                >
+                                    Clear
+                                </button>
                             </div>
 
-                            {transferBookings.length === 0 ? (
+                            <div
+                                className="bookings-transfer-results-bar stayway-load-in stayway-load-6"
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: "16px",
+                                    marginBottom: "16px",
+                                    color: "#777184",
+                                    fontSize: "14px",
+                                }}
+                            >
+                                <span>
+                                    Showing{" "}
+                                    <strong style={{ color: "#302d3a" }}>
+                                        {filteredTransferBookings.length}
+                                    </strong>{" "}
+                                    of{" "}
+                                    <strong style={{ color: "#302d3a" }}>
+                                        {transferBookings.length}
+                                    </strong>{" "}
+                                    transfers
+                                </span>
+
+
+
+
                                 <div
-                                    className="bookings-empty"
+                                    style={{
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        width: "190px",
+                                        minHeight: "42px",
+                                        background: "#ffffff",
+                                        border: "1px solid #ddd8ec",
+                                        borderRadius: "14px",
+                                        boxShadow: "0 8px 24px rgba(78, 64, 125, 0.05)",
+                                    }}
+                                >
+                                    <SlidersHorizontal
+                                        size={17}
+                                        style={{
+                                            marginLeft: "14px",
+                                            color: "#6c5ce7",
+                                            flexShrink: 0,
+                                        }}
+                                    />
+                                    <select
+                                        id="transfer-sort"
+                                        value={transferSortBy}
+                                        onChange={(event) =>
+                                            setTransferSortBy(
+                                                event.target.value as typeof transferSortBy
+                                            )
+                                        }
+                                        aria-label="Sort transfers"
+                                        style={{
+                                            width: "100%",
+                                            height: "40px",
+                                            border: "none",
+                                            outline: "none",
+                                            background: "transparent",
+                                            padding: "0 8px",
+                                            fontSize: "14px",
+                                            color: "#302d3a",
+                                            cursor: "pointer",
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <option value="newest">Newest first</option>
+                                        <option value="oldest">Oldest first</option>
+                                        <option value="priceHigh">Price: high</option>
+                                        <option value="priceLow">Price: low</option>
+                                    </select>
+                                </div>                            </div>
+
+                            {filteredTransferBookings.length === 0 ? (
+                                <div
+                                    className="bookings-empty stayway-load-in stayway-load-6"
                                     style={{
                                         padding: "48px 24px",
                                         borderRadius: "20px",
@@ -1783,7 +2339,6 @@ function BookingsContent() {
                                         border: "1px solid #e4dff0",
                                         textAlign: "center",
                                         boxShadow: "0 10px 30px rgba(78, 64, 125, 0.06)",
-                                        animation: "heroFadeUp 0.7s ease both",
                                     }}
                                 >
                                     <div
@@ -1831,14 +2386,14 @@ function BookingsContent() {
                                 </div>
                             ) : (
                                 <div
-                                    className="bookings-transfers-list"
+                                    className="bookings-transfers-list stayway-load-in stayway-load-5"
                                     style={{
                                         display: "grid",
                                         gap: "18px",
                                     }}
                                 >
-                                    {transferBookings.map(
-                                        (booking, index) => {
+                                    {filteredTransferBookings.map(
+                                        (booking) => {
                                             const isReturn =
                                                 booking.transferType === "return";
 
@@ -1872,7 +2427,7 @@ function BookingsContent() {
                                             const driverName =
                                                 booking.driverName ||
                                                 transferDriver?.name;
-                                            
+
                                             return (
                                                 <article
                                                     key={booking.id}
@@ -1883,8 +2438,6 @@ function BookingsContent() {
                                                         background: "#ffffff",
                                                         border: "1px solid #e8e2f4",
                                                         boxShadow: "0 14px 38px rgba(78, 64, 125, 0.08)",
-                                                        animation: "heroFadeUp 0.7s ease both",
-                                                        animationDelay: `${0.08 + index * 0.08}s`,
                                                     }}
                                                 >
                                                     <div
@@ -2248,4 +2801,4 @@ export default function BookingsPage() {
         </ProtectedRoute>
     );
 }
- 
+

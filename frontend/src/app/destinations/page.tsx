@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -46,6 +47,7 @@ import DestinationCard from "../../components/DestinationCard";
 
 export default function DestinationsPage() {
     const { language } = useSettings();
+
     const [
         destinations,
         setDestinations,
@@ -155,21 +157,32 @@ export default function DestinationsPage() {
             const filtered =
                 availableDestinations.filter(
                     (destination) => {
-                        const localizedCity = getLocalizedCityName(
-                            destination.name,
-                            language
-                        );
-                        const localizedCountry = getLocalizedCountryName(
-                            destination.country,
-                            language
-                        );
+                        const localizedCity =
+                            getLocalizedCityName(
+                                destination.name,
+                                language
+                            );
+
+                        const localizedCountry =
+                            getLocalizedCountryName(
+                                destination.country,
+                                language
+                            );
 
                         const matchesSearch =
                             query === "" ||
-                            destination.name.toLowerCase().includes(query) ||
-                            localizedCity.toLowerCase().includes(query) ||
-                            destination.country.toLowerCase().includes(query) ||
-                            localizedCountry.toLowerCase().includes(query);
+                            destination.name
+                                .toLowerCase()
+                                .includes(query) ||
+                            localizedCity
+                                .toLowerCase()
+                                .includes(query) ||
+                            destination.country
+                                .toLowerCase()
+                                .includes(query) ||
+                            localizedCountry
+                                .toLowerCase()
+                                .includes(query);
 
                         const matchesCountry =
                             countryFilter ===
@@ -193,8 +206,14 @@ export default function DestinationsPage() {
                         sortBy ===
                         "az"
                     ) {
-                        return getLocalizedCityName(a.name, language).localeCompare(
-                            getLocalizedCityName(b.name, language)
+                        return getLocalizedCityName(
+                            a.name,
+                            language
+                        ).localeCompare(
+                            getLocalizedCityName(
+                                b.name,
+                                language
+                            )
                         );
                     }
 
@@ -205,8 +224,14 @@ export default function DestinationsPage() {
                         sortBy ===
                         "za"
                     ) {
-                        return getLocalizedCityName(b.name, language).localeCompare(
-                            getLocalizedCityName(a.name, language)
+                        return getLocalizedCityName(
+                            b.name,
+                            language
+                        ).localeCompare(
+                            getLocalizedCityName(
+                                a.name,
+                                language
+                            )
                         );
                     }
 
@@ -218,8 +243,14 @@ export default function DestinationsPage() {
                         "countryAz"
                     ) {
                         const countryCompare =
-                            getLocalizedCountryName(a.country, language).localeCompare(
-                                getLocalizedCountryName(b.country, language)
+                            getLocalizedCountryName(
+                                a.country,
+                                language
+                            ).localeCompare(
+                                getLocalizedCountryName(
+                                    b.country,
+                                    language
+                                )
                             );
 
                         if (
@@ -242,8 +273,14 @@ export default function DestinationsPage() {
                         "countryZa"
                     ) {
                         const countryCompare =
-                            getLocalizedCountryName(b.country, language).localeCompare(
-                                getLocalizedCountryName(a.country, language)
+                            getLocalizedCountryName(
+                                b.country,
+                                language
+                            ).localeCompare(
+                                getLocalizedCountryName(
+                                    a.country,
+                                    language
+                                )
                             );
 
                         if (
@@ -258,8 +295,14 @@ export default function DestinationsPage() {
                         );
                     }
 
-                    return getLocalizedCityName(a.name, language).localeCompare(
-                        getLocalizedCityName(b.name, language)
+                    return getLocalizedCityName(
+                        a.name,
+                        language
+                    ).localeCompare(
+                        getLocalizedCityName(
+                            b.name,
+                            language
+                        )
                     );
                 }
             );
@@ -291,12 +334,26 @@ export default function DestinationsPage() {
                             STAYWAY
                         </p>
 
-                        <h1>
-                            {getTranslation(language, "destinations")}
+                        <h1
+                            style={{
+                                fontSize: "42px",
+                                lineHeight: 1.1,
+                                fontWeight: 700,
+                                letterSpacing: "-0.02em",
+                                margin: 0,
+                            }}
+                        >
+                            {getTranslation(
+                                language,
+                                "destinations"
+                            )}
                         </h1>
 
                         <p className="admin-description">
-                            {getDestinationUiTranslation(language, "loadingDestinations")}
+                            {getDestinationUiTranslation(
+                                language,
+                                "loadingDestinations"
+                            )}
                         </p>
                     </div>
                 </section>
@@ -343,19 +400,16 @@ export default function DestinationsPage() {
 
                     {/* HEADER */}
 
-                    <div
-                        className="destinations-page-header"
-                        style={{
-                            animation:
-                                "heroFadeUp 0.8s ease both",
-                        }}
-                    >
+                    <div className="destinations-page-header stayway-load-in stayway-load-1">
                         <p className="admin-label">
                             STAYWAY
                         </p>
 
                         <h1>
-                            {getTranslation(language, "destinations")}
+                            {getTranslation(
+                                language,
+                                "destinations"
+                            )}
                         </h1>
 
                         <p className="admin-description">
@@ -368,13 +422,7 @@ export default function DestinationsPage() {
 
                     {availableDestinations.length ===
                     0 ? (
-                        <div
-                            className="empty-state"
-                            style={{
-                                animation:
-                                    "heroFadeUp 0.8s ease 0.15s both",
-                            }}
-                        >
+                        <div className="empty-state stayway-load-in stayway-load-2">
                             <h2>
                                 {getDestinationUiTranslation(
                                     language,
@@ -394,7 +442,7 @@ export default function DestinationsPage() {
                             {/* SEARCH + FILTERS */}
 
                             <div
-                                className="destinations-filters"
+                                className="destinations-filters stayway-load-in stayway-load-2"
                                 style={{
                                     display:
                                         "grid",
@@ -407,8 +455,6 @@ export default function DestinationsPage() {
                                         "28px",
                                     marginBottom:
                                         "20px",
-                                    animation:
-                                        "heroFadeUp 0.8s ease 0.12s both",
                                 }}
                             >
                                 {/* SEARCH */}
@@ -464,8 +510,14 @@ export default function DestinationsPage() {
                                                     .value
                                             )
                                         }
-                                        placeholder={getDestinationUiTranslation(language, "destinationSearch")}
-                                        aria-label={getDestinationUiTranslation(language, "destinationSearch")}
+                                        placeholder={getDestinationUiTranslation(
+                                            language,
+                                            "destinationSearch"
+                                        )}
+                                        aria-label={getDestinationUiTranslation(
+                                            language,
+                                            "destinationSearch"
+                                        )}
                                         style={{
                                             flex: 1,
                                             minWidth: 0,
@@ -498,7 +550,10 @@ export default function DestinationsPage() {
                                                     ""
                                                 )
                                             }
-                                            aria-label={getDestinationUiTranslation(language, "clearSearch")}
+                                            aria-label={getDestinationUiTranslation(
+                                                language,
+                                                "clearSearch"
+                                            )}
                                             style={{
                                                 display:
                                                     "flex",
@@ -578,7 +633,10 @@ export default function DestinationsPage() {
                                                     .value
                                             )
                                         }
-                                        aria-label={getDestinationUiTranslation(language, "filterByCountry")}
+                                        aria-label={getDestinationUiTranslation(
+                                            language,
+                                            "filterByCountry"
+                                        )}
                                         style={{
                                             width:
                                                 "100%",
@@ -601,7 +659,10 @@ export default function DestinationsPage() {
                                         }}
                                     >
                                         <option value="All">
-                                            {getDestinationUiTranslation(language, "allCountries")}
+                                            {getDestinationUiTranslation(
+                                                language,
+                                                "allCountries"
+                                            )}
                                         </option>
 
                                         {availableCountries.map(
@@ -674,7 +735,10 @@ export default function DestinationsPage() {
                                                     .value
                                             )
                                         }
-                                        aria-label={getDestinationUiTranslation(language, "sortDestinations")}
+                                        aria-label={getDestinationUiTranslation(
+                                            language,
+                                            "sortDestinations"
+                                        )}
                                         style={{
                                             width:
                                                 "100%",
@@ -697,19 +761,31 @@ export default function DestinationsPage() {
                                         }}
                                     >
                                         <option value="az">
-                                            {getDestinationUiTranslation(language, "cityAZ")}
+                                            {getDestinationUiTranslation(
+                                                language,
+                                                "cityAZ"
+                                            )}
                                         </option>
 
                                         <option value="za">
-                                            {getDestinationUiTranslation(language, "cityZA")}
+                                            {getDestinationUiTranslation(
+                                                language,
+                                                "cityZA"
+                                            )}
                                         </option>
 
                                         <option value="countryAz">
-                                            {getDestinationUiTranslation(language, "countryAZ")}
+                                            {getDestinationUiTranslation(
+                                                language,
+                                                "countryAZ"
+                                            )}
                                         </option>
 
                                         <option value="countryZa">
-                                            {getDestinationUiTranslation(language, "countryZA")}
+                                            {getDestinationUiTranslation(
+                                                language,
+                                                "countryZA"
+                                            )}
                                         </option>
                                     </select>
                                 </div>
@@ -752,14 +828,17 @@ export default function DestinationsPage() {
                                             "none",
                                     }}
                                 >
-                                    {getDestinationUiTranslation(language, "clear")}
+                                    {getDestinationUiTranslation(
+                                        language,
+                                        "clear"
+                                    )}
                                 </button>
                             </div>
 
                             {/* RESULTS COUNT */}
 
                             <div
-                                className="destinations-results-count"
+                                className="destinations-results-count stayway-load-in stayway-load-3"
                                 style={{
                                     display:
                                         "flex",
@@ -771,12 +850,13 @@ export default function DestinationsPage() {
                                         "#777184",
                                     fontSize:
                                         "14px",
-                                    animation:
-                                        "heroFadeUp 0.7s ease 0.22s both",
                                 }}
                             >
                                 <span>
-                                    {getDestinationUiTranslation(language, "showing")}{" "}
+                                    {getDestinationUiTranslation(
+                                        language,
+                                        "showing"
+                                    )}{" "}
                                     <strong
                                         style={{
                                             color:
@@ -787,7 +867,10 @@ export default function DestinationsPage() {
                                             filteredDestinations.length
                                         }
                                     </strong>{" "}
-                                    {getDestinationUiTranslation(language, "of")}{" "}
+                                    {getDestinationUiTranslation(
+                                        language,
+                                        "of"
+                                    )}{" "}
                                     <strong
                                         style={{
                                             color:
@@ -798,7 +881,10 @@ export default function DestinationsPage() {
                                             availableDestinations.length
                                         }
                                     </strong>{" "}
-                                    {getDestinationUiTranslation(language, "destinationsLower")}
+                                    {getDestinationUiTranslation(
+                                        language,
+                                        "destinationsLower"
+                                    )}
                                 </span>
                             </div>
 
@@ -806,13 +892,7 @@ export default function DestinationsPage() {
 
                             {filteredDestinations.length ===
                             0 ? (
-                                <div
-                                    className="empty-state"
-                                    style={{
-                                        animation:
-                                            "heroFadeUp 0.7s ease both",
-                                    }}
-                                >
+                                <div className="empty-state stayway-load-in stayway-load-4">
                                     <h2>
                                         {getDestinationUiTranslation(
                                             language,
@@ -828,22 +908,15 @@ export default function DestinationsPage() {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="destination-grid">
+                                <div className="destination-grid stayway-load-in stayway-load-4">
                                     {filteredDestinations.map(
                                         (
-                                            destination,
-                                            index
+                                            destination
                                         ) => (
                                             <div
                                                 key={
                                                     destination.id
                                                 }
-                                                style={{
-                                                    animation:
-                                                        "heroFadeUp 0.7s ease both",
-                                                    animationDelay:
-                                                        `${0.12 + index * 0.08}s`,
-                                                }}
                                             >
                                                 <DestinationCard
                                                     destination={{
