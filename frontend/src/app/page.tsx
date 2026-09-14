@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -481,7 +480,7 @@ export default function Home() {
                 </div>
 
             </section>
-            
+
             {/* =================================================
                 TRAVEL CAROUSEL
             ================================================= */}
@@ -538,14 +537,14 @@ export default function Home() {
                                             )
                                         }
                                         aria-label={`View travel image ${
-    index + 1
-}`}
+                                            index + 1
+                                        }`}
                                     >
                                         <img
                                             src={image}
                                             alt={`StayWay travel ${
-    index + 1
-}`}
+                                                index + 1
+                                            }`}
                                         />
                                     </button>
                                 );
@@ -586,8 +585,8 @@ export default function Home() {
                                             )
                                         }
                                         aria-label={`Go to image ${
-    index + 1
-}`}
+                                            index + 1
+                                        }`}
                                     />
                                 )
                             )}
@@ -679,8 +678,8 @@ export default function Home() {
                                     <Link
                                         href="/destinations"
                                         className={`home-destination-card destination-card-${
-    index + 1
-}`}
+                                            index + 1
+                                        }`}
                                         style={{
                                             "--card-index": index,
                                         } as CSSProperties}
@@ -755,13 +754,9 @@ export default function Home() {
             ================================================= */}
 
             <section className="home-stays home-animate home-animate-4">
-
                 <div className="container">
-
                     <div className="home-section-heading stays-heading">
-
                         <div>
-
                             <span className="home-eyebrow">
                                 HANDPICKED STAYS
                             </span>
@@ -773,7 +768,6 @@ export default function Home() {
                                     SPECIAL.
                                 </span>
                             </h2>
-
                         </div>
 
                         <Link
@@ -782,126 +776,98 @@ export default function Home() {
                         >
                             View all stays ↗
                         </Link>
-
                     </div>
 
-
-                    {/* FEATURED PROPERTY CARDS */}
-
-                    {featuredProperties.length ===
-                    0 ? (
+                    {featuredProperties.length === 0 ? (
                         <div className="home-empty-state">
-
                             <h3>
                                 No stays available
                             </h3>
 
                             <p>
-                                Properties added by
-                                the administrator
+                                Properties added by the administrator
                                 will appear here.
                             </p>
-
                         </div>
                     ) : (
                         <div className="home-property-grid">
-
                             {featuredProperties.map(
-                                (
-                                    property
-                                ) => (
+                                (property, index) => (
                                     <Link
                                         href={`/stays/${property.id}`}
                                         className="home-property-card"
                                         style={{
-                                            "--card-index": featuredProperties.indexOf(property),
+                                            "--card-index": index,
                                         } as CSSProperties}
-                                        key={
-                                            property.id
-                                        }
+                                        key={property.id}
                                     >
-
                                         <div className="home-property-image">
-
                                             <img
-                                                src={
-                                                    property.image
-                                                }
-                                                alt={
-                                                    property.name
-                                                }
+                                                src={property.image}
+                                                alt={property.name}
                                             />
 
-                                            <div className="property-image-overlay"></div>
+                                            <div className="property-image-overlay" />
 
                                             <div className="property-rating-badge">
-                                                ★{" "}
-                                                {
-                                                    property.rating
-                                                }
+                                                ★ {property.rating}
                                             </div>
 
                                             <div className="property-view">
                                                 VIEW STAY ↗
                                             </div>
-
                                         </div>
 
                                         <div className="home-property-content">
-
-                                            <div>
-
+                                            <div className="property-location-row">
                                                 <span className="property-location">
-                                                    📍{" "}
-                                                    {
-                                                        property.address
-                                                    }
+                                                    📍 {property.address}
                                                 </span>
 
-                                                <h3>
-                                                    {
-                                                        property.name
-                                                    }
-                                                </h3>
-
-                                            </div>
-
-                                            <div className="home-property-price">
-
-                                                <strong>
-                                                    {
-                                                        selectedCurrency.symbol
-                                                    }
-
-                                                    {Math.round(
-                                                        property.pricePerNight *
-                                                        selectedCurrency.rate
-                                                    ).toLocaleString()}
-                                                </strong>
-
-                                                <span>
-                                                    {" / "}
-                                                    {
-                                                        getTranslation(
-                                                            language,
-                                                            "perNight"
-                                                        )
-                                                    }
+                                                <span className="property-location-arrow">
+                                                    ↗
                                                 </span>
-
                                             </div>
 
+                                            <div className="home-property-main">
+                                                <div className="home-property-info">
+                                                    <h3>
+                                                        {property.name}
+                                                    </h3>
+
+                                                </div>
+
+                                                <div className="home-property-price">
+                                                    <small>
+                                                        FROM
+                                                    </small>
+
+                                                    <div>
+                                                        <strong>
+                                                            {selectedCurrency.symbol}
+                                                            {Math.round(
+                                                                property.pricePerNight *
+                                                                selectedCurrency.rate
+                                                            ).toLocaleString()}
+                                                        </strong>
+
+                                                        <span>
+                                                            /{" "}
+                                                            {getTranslation(
+                                                                language,
+                                                                "perNight"
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-
                                     </Link>
                                 )
                             )}
-
                         </div>
                     )}
-
                 </div>
-
             </section>
 
 
@@ -1152,7 +1118,289 @@ export default function Home() {
 
 
             <style jsx>{`
-    .home-animated .home-animate {
+
+/* =========================================================
+   FEATURED STAYS — HOME
+========================================================= */
+
+.home-property-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px;
+}
+
+.home-property-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(111, 84, 226, 0.11);
+    border-radius: 24px;
+    background: #ffffff;
+    color: inherit;
+    text-decoration: none;
+    box-shadow:
+        0 10px 28px rgba(60, 43, 95, 0.07),
+        0 2px 8px rgba(60, 43, 95, 0.035);
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
+}
+
+.home-property-card::after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    height: 3px;
+    border-radius: 999px 999px 0 0;
+    background: linear-gradient(
+        90deg,
+        rgba(112, 85, 232, 0),
+        rgba(112, 85, 232, 0.72),
+        rgba(112, 85, 232, 0)
+    );
+    opacity: 0;
+    transform: scaleX(0.7);
+    transition:
+        opacity 0.22s ease,
+        transform 0.22s ease;
+}
+
+.home-property-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(111, 84, 226, 0.24);
+    box-shadow:
+        0 22px 46px rgba(60, 43, 95, 0.13),
+        0 6px 18px rgba(60, 43, 95, 0.055);
+}
+
+.home-property-card:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+.home-property-image {
+    position: relative;
+    width: 100%;
+    height: 255px;
+    overflow: hidden;
+    background: #eeeaf6;
+}
+
+.home-property-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.home-property-card:hover .home-property-image img {
+    transform: scale(1.04);
+}
+
+.property-image-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(24, 18, 40, 0.00) 38%,
+            rgba(24, 18, 40, 0.34) 100%
+        );
+    pointer-events: none;
+}
+
+.property-rating-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0 13px;
+    border: 1px solid rgba(255, 255, 255, 0.62);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.93);
+    color: #302a3b;
+    font-size: 13px;
+    font-weight: 850;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 20px rgba(30, 22, 55, 0.13);
+}
+
+.property-view {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #5f48d8;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.home-property-card:hover .property-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.home-property-content {
+    padding: 16px 20px 18px;
+}
+
+.property-location-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee9f5;
+}
+
+.property-location {
+    display: block;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #777181;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.property-location-arrow {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: #f1edff;
+    color: #684ee2;
+    font-size: 13px;
+    font-weight: 900;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.home-property-card:hover .property-location-arrow {
+    transform: translate(2px, -2px);
+    background: #e9e2ff;
+}
+
+.home-property-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-property-info {
+    min-width: 0;
+}
+
+.home-property-info h3 {
+    margin: 0;
+    color: #292631;
+    font-size: 20px;
+    line-height: 1.12;
+    font-weight: 820;
+    letter-spacing: -0.028em;
+}
+
+.home-property-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 96px;
+    text-align: right;
+}
+
+.home-property-price small {
+    margin-bottom: 5px;
+    color: #9b94a3;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.10em;
+}
+
+.home-property-price > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.home-property-price strong {
+    color: #292631;
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: -0.045em;
+}
+
+.home-property-price span {
+    color: #817a88;
+    font-size: 10px;
+    font-weight: 650;
+}
+
+@media (max-width: 1150px) {
+    .home-property-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .home-property-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-property-image {
+        height: 230px;
+    }
+
+    .home-property-content {
+        padding: 15px 18px 17px;
+    }
+}
+
+@media (max-width: 460px) {
+    .home-property-main {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .home-property-price {
+        margin-top: 14px;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .home-property-price > div {
+        justify-content: flex-start;
+    }
+}
+
+.home-animated .home-animate {
     opacity: 0;
     animation: homeFadeUp 0.8s ease both;
 }
