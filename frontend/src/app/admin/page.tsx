@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -9,7 +10,6 @@ import {
 } from "react";
 
 import {
-    bookings as mockBookings,
     properties,
     users,
     destinations as mockDestinations,
@@ -78,6 +78,14 @@ import {
 } from "../../services/transferService";
 
 
+type AdminBooking = Booking & {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+};
+
+
 export default function AdminPage() {
     const { currentUser } = useUser();
 
@@ -94,6 +102,16 @@ export default function AdminPage() {
         return `${selectedCurrency.symbol}${Math.round(
             convertedPrice
         ).toLocaleString()}`;
+    };
+
+    const formatTransferDate = (date: string) => {
+        const parts = date.split("-");
+
+        if (parts.length === 3 && parts[0].length === 4) {
+            return `${parts[2]}.${parts[1]}.${parts[0]}`;
+        }
+
+        return date;
     };
 
     const [allBookings, setAllBookings] =
@@ -119,6 +137,9 @@ export default function AdminPage() {
 
     const [allTransferBookings, setAllTransferBookings] =
         useState<TransferBooking[]>(getTransferBookings());
+
+    const [adminUsers, setAdminUsers] =
+        useState<typeof users>(users);
 
     const [selectedTransferCity, setSelectedTransferCity] =
         useState("Athens");
@@ -203,6 +224,50 @@ export default function AdminPage() {
 
     const [driverError, setDriverError] =
         useState("");
+
+    const [selectedScheduleDriverId, setSelectedScheduleDriverId] =
+        useState<string | null>(null);
+
+    const formatScheduleDate = (date: string) => {
+        const parsedDate = new Date(`${date}T00:00:00`);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return date;
+        }
+
+        return parsedDate.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
+    };
+
+    const getScheduleBookings = (driverId: string) => {
+        return getTransferDriverBookings(driverId)
+            .filter(
+                (booking) =>
+                    Boolean(booking.date && booking.time)
+            )
+            .sort((a, b) => {
+                const first = new Date(
+                    `${a.date}T${a.time}`
+                ).getTime();
+
+                const second = new Date(
+                    `${b.date}T${b.time}`
+                ).getTime();
+
+                return first - second;
+            });
+    };
+
+    const getBookingDuration = (booking: TransferBooking) => {
+        return booking.optionTitle
+            .toLowerCase()
+            .includes("family")
+            ? 40
+            : 35;
+    };
 
     const handleTransferVehicleSubmit = (event: FormEvent) => {
         event.preventDefault();
@@ -542,6 +607,64 @@ export default function AdminPage() {
     const [bookingUserFilter, setBookingUserFilter] =
         useState("All");
 
+    const bookingCustomers = useMemo(() => {
+        const customers = new Map<
+            string,
+            {
+                key: string;
+                name: string;
+                email: string;
+                phone: string;
+            }
+        >();
+
+        allBookings.forEach((booking) => {
+            const customer = booking as AdminBooking;
+            const fallbackUser = users.find(
+                (user) => user.id === booking.userId
+            );
+
+            const name = [
+                customer.firstName,
+                customer.lastName,
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .trim() || fallbackUser?.name || "Unknown user";
+
+            const email =
+                customer.email?.trim() ||
+                fallbackUser?.email ||
+                "";
+
+            const phone = customer.phone?.trim() || "";
+
+            const key =
+                customer.firstName ||
+                customer.lastName ||
+                customer.email ||
+                customer.phone
+                    ? `customer:${name}|${email}|${phone}`
+                    : `user:${booking.userId}`;
+
+            if (!customers.has(key)) {
+                customers.set(key, {
+                    key,
+                    name,
+                    email,
+                    phone,
+                });
+            }
+        });
+
+        return Array.from(customers.values()).sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
+    }, [allBookings]);
+
+    const [transferBookingStatusFilter, setTransferBookingStatusFilter] =
+        useState("All");
+
     // =========================================
 // ADMIN COUNTRIES
 // =========================================
@@ -759,7 +882,7 @@ export default function AdminPage() {
         const search =
             userSearch.trim().toLowerCase();
 
-        return users.filter((user) => {
+        return adminUsers.filter((user) => {
             const matchesSearch =
                 user.name
                     .toLowerCase()
@@ -777,7 +900,7 @@ export default function AdminPage() {
                 matchesRole
             );
         });
-    }, [userSearch, userRoleFilter]);
+    }, [adminUsers, userSearch, userRoleFilter]);
 
 
     // =========================================
@@ -793,6 +916,8 @@ export default function AdminPage() {
                 (item) => item.id === booking.propertyId
             );
 
+            const customer = booking as AdminBooking;
+
             const user = users.find(
                 (item) => item.id === booking.userId
             );
@@ -800,8 +925,25 @@ export default function AdminPage() {
             const propertyName =
                 property?.name.toLowerCase() ?? "";
 
+            const bookingGuestName = [
+                customer.firstName,
+                customer.lastName,
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            const bookingGuestEmail =
+                customer.email?.toLowerCase() ?? "";
+
+            const bookingGuestPhone =
+                customer.phone?.toLowerCase() ?? "";
+
             const userName =
                 user?.name.toLowerCase() ?? "";
+
+            const userEmail =
+                user?.email.toLowerCase() ?? "";
 
             const checkIn =
                 booking.checkIn.toLowerCase();
@@ -815,14 +957,34 @@ export default function AdminPage() {
             const matchesSearch =
                 !search ||
                 propertyName.includes(search) ||
+                bookingGuestName.includes(search) ||
+                bookingGuestEmail.includes(search) ||
+                bookingGuestPhone.includes(search) ||
                 userName.includes(search) ||
+                userEmail.includes(search) ||
                 checkIn.includes(search) ||
                 checkOut.includes(search) ||
                 status.includes(search);
 
+            const bookingCustomerKey =
+                customer.firstName ||
+                customer.lastName ||
+                customer.email ||
+                customer.phone
+                    ? `customer:${[
+                        customer.firstName,
+                        customer.lastName,
+                    ]
+                        .filter(Boolean)
+                        .join(" ")
+                        .trim() || "Unknown user"}|${
+                        customer.email?.trim() ?? ""
+                    }|${customer.phone?.trim() ?? ""}`
+                    : `user:${booking.userId}`;
+
             const matchesUser =
                 bookingUserFilter === "All" ||
-                booking.userId === Number(bookingUserFilter);
+                bookingCustomerKey === bookingUserFilter;
 
             const matchesStatus =
                 bookingStatusFilter === "All" ||
@@ -907,12 +1069,22 @@ export default function AdminPage() {
             (booking) => booking.status === "confirmed"
         ).length;
 
+        const confirmedTransferBookings = allTransferBookings.filter(
+            (booking) =>
+                (booking as TransferBooking & {
+                    status?: "pending" | "confirmed" | "cancelled";
+                }).status !== "pending" &&
+                (booking as TransferBooking & {
+                    status?: "pending" | "confirmed" | "cancelled";
+                }).status !== "cancelled"
+        );
+
         const confirmedTotal =
-            confirmedStayBookings + totalTransferBookings;
+            confirmedStayBookings + confirmedTransferBookings.length;
 
         const totalRevenue =
             confirmedRevenue +
-            allTransferBookings.reduce(
+            confirmedTransferBookings.reduce(
                 (total, booking) => total + booking.price,
                 0
             );
@@ -1028,6 +1200,14 @@ export default function AdminPage() {
             );
 
         const transferEvents = allTransferBookings
+            .filter((booking) => {
+                const status =
+                    (booking as TransferBooking & {
+                        status?: "pending" | "confirmed" | "cancelled";
+                    }).status;
+
+                return status !== "pending" && status !== "cancelled";
+            })
             .map((booking) => ({
                 date: getDate(booking.date),
                 revenue: booking.price,
@@ -1115,18 +1295,49 @@ export default function AdminPage() {
         // This keeps the period selector consistent across the whole dashboard.
         const filteredStayBookings = allBookings.filter((booking) => {
             const date = getDate(booking.checkIn);
-            return date !== null && date >= start && date <= now;
+
+            if (date === null || date < start) {
+                return false;
+            }
+
+            // For the 12-month view, include the entire current month,
+            // including future bookings already made for this month.
+            if (analyticsPeriod === "12m") {
+                return true;
+            }
+
+            // For 7 Days / 30 Days, keep the period up to today.
+            return date <= now;
         });
 
         const filteredTransferBookings = allTransferBookings.filter((booking) => {
             const date = getDate(booking.date);
-            return date !== null && date >= start && date <= now;
+
+            if (date === null || date < start) {
+                return false;
+            }
+
+            // For the 12-month view, include the entire current month,
+            // including future transfer bookings already made for this month.
+            if (analyticsPeriod === "12m") {
+                return true;
+            }
+
+            return date <= now;
         });
 
         const confirmed =
             filteredStayBookings.filter(
                 (booking) => booking.status === "confirmed"
-            ).length + filteredTransferBookings.length;
+            ).length +
+            filteredTransferBookings.filter((booking) => {
+                const status =
+                    (booking as TransferBooking & {
+                        status?: "pending" | "confirmed" | "cancelled";
+                    }).status;
+
+                return status !== "pending" && status !== "cancelled";
+            }).length;
 
         const cancelled = filteredStayBookings.filter(
             (booking) => booking.status === "cancelled"
@@ -1170,10 +1381,19 @@ export default function AdminPage() {
                 0
             );
 
-        const transferRevenue = filteredTransferBookings.reduce(
-            (sum, booking) => sum + booking.price,
-            0
-        );
+        const transferRevenue = filteredTransferBookings
+            .filter((booking) => {
+                const status =
+                    (booking as TransferBooking & {
+                        status?: "pending" | "confirmed" | "cancelled";
+                    }).status;
+
+                return status !== "pending" && status !== "cancelled";
+            })
+            .reduce(
+                (sum, booking) => sum + booking.price,
+                0
+            );
 
         const revenueValues = buckets.map(
             (bucket) => bucket.revenue
@@ -1185,13 +1405,17 @@ export default function AdminPage() {
             cancelled,
             totalBookings,
             popularDestinations,
-            oneWayTransfers: filteredTransferBookings.filter(
-                (booking) => booking.transferType !== "return"
-            ).length,
+            /*
+             * A return reservation contains two transfer legs:
+             * the outbound leg and the return leg.
+             * Therefore it must count as 1 in ONE-WAY and 1 in RETURN.
+             */
+            oneWayTransfers: filteredTransferBookings.length,
             returnTransfers: filteredTransferBookings.filter(
                 (booking) => booking.transferType === "return"
             ).length,
             totalRevenue: totalRevenue + transferRevenue,
+            transferRevenue,
             maxRevenue: Math.max(...revenueValues, 1),
             maxBookings: Math.max(
                 ...buckets.map(
@@ -1253,90 +1477,48 @@ export default function AdminPage() {
                 "stayway_bookings"
             );
 
-        if (savedBookings) {
+        if (savedBookings !== null) {
             try {
+                /*
+                 * localStorage is the source of truth.
+                 * If the saved value is [] it must remain [].
+                 * Never re-add mock bookings after the key exists.
+                 */
                 const parsedBookings =
                     JSON.parse(
                         savedBookings
                     ) as Booking[];
 
-                /*
-                 * Păstrăm rezervările existente
-                 * din localStorage.
-                 *
-                 * Adăugăm și rezervările mock
-                 * care lipsesc, dar fără duplicate.
-                 *
-                 * Dacă aceeași rezervare există
-                 * în ambele locuri, versiunea din
-                 * localStorage are prioritate.
-                 */
-                const existingIds =
-                    new Set(
-                        parsedBookings.map(
-                            (booking) =>
-                                booking.id
-                        )
-                    );
-
-                const missingMockBookings =
-                    mockBookings.filter(
-                        (booking) =>
-                            !existingIds.has(
-                                booking.id
-                            )
-                    );
-
-                const mergedBookings =
-                    [
-                        ...missingMockBookings,
-                        ...parsedBookings,
-                    ];
-
-                localStorage.setItem(
-                    "stayway_bookings",
-                    JSON.stringify(
-                        mergedBookings
-                    )
-                );
-
                 setAllBookings(
-                    mergedBookings
+                    parsedBookings
                 );
             } catch {
-                const initialBookings =
-                    mockBookings as Booking[];
-
+                /*
+                 * If the saved value is corrupted, recover with
+                 * an empty booking list instead of restoring mocks.
+                 */
                 localStorage.setItem(
                     "stayway_bookings",
-                    JSON.stringify(
-                        initialBookings
-                    )
+                    JSON.stringify([])
                 );
 
-                setAllBookings(
-                    initialBookings
-                );
+                setAllBookings([]);
             }
         } else {
             /*
-             * Prima utilizare:
-             * salvăm rezervările mock în
-             * localStorage.
+             * No booking data exists in localStorage.
+             * Start with an empty list.
+             *
+             * IMPORTANT:
+             * Do not seed mockBookings here. Otherwise a booking
+             * deleted by the user/admin would return after reload.
              */
-            const initialBookings =
-                mockBookings as Booking[];
-
             localStorage.setItem(
                 "stayway_bookings",
-                JSON.stringify(
-                    initialBookings
-                )
+                JSON.stringify([])
             );
 
-            setAllBookings(
-                initialBookings
-            );
+            setAllBookings([]);
         }
 
         setAllProperties(
@@ -1350,6 +1532,185 @@ export default function AdminPage() {
         setAllTransferBookings(
             getTransferBookings()
         );
+
+        /*
+         * Refresh dashboard booking data whenever bookings/transfers
+         * change elsewhere in the app or when the Admin page becomes
+         * active again.
+         */
+        const loadDashboardBookings = () => {
+            const currentBookings =
+                localStorage.getItem("stayway_bookings");
+
+            if (currentBookings !== null) {
+                try {
+                    const parsedBookings =
+                        JSON.parse(currentBookings) as Booking[];
+
+                    setAllBookings(parsedBookings);
+                } catch {
+                    setAllBookings([]);
+                }
+            } else {
+                setAllBookings([]);
+            }
+
+            setAllTransferBookings(
+                getTransferBookings()
+            );
+        };
+
+        const loadRegisteredUsers = () => {
+            const storedUsers =
+                localStorage.getItem(
+                    "stayway_registered_users"
+                );
+
+            let registeredUsers: typeof users = [];
+
+            if (storedUsers) {
+                try {
+                    const parsedUsers = JSON.parse(
+                        storedUsers
+                    );
+
+                    if (Array.isArray(parsedUsers)) {
+                        registeredUsers =
+                            parsedUsers as typeof users;
+                    }
+                } catch {
+                    registeredUsers = [];
+                }
+            }
+
+            /*
+             * Build the Admin Users list from:
+             * 1. the existing mock users
+             * 2. users created through Sign Up
+             *
+             * Email is the unique key. This prevents duplicates even
+             * when the same registered user is stored more than once.
+             *
+             * Mock users stay as the original records when an identical
+             * email already exists in the mock data.
+             */
+            const usersByEmail = new Map<string, (typeof users)[number]>();
+
+            users.forEach((user) => {
+                const email = user.email.trim().toLowerCase();
+
+                if (email) {
+                    usersByEmail.set(email, user);
+                }
+            });
+
+            registeredUsers.forEach((registeredUser) => {
+                const email = registeredUser.email
+                    .trim()
+                    .toLowerCase();
+
+                if (!email || usersByEmail.has(email)) {
+                    return;
+                }
+
+                usersByEmail.set(email, registeredUser);
+            });
+
+            setAdminUsers(Array.from(usersByEmail.values()));
+        };
+
+        loadRegisteredUsers();
+
+        const handleRegisteredUsersChange = () => {
+            loadRegisteredUsers();
+            loadDashboardBookings();
+        };
+
+        const handleDashboardBookingsChange = () => {
+            loadDashboardBookings();
+        };
+
+        const handleWindowFocus = () => {
+            loadRegisteredUsers();
+            loadDashboardBookings();
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                loadRegisteredUsers();
+                loadDashboardBookings();
+            }
+        };
+
+        /*
+         * "storage" handles changes made from another browser tab/window.
+         * The focus/visibility handlers make sure the Admin page also
+         * refreshes when the user returns to it after signing up.
+         *
+         * The custom event is supported for same-window updates if the
+         * Sign Up flow dispatches "stayway_registered_users_changed".
+         */
+        window.addEventListener(
+            "storage",
+            handleRegisteredUsersChange
+        );
+
+        window.addEventListener(
+            "stayway_registered_users_changed",
+            handleRegisteredUsersChange
+        );
+
+        window.addEventListener(
+            "stayway_bookings_changed",
+            handleDashboardBookingsChange
+        );
+
+        window.addEventListener(
+            "stayway_transfers_changed",
+            handleDashboardBookingsChange
+        );
+
+        window.addEventListener(
+            "focus",
+            handleWindowFocus
+        );
+
+        document.addEventListener(
+            "visibilitychange",
+            handleVisibilityChange
+        );
+
+        return () => {
+            window.removeEventListener(
+                "storage",
+                handleRegisteredUsersChange
+            );
+
+            window.removeEventListener(
+                "stayway_registered_users_changed",
+                handleRegisteredUsersChange
+            );
+
+            window.removeEventListener(
+                "stayway_bookings_changed",
+                handleDashboardBookingsChange
+            );
+
+            window.removeEventListener(
+                "stayway_transfers_changed",
+                handleDashboardBookingsChange
+            );
+
+            window.removeEventListener(
+                "focus",
+                handleWindowFocus
+            );
+
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            );
+        };
     }, []);
 
     // =========================================
@@ -1879,29 +2240,73 @@ export default function AdminPage() {
     };
 
     // =========================================
+    // BOOKING CONFIRMATION
+    // =========================================
+
+    const updateStayBookingStatus = (
+        bookingId: string,
+        status: "pending" | "confirmed" | "cancelled"
+    ) => {
+        const updatedBookings = allBookings.map((booking) =>
+            booking.id === bookingId
+                ? { ...booking, status }
+                : booking
+        );
+
+        localStorage.setItem(
+            "stayway_bookings",
+            JSON.stringify(updatedBookings)
+        );
+
+        setAllBookings(updatedBookings);
+    };
+
+    const updateTransferBookingStatus = (
+        bookingId: string,
+        status: "pending" | "confirmed" | "cancelled"
+    ) => {
+        const updatedBookings = allTransferBookings.map((booking) =>
+            booking.id === bookingId
+                ? { ...booking, status }
+                : booking
+        );
+
+        localStorage.setItem(
+            "stayway_transfers",
+            JSON.stringify(updatedBookings)
+        );
+
+        setAllTransferBookings(updatedBookings);
+    };
+
+    // =========================================
     // TRANSFER FILTERS
     // =========================================
 
     const filteredTransferBookings = (() => {
-        const city = selectedTransferCity.toLowerCase();
         const search = transferBookingSearch.trim().toLowerCase();
 
+        /*
+         * Transfer bookings are global admin data.
+         * The City selector above controls vehicles and drivers,
+         * but it must NOT hide a booking made in another city.
+         */
         return allTransferBookings.filter((booking) => {
-            if (!booking.vehicleId) {
-                return false;
-            }
-
-            const vehicle = allTransferVehicles.find(
-                (item) => item.id === booking.vehicleId
-            );
-
-            if (vehicle?.city.toLowerCase() !== city) {
-                return false;
-            }
-
             if (
                 transferBookingTypeFilter !== "all" &&
                 booking.transferType !== transferBookingTypeFilter
+            ) {
+                return false;
+            }
+
+            const bookingStatus =
+                (booking as TransferBooking & {
+                    status?: "pending" | "confirmed" | "cancelled";
+                }).status ?? "confirmed";
+
+            if (
+                transferBookingStatusFilter !== "All" &&
+                bookingStatus !== transferBookingStatusFilter
             ) {
                 return false;
             }
@@ -2008,8 +2413,8 @@ export default function AdminPage() {
     // ADMIN USERS
     // =========================================
 
-    const adminUsers =
-        users.filter(
+    const adminAccounts =
+        adminUsers.filter(
             (user) =>
                 user.role ===
                 "admin"
@@ -2022,67 +2427,67 @@ export default function AdminPage() {
     return (
         <main>
             <style>{`
-                /* ADMIN PAGE LOAD ANIMATIONS */
-                @keyframes adminPageEnter {
-                    from {
-                        opacity: 0;
-                        transform: translateY(22px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
+    /* ADMIN PAGE LOAD ANIMATIONS */
+    @keyframes adminPageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-                .admin-load-in {
-                    opacity: 0;
-                    animation: adminPageEnter 0.8s ease both;
-                    will-change: opacity, transform;
-                }
+.admin-load-in {
+    opacity: 0;
+    animation: adminPageEnter 0.8s ease both;
+    will-change: opacity, transform;
+}
 
-                .admin-load-1 { animation-delay: 0s; }
-                .admin-load-2 { animation-delay: 0.12s; }
-                .admin-load-3 { animation-delay: 0.18s; }
-                .admin-load-4 { animation-delay: 0.24s; }
-                .admin-load-5 { animation-delay: 0.30s; }
-                .admin-load-6 { animation-delay: 0.36s; }
-                .admin-load-7 { animation-delay: 0.44s; }
-                .admin-load-8 { animation-delay: 0.52s; }
+.admin-load-1 { animation-delay: 0s; }
+.admin-load-2 { animation-delay: 0.12s; }
+.admin-load-3 { animation-delay: 0.18s; }
+.admin-load-4 { animation-delay: 0.24s; }
+.admin-load-5 { animation-delay: 0.30s; }
+.admin-load-6 { animation-delay: 0.36s; }
+.admin-load-7 { animation-delay: 0.44s; }
+.admin-load-8 { animation-delay: 0.52s; }
 
-                @media (prefers-reduced-motion: reduce) {
-                    .admin-load-in {
-                        opacity: 1 !important;
-                        animation: none !important;
-                        transform: none !important;
-                    }
-                }
+@media (prefers-reduced-motion: reduce) {
+.admin-load-in {
+        opacity: 1 !important;
+        animation: none !important;
+        transform: none !important;
+    }
+}
 
-                @media (max-width: 900px) {
-                    .admin-analytics-primary,
-                    .admin-analytics-secondary,
-                    .admin-users-grid {
-                        grid-template-columns: 1fr !important;
-                    }
+@media (max-width: 900px) {
+.admin-analytics-primary,
+.admin-analytics-secondary,
+.admin-users-grid {
+        grid-template-columns: 1fr !important;
+    }
 
-                    .admin-user-overview {
-                        grid-template-columns: 1fr 1fr !important;
-                    }
+.admin-user-overview {
+        grid-template-columns: 1fr 1fr !important;
+    }
 
-                    .admin-transfer-analytics-grid {
-                        grid-template-columns: 1fr 1fr !important;
-                    }
-                }
+.admin-transfer-analytics-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
 
-                @media (max-width: 600px) {
-                    .admin-user-overview {
-                        grid-template-columns: 1fr !important;
-                    }
+@media (max-width: 600px) {
+.admin-user-overview {
+        grid-template-columns: 1fr !important;
+    }
 
-                    .admin-transfer-analytics-grid {
-                        grid-template-columns: 1fr !important;
-                    }
-                }
-            `}</style>
+.admin-transfer-analytics-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+`}</style>
 
             <section className="section">
                 <div className="container admin-page">
@@ -2249,7 +2654,7 @@ export default function AdminPage() {
                             style={{ flex: "1 1 170px", minWidth: "150px" }}
                         >
                             <span>Users</span>
-                            <strong>{users.length}</strong>
+                            <strong>{adminUsers.length}</strong>
                         </div>
 
                         <div
@@ -2845,10 +3250,10 @@ export default function AdminPage() {
                                 <div style={{ padding: "16px", borderRadius: "16px", background: "rgba(255,255,255,0.76)", border: "1px solid #eeeaf6" }}>
                                     <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 800 }}>TRANSFER REVENUE</span>
                                     <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "24px" }}>
-                                        {formatPrice(allTransferBookings.reduce((sum, booking) => sum + booking.price, 0))}
+                                        {formatPrice(analyticsData.transferRevenue)}
                                     </strong>
                                     <span style={{ display: "block", marginTop: "5px", color: "#91899d", fontSize: "10px" }}>
-                                        across all transfer reservations
+                                        confirmed transfer reservations
                                     </span>
                                 </div>
                             </div>
@@ -4115,7 +4520,7 @@ export default function AdminPage() {
                                         Total users
                                     </span>
                                     <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "26px", lineHeight: 1 }}>
-                                        {users.length}
+                                        {adminUsers.length}
                                     </strong>
                                 </div>
 
@@ -4132,7 +4537,7 @@ export default function AdminPage() {
                                         Admin accounts
                                     </span>
                                     <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "26px", lineHeight: 1 }}>
-                                        {adminUsers.length}
+                                        {adminAccounts.length}
                                     </strong>
                                 </div>
 
@@ -5277,14 +5682,29 @@ export default function AdminPage() {
                                                             );
                                                         })()}
 
-                                                        {getTransferDriverStatus(driver.id) === "busy" &&
-                                                            getTransferDriverBookings(driver.id).map(
-                                                                (booking) => (
-                                                                    <small key={booking.id}>
-                                                                        {booking.date} · {booking.time}
-                                                                    </small>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setSelectedScheduleDriverId(
+                                                                    driver.id
                                                                 )
-                                                            )}
+                                                            }
+                                                            style={{
+                                                                display: "inline-flex",
+                                                                alignItems: "center",
+                                                                gap: "6px",
+                                                                marginTop: "9px",
+                                                                padding: 0,
+                                                                border: "none",
+                                                                background: "transparent",
+                                                                color: "#6652d7",
+                                                                fontSize: "12px",
+                                                                fontWeight: 800,
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            📅 View schedule
+                                                        </button>
                                                     </div>
 
                                                     <div className="admin-row-actions">
@@ -5364,7 +5784,7 @@ export default function AdminPage() {
                                             <h2 style={{ margin: 0 }}>Transfer Bookings</h2>
                                         </div>
                                         <p style={{ margin: 0 }}>
-                                            Users who booked a taxi in <strong>{selectedTransferCity}</strong>.
+                                            All transfer bookings made on StayWay.
                                         </p>
                                     </div>
                                 </div>
@@ -5377,7 +5797,7 @@ export default function AdminPage() {
                                         border: "1px solid #ebe5f5",
                                         background: "#fbf9ff",
                                         display: "grid",
-                                        gridTemplateColumns: "minmax(280px, 1fr) 190px",
+                                        gridTemplateColumns: "minmax(260px, 1fr) 170px 170px",
                                         gap: "12px",
                                         alignItems: "end",
                                     }}
@@ -5405,6 +5825,36 @@ export default function AdminPage() {
                                             }
                                             placeholder="Name, email, phone, vehicle, route..."
                                         />
+                                    </div>
+
+                                    <div className="form-group" style={{ margin: 0 }}>
+                                        <label
+                                            htmlFor="transferBookingStatusFilter"
+                                            style={{
+                                                display: "block",
+                                                marginBottom: "7px",
+                                                fontSize: "12px",
+                                                fontWeight: 800,
+                                                color: "#5f596d",
+                                            }}
+                                        >
+                                            Status
+                                        </label>
+                                        <select
+                                            id="transferBookingStatusFilter"
+                                            style={{ width: "100%", boxSizing: "border-box" }}
+                                            value={transferBookingStatusFilter}
+                                            onChange={(event) =>
+                                                setTransferBookingStatusFilter(
+                                                    event.target.value
+                                                )
+                                            }
+                                        >
+                                            <option value="All">All statuses</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
                                     </div>
 
                                     <div className="form-group" style={{ margin: 0 }}>
@@ -5460,6 +5910,11 @@ export default function AdminPage() {
 
                                             const vehicleImage = vehicle?.image;
                                             const isReturn = booking.transferType === "return";
+                                            const bookingStatus =
+                                                (booking as TransferBooking & {
+                                                    status?: "pending" | "confirmed" | "cancelled";
+                                                }).status ?? "confirmed";
+                                            const isPending = bookingStatus === "pending";
 
                                             return (
                                                 <div
@@ -5654,19 +6109,40 @@ export default function AdminPage() {
                                                                     fontSize: "12px",
                                                                 }}
                                                             >
-                                                                <span>📅 {booking.date}</span>
+                                                                <strong
+                                                                    style={{
+                                                                        color: "#5f586c",
+                                                                        fontWeight: 800,
+                                                                    }}
+                                                                >
+                                                                    Plecare:
+                                                                </strong>
+                                                                <span>📅 {formatTransferDate(booking.date)}</span>
                                                                 <span>·</span>
                                                                 <span>🕐 {booking.time}</span>
                                                             </div>
                                                             {isReturn && booking.returnDate && booking.returnTime && (
                                                                 <div
                                                                     style={{
-                                                                        marginTop: "4px",
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        gap: "8px",
+                                                                        marginTop: "5px",
                                                                         color: "#777182",
                                                                         fontSize: "12px",
                                                                     }}
                                                                 >
-                                                                    Return: {booking.returnDate} · {booking.returnTime}
+                                                                    <strong
+                                                                        style={{
+                                                                            color: "#5f586c",
+                                                                            fontWeight: 800,
+                                                                        }}
+                                                                    >
+                                                                        Return:
+                                                                    </strong>
+                                                                    <span>📅 {formatTransferDate(booking.returnDate)}</span>
+                                                                    <span>·</span>
+                                                                    <span>🕐 {booking.returnTime}</span>
                                                                 </div>
                                                             )}
                                                         </div>
@@ -5685,8 +6161,18 @@ export default function AdminPage() {
                                                                     gap: "6px",
                                                                     padding: "7px 10px",
                                                                     borderRadius: "999px",
-                                                                    background: "#eaf8f0",
-                                                                    color: "#16804a",
+                                                                    background:
+                                                                        bookingStatus === "confirmed"
+                                                                            ? "#eaf8f0"
+                                                                            : bookingStatus === "pending"
+                                                                                ? "#fff7e6"
+                                                                                : "#fef0f0",
+                                                                    color:
+                                                                        bookingStatus === "confirmed"
+                                                                            ? "#16804a"
+                                                                            : bookingStatus === "pending"
+                                                                                ? "#b77900"
+                                                                                : "#dc2626",
                                                                     fontSize: "11px",
                                                                     fontWeight: 800,
                                                                     marginBottom: "10px",
@@ -5697,10 +6183,15 @@ export default function AdminPage() {
                                                                         width: "7px",
                                                                         height: "7px",
                                                                         borderRadius: "50%",
-                                                                        background: "#22a05a",
+                                                                        background:
+                                                                            bookingStatus === "confirmed"
+                                                                                ? "#22a05a"
+                                                                                : bookingStatus === "pending"
+                                                                                    ? "#f59e0b"
+                                                                                    : "#ef4444",
                                                                     }}
                                                                 />
-                                                                Confirmed
+                                                                {bookingStatus}
                                                             </span>
                                                             <strong
                                                                 style={{
@@ -5731,12 +6222,67 @@ export default function AdminPage() {
                                                             paddingTop: "13px",
                                                             borderTop: "1px solid #f0ecf6",
                                                             display: "flex",
-                                                            justifyContent: "flex-end",
-                                                            color: "#938da0",
-                                                            fontSize: "11px",
+                                                            alignItems: "center",
+                                                            justifyContent: "space-between",
+                                                            gap: "12px",
+                                                            flexWrap: "wrap",
                                                         }}
                                                     >
-                                                        {isReturn ? "Return transfer" : "One-way transfer"}
+                                                        <span
+                                                            style={{
+                                                                color: "#938da0",
+                                                                fontSize: "11px",
+                                                            }}
+                                                        >
+                                                            {isReturn ? "Return transfer" : "One-way transfer"}
+                                                        </span>
+
+                                                        <div
+                                                            style={{
+                                                                display: "flex",
+                                                                gap: "8px",
+                                                                flexWrap: "wrap",
+                                                            }}
+                                                        >
+                                                            {bookingStatus === "pending" && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-save-button"
+                                                                    style={{
+                                                                        minHeight: "38px",
+                                                                        padding: "0 14px",
+                                                                    }}
+                                                                    onClick={() =>
+                                                                        updateTransferBookingStatus(
+                                                                            booking.id,
+                                                                            "confirmed"
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Confirm booking
+                                                                </button>
+                                                            )}
+
+                                                            {(bookingStatus === "pending" || bookingStatus === "confirmed") && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-cancel-button"
+                                                                    style={{
+                                                                        minHeight: "38px",
+                                                                        padding: "0 14px",
+                                                                    }}
+                                                                    onClick={() =>
+                                                                        updateTransferBookingStatus(
+                                                                            booking.id,
+                                                                            "cancelled"
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Cancel booking
+                                                                </button>
+                                                            )}
+
+                                                        </div>
                                                     </div>
                                                 </div>
                                             );
@@ -5864,9 +6410,13 @@ export default function AdminPage() {
                                             style={{ width: "100%", boxSizing: "border-box" }}
                                         >
                                             <option value="All">All users</option>
-                                            {users.map((user) => (
-                                                <option key={user.id} value={user.id}>
-                                                    {user.name}
+                                            {bookingCustomers.map((customer) => (
+                                                <option
+                                                    key={customer.key}
+                                                    value={customer.key}
+                                                >
+                                                    {customer.name}
+                                                    {customer.email ? ` · ${customer.email}` : ""}
                                                 </option>
                                             ))}
                                         </select>
@@ -6004,6 +6554,7 @@ export default function AdminPage() {
                                         }}
                                     >
                                         {filteredBookings.map((booking) => {
+                                            const customer = booking as AdminBooking;
                                             const user = users.find(
                                                 (item) => item.id === booking.userId
                                             );
@@ -6011,6 +6562,7 @@ export default function AdminPage() {
                                                 (item) => item.id === booking.propertyId
                                             );
                                             const isConfirmed = booking.status === "confirmed";
+                                            const isPending = booking.status === "pending";
 
                                             return (
                                                 <div
@@ -6147,7 +6699,7 @@ export default function AdminPage() {
                                                                         flexShrink: 0,
                                                                     }}
                                                                 >
-                                                                    {(user?.name?.[0] || "U").toUpperCase()}
+                                                                    {(customer.firstName?.[0] || customer.lastName?.[0] || user?.name?.[0] || "U").toUpperCase()}
                                                                 </span>
                                                             <div style={{ minWidth: 0 }}>
                                                                 <strong
@@ -6160,7 +6712,9 @@ export default function AdminPage() {
                                                                         whiteSpace: "nowrap",
                                                                     }}
                                                                 >
-                                                                    {user?.name ?? "Unknown user"}
+                                                                    {[customer.firstName, customer.lastName]
+                                                                        .filter(Boolean)
+                                                                        .join(" ") || user?.name || "Unknown user"}
                                                                 </strong>
                                                                 <span
                                                                     style={{
@@ -6173,8 +6727,21 @@ export default function AdminPage() {
                                                                         whiteSpace: "nowrap",
                                                                     }}
                                                                 >
-                                                                        {user?.email ?? ""}
-                                                                    </span>
+                                                                    {customer.email || user?.email || "—"}
+                                                                </span>
+                                                                <span
+                                                                    style={{
+                                                                        display: "block",
+                                                                        marginTop: "2px",
+                                                                        color: "#8a8298",
+                                                                        fontSize: "11px",
+                                                                        overflow: "hidden",
+                                                                        textOverflow: "ellipsis",
+                                                                        whiteSpace: "nowrap",
+                                                                    }}
+                                                                >
+                                                                    {customer.phone || "—"}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -6220,8 +6787,18 @@ export default function AdminPage() {
                                                                     gap: "5px",
                                                                     padding: "6px 9px",
                                                                     borderRadius: "999px",
-                                                                    color: isConfirmed ? "#16804a" : "#dc2626",
-                                                                    background: isConfirmed ? "#eaf8f0" : "#fef0f0",
+                                                                    color:
+                                                                        isConfirmed
+                                                                            ? "#16804a"
+                                                                            : isPending
+                                                                                ? "#b77900"
+                                                                                : "#dc2626",
+                                                                    background:
+                                                                        isConfirmed
+                                                                            ? "#eaf8f0"
+                                                                            : isPending
+                                                                                ? "#fff7e6"
+                                                                                : "#fef0f0",
                                                                     fontSize: "10px",
                                                                     fontWeight: 800,
                                                                     textTransform: "capitalize",
@@ -6233,7 +6810,12 @@ export default function AdminPage() {
                                                                         width: "6px",
                                                                         height: "6px",
                                                                         borderRadius: "50%",
-                                                                        background: isConfirmed ? "#22a05a" : "#ef4444",
+                                                                        background:
+                                                                            isConfirmed
+                                                                                ? "#22a05a"
+                                                                                : isPending
+                                                                                    ? "#f59e0b"
+                                                                                    : "#ef4444",
                                                                     }}
                                                                 />
                                                                 {booking.status}
@@ -6248,6 +6830,49 @@ export default function AdminPage() {
                                                         >
                                                             {formatPrice(booking.totalPrice)}
                                                         </strong>
+
+                                                        {booking.status === "pending" && (
+                                                            <button
+                                                                type="button"
+                                                                className="admin-save-button"
+                                                                style={{
+                                                                    minHeight: "36px",
+                                                                    padding: "0 12px",
+                                                                    marginTop: "9px",
+                                                                    fontSize: "12px",
+                                                                }}
+                                                                onClick={() =>
+                                                                    updateStayBookingStatus(
+                                                                        booking.id,
+                                                                        "confirmed"
+                                                                    )
+                                                                }
+                                                            >
+                                                                Confirm booking
+                                                            </button>
+                                                        )}
+
+                                                        {(booking.status === "pending" || booking.status === "confirmed") && (
+                                                            <button
+                                                                type="button"
+                                                                className="admin-cancel-button"
+                                                                style={{
+                                                                    minHeight: "36px",
+                                                                    padding: "0 12px",
+                                                                    marginTop: "9px",
+                                                                    fontSize: "12px",
+                                                                }}
+                                                                onClick={() =>
+                                                                    updateStayBookingStatus(
+                                                                        booking.id,
+                                                                        "cancelled"
+                                                                    )
+                                                                }
+                                                            >
+                                                                Cancel booking
+                                                            </button>
+                                                        )}
+
                                                     </div>
                                                 </div>
                                             );
@@ -6262,6 +6887,782 @@ export default function AdminPage() {
 
                 </div>
             </section>
+
+            {selectedScheduleDriverId && (
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="driver-schedule-title"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setSelectedScheduleDriverId(null);
+                        }
+                    }}
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        zIndex: 1000,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: "24px",
+                        background: "rgba(39, 32, 57, 0.42)",
+                        backdropFilter: "blur(7px)",
+                    }}
+                >
+                    {(() => {
+                        const scheduleDriver =
+                            allTransferDrivers.find(
+                                (driver) =>
+                                    driver.id ===
+                                    selectedScheduleDriverId
+                            );
+
+                        if (!scheduleDriver) {
+                            return null;
+                        }
+
+                        const assignedVehicle =
+                            allTransferVehicles.find(
+                                (vehicle) =>
+                                    vehicle.driverId ===
+                                    scheduleDriver.id
+                            );
+
+                        const scheduleBookings =
+                            getScheduleBookings(
+                                scheduleDriver.id
+                            );
+
+                        return (
+                            <div
+                                style={{
+                                    width: "min(720px, 100%)",
+                                    maxHeight: "min(720px, 90vh)",
+                                    overflowY: "auto",
+                                    borderRadius: "24px",
+                                    background: "#ffffff",
+                                    border: "1px solid #e8e2f2",
+                                    boxShadow:
+                                        "0 30px 90px rgba(43, 32, 72, 0.24)",
+                                }}
+                            >
+                                {/* Header */}
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent:
+                                            "space-between",
+                                        gap: "20px",
+                                        padding: "22px 24px 20px",
+                                        borderBottom:
+                                            "1px solid #eee9f6",
+                                        background:
+                                            "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                flexWrap: "wrap",
+                                                gap: "10px",
+                                            }}
+                                        >
+                                            <span
+                                                style={{
+                                                    color: "#7055e8",
+                                                    fontSize: "10px",
+                                                    fontWeight: 900,
+                                                    letterSpacing:
+                                                        "0.12em",
+                                                }}
+                                            >
+                                                DRIVER SCHEDULE
+                                            </span>
+
+                                            <span
+                                                style={{
+                                                    padding:
+                                                        "4px 8px",
+                                                    borderRadius:
+                                                        "999px",
+                                                    background:
+                                                        scheduleDriver.status ===
+                                                        "inactive"
+                                                            ? "#fff0f0"
+                                                            : scheduleDriver.status ===
+                                                            "busy"
+                                                                ? "#fff7e6"
+                                                                : "#eaf8f0",
+                                                    color:
+                                                        scheduleDriver.status ===
+                                                        "inactive"
+                                                            ? "#c73535"
+                                                            : scheduleDriver.status ===
+                                                            "busy"
+                                                                ? "#b77900"
+                                                                : "#16804a",
+                                                    fontSize: "9px",
+                                                    fontWeight: 800,
+                                                    textTransform:
+                                                        "uppercase",
+                                                }}
+                                            >
+                                                {scheduleDriver.status}
+                                            </span>
+                                        </div>
+
+                                        <h2
+                                            id="driver-schedule-title"
+                                            style={{
+                                                margin: "7px 0 0",
+                                                color: "#292532",
+                                                fontSize: "25px",
+                                                lineHeight: 1.15,
+                                                fontWeight: 800,
+                                            }}
+                                        >
+                                            {scheduleDriver.name}
+                                        </h2>
+
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                flexWrap: "wrap",
+                                                gap: "7px",
+                                                marginTop: "7px",
+                                                color: "#777182",
+                                                fontSize: "11px",
+                                            }}
+                                        >
+                                            <span>
+                                                {scheduleDriver.phone}
+                                            </span>
+                                            <span>·</span>
+                                            <span>
+                                                {scheduleDriver.city}
+                                            </span>
+
+                                            {assignedVehicle && (
+                                                <>
+                                                    <span>·</span>
+                                                    <span>
+                                                        🚘{" "}
+                                                        {
+                                                            assignedVehicle.name
+                                                        }
+                                                        {" · "}
+                                                        {
+                                                            assignedVehicle.licensePlate
+                                                        }
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        aria-label="Close schedule"
+                                        onClick={() =>
+                                            setSelectedScheduleDriverId(
+                                                null
+                                            )
+                                        }
+                                        style={{
+                                            width: "36px",
+                                            height: "36px",
+                                            flexShrink: 0,
+                                            borderRadius: "11px",
+                                            border:
+                                                "1px solid #e9e4f3",
+                                            background: "#ffffff",
+                                            color: "#665f72",
+                                            fontSize: "19px",
+                                            lineHeight: 1,
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+
+                                {/* Schedule content */}
+                                <div
+                                    style={{
+                                        padding: "20px 24px 24px",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "flex-end",
+                                            justifyContent:
+                                                "space-between",
+                                            gap: "12px",
+                                            marginBottom: "13px",
+                                        }}
+                                    >
+                                        <div>
+                                            <strong
+                                                style={{
+                                                    display: "block",
+                                                    color: "#302c3a",
+                                                    fontSize: "15px",
+                                                }}
+                                            >
+                                                Upcoming transfers
+                                            </strong>
+
+                                            <span
+                                                style={{
+                                                    display: "block",
+                                                    marginTop: "3px",
+                                                    color: "#91899d",
+                                                    fontSize: "11px",
+                                                }}
+                                            >
+                                                {scheduleBookings.length}{" "}
+                                                {scheduleBookings.length ===
+                                                1
+                                                    ? "scheduled transfer"
+                                                    : "scheduled transfers"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {scheduleBookings.length === 0 ? (
+                                        <div
+                                            style={{
+                                                padding: "34px 22px",
+                                                borderRadius: "16px",
+                                                background: "#faf8ff",
+                                                border: "1px solid #eee9f7",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    marginBottom:
+                                                        "8px",
+                                                    fontSize: "27px",
+                                                }}
+                                            >
+                                                📅
+                                            </div>
+
+                                            <strong
+                                                style={{
+                                                    display: "block",
+                                                    color: "#302c3a",
+                                                    fontSize: "14px",
+                                                }}
+                                            >
+                                                No upcoming transfers
+                                            </strong>
+
+                                            <span
+                                                style={{
+                                                    display: "block",
+                                                    marginTop: "4px",
+                                                    color: "#91899d",
+                                                    fontSize: "11px",
+                                                }}
+                                            >
+                                                This driver currently has
+                                                no active scheduled bookings.
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: "10px",
+                                            }}
+                                        >
+                                            {scheduleBookings.map(
+                                                (booking) => {
+                                                    const bookingStatus =
+                                                        booking.status ??
+                                                        "confirmed";
+                                                    const duration =
+                                                        getBookingDuration(
+                                                            booking
+                                                        );
+                                                    const isReturn =
+                                                        booking.transferType ===
+                                                        "return";
+
+                                                    return (
+                                                        <div
+                                                            key={booking.id}
+                                                            style={{
+                                                                borderRadius:
+                                                                    "16px",
+                                                                border:
+                                                                    "1px solid #e9e4f3",
+                                                                overflow:
+                                                                    "hidden",
+                                                                background:
+                                                                    "#ffffff",
+                                                            }}
+                                                        >
+                                                            {/* Main transfer */}
+                                                            <div
+                                                                style={{
+                                                                    padding:
+                                                                        "15px 17px 16px",
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    style={{
+                                                                        display:
+                                                                            "flex",
+                                                                        alignItems:
+                                                                            "flex-start",
+                                                                        justifyContent:
+                                                                            "space-between",
+                                                                        gap: "15px",
+                                                                    }}
+                                                                >
+                                                                    <div
+                                                                        style={{
+                                                                            minWidth: 0,
+                                                                        }}
+                                                                    >
+                                                                        <div
+                                                                            style={{
+                                                                                display:
+                                                                                    "flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                flexWrap:
+                                                                                    "wrap",
+                                                                                gap: "8px",
+                                                                            }}
+                                                                        >
+                                                                            <strong
+                                                                                style={{
+                                                                                    color:
+                                                                                        "#302c3a",
+                                                                                    fontSize:
+                                                                                        "15px",
+                                                                                }}
+                                                                            >
+                                                                                {formatScheduleDate(
+                                                                                    booking.date
+                                                                                )}
+                                                                            </strong>
+
+                                                                            <span
+                                                                                style={{
+                                                                                    padding:
+                                                                                        "4px 8px",
+                                                                                    borderRadius:
+                                                                                        "999px",
+                                                                                    background:
+                                                                                        bookingStatus ===
+                                                                                        "confirmed"
+                                                                                            ? "#eaf8f0"
+                                                                                            : bookingStatus ===
+                                                                                            "cancelled"
+                                                                                                ? "#fff0f0"
+                                                                                                : "#fff7e6",
+                                                                                    color:
+                                                                                        bookingStatus ===
+                                                                                        "confirmed"
+                                                                                            ? "#16804a"
+                                                                                            : bookingStatus ===
+                                                                                            "cancelled"
+                                                                                                ? "#c73535"
+                                                                                                : "#b77900",
+                                                                                    fontSize:
+                                                                                        "9px",
+                                                                                    fontWeight:
+                                                                                        800,
+                                                                                    textTransform:
+                                                                                        "uppercase",
+                                                                                }}
+                                                                            >
+                                                                                {
+                                                                                    bookingStatus
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div
+                                                                            style={{
+                                                                                display:
+                                                                                    "flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                flexWrap:
+                                                                                    "wrap",
+                                                                                gap: "8px",
+                                                                                marginTop:
+                                                                                    "5px",
+                                                                                color:
+                                                                                    "#6d6678",
+                                                                                fontSize:
+                                                                                    "11px",
+                                                                                fontWeight:
+                                                                                    700,
+                                                                            }}
+                                                                        >
+                                                                            <span>
+                                                                                🕐{" "}
+                                                                                {
+                                                                                    booking.time
+                                                                                }
+                                                                            </span>
+                                                                            <span>
+                                                                                ·{" "}
+                                                                                {
+                                                                                    duration
+                                                                                }{" "}
+                                                                                min
+                                                                            </span>
+                                                                            <span>
+                                                                                ·{" "}
+                                                                                {isReturn
+                                                                                    ? "Return"
+                                                                                    : "One-way"}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div
+                                                                        style={{
+                                                                            flexShrink:
+                                                                                0,
+                                                                            textAlign:
+                                                                                "right",
+                                                                        }}
+                                                                    >
+                                                                        <span
+                                                                            style={{
+                                                                                display:
+                                                                                    "block",
+                                                                                color:
+                                                                                    "#9a93a5",
+                                                                                fontSize:
+                                                                                    "9px",
+                                                                                fontWeight:
+                                                                                    800,
+                                                                                letterSpacing:
+                                                                                    "0.05em",
+                                                                                textTransform:
+                                                                                    "uppercase",
+                                                                            }}
+                                                                        >
+                                                                            Passenger
+                                                                        </span>
+
+                                                                        <strong
+                                                                            style={{
+                                                                                display:
+                                                                                    "block",
+                                                                                marginTop:
+                                                                                    "3px",
+                                                                                color:
+                                                                                    "#403b4a",
+                                                                                fontSize:
+                                                                                    "11px",
+                                                                            }}
+                                                                        >
+                                                                            {
+                                                                                booking.firstName
+                                                                            }{" "}
+                                                                            {
+                                                                                booking.lastName
+                                                                            }
+                                                                        </strong>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    style={{
+                                                                        display:
+                                                                            "grid",
+                                                                        gridTemplateColumns:
+                                                                            "1fr 28px 1fr",
+                                                                        alignItems:
+                                                                            "center",
+                                                                        gap: "10px",
+                                                                        marginTop:
+                                                                            "14px",
+                                                                        paddingTop:
+                                                                            "12px",
+                                                                        borderTop:
+                                                                            "1px solid #f1edf6",
+                                                                    }}
+                                                                >
+                                                                    <div
+                                                                        style={{
+                                                                            minWidth: 0,
+                                                                        }}
+                                                                    >
+                                                                        <span
+                                                                            style={{
+                                                                                display:
+                                                                                    "block",
+                                                                                color:
+                                                                                    "#9a93a5",
+                                                                                fontSize:
+                                                                                    "9px",
+                                                                                fontWeight:
+                                                                                    800,
+                                                                                letterSpacing:
+                                                                                    "0.05em",
+                                                                                textTransform:
+                                                                                    "uppercase",
+                                                                            }}
+                                                                        >
+                                                                            Pick-up
+                                                                        </span>
+
+                                                                        <strong
+                                                                            style={{
+                                                                                display:
+                                                                                    "block",
+                                                                                marginTop:
+                                                                                    "4px",
+                                                                                color:
+                                                                                    "#403b4a",
+                                                                                fontSize:
+                                                                                    "11px",
+                                                                                lineHeight:
+                                                                                    1.35,
+                                                                            }}
+                                                                        >
+                                                                            {
+                                                                                booking.pickup
+                                                                            }
+                                                                        </strong>
+                                                                    </div>
+
+                                                                    <span
+                                                                        style={{
+                                                                            display:
+                                                                                "flex",
+                                                                            alignItems:
+                                                                                "center",
+                                                                            justifyContent:
+                                                                                "center",
+                                                                            color:
+                                                                                "#7055e8",
+                                                                            fontSize:
+                                                                                "17px",
+                                                                        }}
+                                                                    >
+                                                                        →
+                                                                    </span>
+
+                                                                    <div
+                                                                        style={{
+                                                                            minWidth: 0,
+                                                                        }}
+                                                                    >
+                                                                        <span
+                                                                            style={{
+                                                                                display:
+                                                                                    "block",
+                                                                                color:
+                                                                                    "#9a93a5",
+                                                                                fontSize:
+                                                                                    "9px",
+                                                                                fontWeight:
+                                                                                    800,
+                                                                                letterSpacing:
+                                                                                    "0.05em",
+                                                                                textTransform:
+                                                                                    "uppercase",
+                                                                            }}
+                                                                        >
+                                                                            Destination
+                                                                        </span>
+
+                                                                        <strong
+                                                                            style={{
+                                                                                display:
+                                                                                    "block",
+                                                                                marginTop:
+                                                                                    "4px",
+                                                                                color:
+                                                                                    "#403b4a",
+                                                                                fontSize:
+                                                                                    "11px",
+                                                                                lineHeight:
+                                                                                    1.35,
+                                                                            }}
+                                                                        >
+                                                                            {
+                                                                                booking.destination
+                                                                            }
+                                                                        </strong>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    style={{
+                                                                        display:
+                                                                            "flex",
+                                                                        alignItems:
+                                                                            "center",
+                                                                        flexWrap:
+                                                                            "wrap",
+                                                                        gap: "8px",
+                                                                        marginTop:
+                                                                            "11px",
+                                                                        color:
+                                                                            "#91899d",
+                                                                        fontSize:
+                                                                            "10px",
+                                                                    }}
+                                                                >
+                                                                    <span>
+                                                                        👤{" "}
+                                                                        {
+                                                                            booking.passengers
+                                                                        }{" "}
+                                                                        passenger
+                                                                        {booking.passengers ===
+                                                                        1
+                                                                            ? ""
+                                                                            : "s"}
+                                                                    </span>
+
+                                                                    <span>
+                                                                        ·
+                                                                    </span>
+
+                                                                    <span>
+                                                                        {
+                                                                            booking.email
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Return journey */}
+                                                            {isReturn &&
+                                                                booking.returnDate &&
+                                                                booking.returnTime && (
+                                                                    <div
+                                                                        style={{
+                                                                            display:
+                                                                                "flex",
+                                                                            alignItems:
+                                                                                "center",
+                                                                            justifyContent:
+                                                                                "space-between",
+                                                                            gap: "16px",
+                                                                            padding:
+                                                                                "11px 17px 12px",
+                                                                            borderTop:
+                                                                                "1px solid #eee9f6",
+                                                                            background:
+                                                                                "#faf8ff",
+                                                                        }}
+                                                                    >
+                                                                        <div
+                                                                            style={{
+                                                                                display:
+                                                                                    "flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                gap: "10px",
+                                                                            }}
+                                                                        >
+                                                                            <span
+                                                                                style={{
+                                                                                    color:
+                                                                                        "#7055e8",
+                                                                                    fontSize:
+                                                                                        "10px",
+                                                                                    fontWeight:
+                                                                                        900,
+                                                                                    letterSpacing:
+                                                                                        "0.08em",
+                                                                                    textTransform:
+                                                                                        "uppercase",
+                                                                                }}
+                                                                            >
+                                                                                Return
+                                                                            </span>
+
+                                                                            <span
+                                                                                style={{
+                                                                                    color:
+                                                                                        "#d5cfdf",
+                                                                                }}
+                                                                            >
+                                                                                |
+                                                                            </span>
+
+                                                                            <strong
+                                                                                style={{
+                                                                                    color:
+                                                                                        "#4a4453",
+                                                                                    fontSize:
+                                                                                        "11px",
+                                                                                }}
+                                                                            >
+                                                                                📅{" "}
+                                                                                {formatScheduleDate(
+                                                                                    booking.returnDate
+                                                                                )}
+                                                                            </strong>
+
+                                                                            <strong
+                                                                                style={{
+                                                                                    color:
+                                                                                        "#4a4453",
+                                                                                    fontSize:
+                                                                                        "11px",
+                                                                                }}
+                                                                            >
+                                                                                🕐{" "}
+                                                                                {
+                                                                                    booking.returnTime
+                                                                                }
+                                                                            </strong>
+                                                                        </div>
+
+                                                                        <span
+                                                                            style={{
+                                                                                color:
+                                                                                    "#91899d",
+                                                                                fontSize:
+                                                                                    "10px",
+                                                                            }}
+                                                                        >
+                                                                            Same driver
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+            )}
+
         </main>
     );
 }

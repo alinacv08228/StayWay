@@ -15086,3 +15086,308 @@ html.dark .transfers-cta-card {
         transform: none !important;
     }
 }
+
+
+/* =========================================
+   STAYWAY TRANSFER SUMMARY — POLISHED
+   ========================================= */
+
+.transfer-checkout-layout {
+    align-items: stretch;
+}
+
+.transfer-summary-card {
+    padding: 30px;
+    position: static;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 24px;
+}
+
+/* HEADER */
+
+.transfer-summary-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #ebe7f2;
+}
+
+.transfer-summary-header h2 {
+    margin: 10px 0 0;
+    font-size: 27px;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #292433;
+}
+
+.transfer-summary-price {
+    flex-shrink: 0;
+    padding-top: 2px;
+    text-align: right;
+}
+
+.transfer-summary-price span {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1;
+    color: #8b8495;
+}
+
+.transfer-summary-price strong {
+    display: block;
+    font-size: 31px;
+    line-height: 1;
+    font-weight: 800;
+    color: #292433;
+}
+
+
+/* ROUTE */
+
+.transfer-summary-route {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    padding: 23px 0;
+    border-bottom: 1px solid #ebe7f2;
+}
+
+.transfer-summary-route span,
+.transfer-summary-details span,
+.transfer-summary-return-details span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: #8b8495;
+}
+
+.transfer-summary-route strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.4;
+    font-weight: 800;
+    color: #292433;
+    word-break: break-word;
+}
+
+.transfer-summary-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f0ebff;
+    color: #7254df;
+    font-size: 20px;
+}
+
+
+/* DETAILS */
+
+.transfer-summary-details {
+    display: grid;
+    grid-template-columns: 1.05fr 0.8fr 1.15fr;
+    padding: 21px 0;
+    border-bottom: 1px solid #ebe7f2;
+}
+
+.transfer-summary-details > div {
+    min-width: 0;
+    padding: 0 17px;
+    border-right: 1px solid #ebe7f2;
+}
+
+.transfer-summary-details > div:first-child {
+    padding-left: 0;
+}
+
+.transfer-summary-details > div:last-child {
+    padding-right: 0;
+    border-right: none;
+}
+
+.transfer-summary-details strong,
+.transfer-summary-return-details strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 800;
+    color: #292433;
+    word-break: break-word;
+}
+
+
+/* RETURN JOURNEY */
+
+.transfer-summary-return {
+    padding: 21px 0 2px;
+}
+
+.transfer-summary-return .transfers-eyebrow {
+    display: block;
+}
+
+.transfer-summary-return-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 16px;
+}
+
+.transfer-summary-return-details > div:first-child {
+    padding-right: 17px;
+    border-right: 1px solid #ebe7f2;
+}
+
+.transfer-summary-return-details > div:last-child {
+    padding-left: 17px;
+}
+
+
+/* TOTAL */
+
+.transfer-summary-divider {
+    height: 1px;
+    margin-top: 20px;
+    background: #ebe7f2;
+}
+
+.transfer-summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 18px;
+}
+
+.transfer-summary-total span {
+    font-size: 15px;
+    font-weight: 750;
+    color: #615b6d;
+}
+
+.transfer-summary-total strong {
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 800;
+    color: #292433;
+}
+
+
+/* CONFIRM */
+
+.transfer-confirm-button {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 13px;
+    background: #7254df;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.transfer-confirm-button:hover {
+    background: #6448d1;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(114, 84, 223, 0.22);
+}
+
+
+/* BACK */
+
+.transfer-summary-back {
+    display: block;
+    margin-top: 14px;
+    text-align: center;
+    color: #7254df;
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.transfer-summary-back:hover {
+    text-decoration: underline;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    .transfer-checkout-layout {
+        align-items: stretch;
+    }
+
+    .transfer-summary-card {
+        padding: 23px;
+        position: static;
+        height: 100%;
+        border-radius: 19px;
+    }
+
+    .transfer-summary-header {
+        gap: 16px;
+        padding-bottom: 19px;
+    }
+
+    .transfer-summary-header h2 {
+        font-size: 23px;
+    }
+
+    .transfer-summary-price strong {
+        font-size: 28px;
+    }
+
+    .transfer-summary-route {
+        gap: 11px;
+        padding: 19px 0;
+        grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+    }
+
+    .transfer-summary-route strong {
+        font-size: 14px;
+    }
+
+    .transfer-summary-arrow {
+        width: 40px;
+        height: 40px;
+    }
+
+    .transfer-summary-details {
+        padding: 18px 0;
+    }
+
+    .transfer-summary-details > div {
+        padding: 0 11px;
+    }
+
+    .transfer-summary-return {
+        padding-top: 18px;
+    }
+
+    .transfer-summary-return-details > div:first-child {
+        padding-right: 11px;
+    }
+
+    .transfer-summary-return-details > div:last-child {
+        padding-left: 11px;
+    }
+
+    .transfer-summary-divider {
+        margin-top: 18px;
+    }
+}

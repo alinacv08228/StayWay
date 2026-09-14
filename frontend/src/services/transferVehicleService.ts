@@ -3,6 +3,12 @@ import {
     TransferVehicle,
 } from "../data/transferVehicles";
 
+import {
+    getTransferBookings,
+    isActiveTransferBooking,
+    TransferBooking,
+} from "./transferService";
+
 const STORAGE_KEY = "stayway_transfer_vehicles";
 
 export function getTransferVehicles(): TransferVehicle[] {
@@ -22,42 +28,49 @@ export function getTransferVehicles(): TransferVehicle[] {
     }
 
     try {
-        const storedVehicles: TransferVehicle[] = JSON.parse(stored);
+        const storedVehicles: TransferVehicle[] =
+            JSON.parse(stored);
 
         // Keep existing saved data, but automatically add any
         // initial vehicles that are missing from localStorage.
-        const updatedVehicles = initialTransferVehicles.map(
-            (initialVehicle) => {
-                const existingVehicle = storedVehicles.find(
-                    (vehicle) => vehicle.id === initialVehicle.id
-                );
+        const updatedVehicles =
+            initialTransferVehicles.map(
+                (initialVehicle) => {
+                    const existingVehicle =
+                        storedVehicles.find(
+                            (vehicle) =>
+                                vehicle.id ===
+                                initialVehicle.id
+                        );
 
-                if (!existingVehicle) {
-                    return initialVehicle;
+                    if (!existingVehicle) {
+                        return initialVehicle;
+                    }
+
+                    return {
+                        ...initialVehicle,
+                        ...existingVehicle,
+                        licensePlate:
+                            existingVehicle.licensePlate ||
+                            initialVehicle.licensePlate ||
+                            "",
+                        driverId:
+                            existingVehicle.driverId ||
+                            initialVehicle.driverId,
+                    };
                 }
-
-                return {
-                    ...initialVehicle,
-                    ...existingVehicle,
-                    licensePlate:
-                        existingVehicle.licensePlate ||
-                        initialVehicle.licensePlate ||
-                        "",
-                    driverId:
-                        existingVehicle.driverId ||
-                        initialVehicle.driverId,
-                };
-            }
-        );
+            );
 
         // Keep custom vehicles created from Admin as well.
-        const customVehicles = storedVehicles.filter(
-            (vehicle) =>
-                !initialTransferVehicles.some(
-                    (initialVehicle) =>
-                        initialVehicle.id === vehicle.id
-                )
-        );
+        const customVehicles =
+            storedVehicles.filter(
+                (vehicle) =>
+                    !initialTransferVehicles.some(
+                        (initialVehicle) =>
+                            initialVehicle.id ===
+                            vehicle.id
+                    )
+            );
 
         const allVehicles = [
             ...updatedVehicles,
@@ -73,7 +86,9 @@ export function getTransferVehicles(): TransferVehicle[] {
     } catch {
         localStorage.setItem(
             STORAGE_KEY,
-            JSON.stringify(initialTransferVehicles)
+            JSON.stringify(
+                initialTransferVehicles
+            )
         );
 
         return initialTransferVehicles;
@@ -100,7 +115,9 @@ export function createTransferVehicle(
 
     const newVehicle = {
         ...vehicle,
-        id: vehicle.id || `vehicle-${Date.now()}`,
+        id:
+            vehicle.id ||
+            `vehicle-${Date.now()}`,
     };
 
     saveTransferVehicles([
@@ -118,7 +135,8 @@ export function updateTransferVehicle(
     const vehicles = getTransferVehicles();
 
     const index = vehicles.findIndex(
-        (vehicle) => vehicle.id === vehicleId
+        (vehicle) =>
+            vehicle.id === vehicleId
     );
 
     if (index === -1) {
@@ -142,15 +160,22 @@ export function deleteTransferVehicle(
 ): boolean {
     const vehicles = getTransferVehicles();
 
-    const filteredVehicles = vehicles.filter(
-        (vehicle) => vehicle.id !== vehicleId
-    );
+    const filteredVehicles =
+        vehicles.filter(
+            (vehicle) =>
+                vehicle.id !== vehicleId
+        );
 
-    if (filteredVehicles.length === vehicles.length) {
+    if (
+        filteredVehicles.length ===
+        vehicles.length
+    ) {
         return false;
     }
 
-    saveTransferVehicles(filteredVehicles);
+    saveTransferVehicles(
+        filteredVehicles
+    );
 
     return true;
 }
@@ -169,6 +194,28 @@ export function getTransferVehicleById(
     vehicleId: string
 ): TransferVehicle | undefined {
     return getTransferVehicles().find(
-        (vehicle) => vehicle.id === vehicleId
+        (vehicle) =>
+            vehicle.id === vehicleId
+    );
+}
+
+/**
+ * Returns only active bookings assigned to a
+ * specific vehicle.
+ *
+ * pending   -> occupies the vehicle
+ * confirmed -> occupies the vehicle
+ * cancelled -> does not occupy the vehicle
+ *
+ * Older bookings without a status are treated
+ * as active by isActiveTransferBooking().
+ */
+export function getTransferVehicleBookings(
+    vehicleId: string
+): TransferBooking[] {
+    return getTransferBookings().filter(
+        (booking) =>
+            booking.vehicleId === vehicleId &&
+            isActiveTransferBooking(booking)
     );
 }

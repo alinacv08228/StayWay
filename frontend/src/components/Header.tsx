@@ -21,191 +21,229 @@ const headerExtraTranslations: Record<string, HeaderExtraTranslation> = {
         login: "Login",
         logout: "Logout",
     },
+
     "Română": {
         helpSupport: "Ajutor și asistență",
         login: "Autentificare",
         logout: "Deconectare",
     },
+
     "Русский": {
         helpSupport: "Помощь и поддержка",
         login: "Войти",
         logout: "Выйти",
     },
+
     "Українська": {
         helpSupport: "Допомога та підтримка",
         login: "Увійти",
         logout: "Вийти",
     },
+
     "Français": {
         helpSupport: "Aide et assistance",
         login: "Connexion",
         logout: "Déconnexion",
     },
+
     "Español": {
         helpSupport: "Ayuda y soporte",
         login: "Iniciar sesión",
         logout: "Cerrar sesión",
     },
+
     "Deutsch": {
         helpSupport: "Hilfe und Support",
         login: "Anmelden",
         logout: "Abmelden",
     },
+
     "Italiano": {
         helpSupport: "Aiuto e assistenza",
         login: "Accedi",
         logout: "Disconnetti",
     },
+
     "Português": {
         helpSupport: "Ajuda e suporte",
         login: "Iniciar sessão",
         logout: "Terminar sessão",
     },
+
     "Nederlands": {
         helpSupport: "Hulp en ondersteuning",
         login: "Inloggen",
         logout: "Uitloggen",
     },
+
     "Norsk": {
         helpSupport: "Hjelp og støtte",
         login: "Logg inn",
         logout: "Logg ut",
     },
+
     "Svenska": {
         helpSupport: "Hjälp och support",
         login: "Logga in",
         logout: "Logga ut",
     },
+
     "Dansk": {
         helpSupport: "Hjælp og support",
         login: "Log ind",
         logout: "Log ud",
     },
+
     "Suomi": {
         helpSupport: "Ohje ja tuki",
         login: "Kirjaudu",
         logout: "Kirjaudu ulos",
     },
+
     "Polski": {
         helpSupport: "Pomoc i wsparcie",
         login: "Zaloguj się",
         logout: "Wyloguj się",
     },
+
     "Čeština": {
         helpSupport: "Nápověda a podpora",
         login: "Přihlásit se",
         logout: "Odhlásit se",
     },
+
     "Slovenčina": {
         helpSupport: "Pomoc a podpora",
         login: "Prihlásiť sa",
         logout: "Odhlásiť sa",
     },
+
     "Magyar": {
         helpSupport: "Súgó és támogatás",
         login: "Bejelentkezés",
         logout: "Kijelentkezés",
     },
+
     "Български": {
         helpSupport: "Помощ и поддръжка",
         login: "Вход",
         logout: "Изход",
     },
+
     "Hrvatski": {
         helpSupport: "Pomoć i podrška",
         login: "Prijava",
         logout: "Odjava",
     },
+
     "Slovenščina": {
         helpSupport: "Pomoč in podpora",
         login: "Prijava",
         logout: "Odjava",
     },
+
     "Srpski": {
         helpSupport: "Pomoć i podrška",
         login: "Prijavi se",
         logout: "Odjavi se",
     },
+
     "Bosanski": {
         helpSupport: "Pomoć i podrška",
         login: "Prijava",
         logout: "Odjava",
     },
+
     "Ελληνικά": {
         helpSupport: "Βοήθεια και υποστήριξη",
         login: "Σύνδεση",
         logout: "Αποσύνδεση",
     },
+
     "Türkçe": {
         helpSupport: "Yardım ve destek",
         login: "Giriş yap",
         logout: "Çıkış yap",
     },
+
     "العربية": {
         helpSupport: "المساعدة والدعم",
         login: "تسجيل الدخول",
         logout: "تسجيل الخروج",
     },
+
     "עברית": {
         helpSupport: "עזרה ותמיכה",
         login: "התחברות",
         logout: "התנתקות",
     },
+
     "हिन्दी": {
         helpSupport: "सहायता और समर्थन",
         login: "लॉग इन",
         logout: "लॉग आउट",
     },
+
     "ไทย": {
         helpSupport: "ความช่วยเหลือและการสนับสนุน",
         login: "เข้าสู่ระบบ",
         logout: "ออกจากระบบ",
     },
+
     "Bahasa Indonesia": {
         helpSupport: "Bantuan & Dukungan",
         login: "Masuk",
         logout: "Keluar",
     },
+
     "Tiếng Việt": {
         helpSupport: "Trợ giúp & Hỗ trợ",
         login: "Đăng nhập",
         logout: "Đăng xuất",
     },
+
     "한국어": {
         helpSupport: "도움말 및 지원",
         login: "로그인",
         logout: "로그아웃",
     },
+
     "日本語": {
         helpSupport: "ヘルプとサポート",
         login: "ログイン",
         logout: "ログアウト",
     },
+
     "中文": {
         helpSupport: "帮助与支持",
         login: "登录",
         logout: "退出登录",
     },
+
     "繁體中文": {
         helpSupport: "幫助與支援",
         login: "登入",
         logout: "登出",
     },
+
     "Català": {
         helpSupport: "Ajuda i suport",
         login: "Inicia sessió",
         logout: "Tanca la sessió",
     },
+
     "Eesti": {
         helpSupport: "Abi ja tugi",
         login: "Logi sisse",
         logout: "Logi välja",
     },
+
     "Latviešu": {
         helpSupport: "Palīdzība un atbalsts",
         login: "Pieteikties",
         logout: "Izrakstīties",
     },
+
     "Lietuvių": {
         helpSupport: "Pagalba ir palaikymas",
         login: "Prisijungti",
@@ -278,10 +316,10 @@ export default function Header() {
                     <Link
                         href="/"
                         className={`nav-link ${
-    isActive("/")
-        ? "active"
-        : ""
-}`}
+                            isActive("/")
+                                ? "active"
+                                : ""
+                        }`}
                     >
                         {t("home")}
                     </Link>
@@ -289,12 +327,12 @@ export default function Header() {
                     <Link
                         href="/destinations"
                         className={`nav-link ${
-    isActive(
-        "/destinations"
-    )
-        ? "active"
-        : ""
-}`}
+                            isActive(
+                                "/destinations"
+                            )
+                                ? "active"
+                                : ""
+                        }`}
                     >
                         {t("destinations")}
                     </Link>
@@ -302,10 +340,10 @@ export default function Header() {
                     <Link
                         href="/stays"
                         className={`nav-link ${
-    isActive("/stays")
-        ? "active"
-        : ""
-}`}
+                            isActive("/stays")
+                                ? "active"
+                                : ""
+                        }`}
                     >
                         {t("stays")}
                     </Link>
@@ -324,10 +362,10 @@ export default function Header() {
                     <Link
                         href="/bookings"
                         className={`nav-link ${
-    isActive("/bookings")
-        ? "active"
-        : ""
-}`}
+                            isActive("/bookings")
+                                ? "active"
+                                : ""
+                        }`}
                     >
                         {t("myBookings")}
                     </Link>
@@ -335,49 +373,63 @@ export default function Header() {
                     <Link
                         href="/help"
                         className={`nav-link ${
-    isActive("/help")
-        ? "active"
-        : ""
-}`}
+                            isActive("/help")
+                                ? "active"
+                                : ""
+                        }`}
                     >
                         {headerText.helpSupport}
                     </Link>
 
-                    {currentUser?.role ===
-                        "admin" && (
-                            <Link
-                                href="/admin"
-                                className={`nav-link ${
-    isActive("/admin")
-        ? "active"
-        : ""
-}`}
-                            >
-                                {t("admin")}
-                            </Link>
-                        )}
+                    {/* ADMIN DASHBOARD */}
+                    {currentUser?.role === "admin" && (
+                        <Link
+                            href="/admin"
+                            className={`nav-link ${
+                                isActive("/admin")
+                                    ? "active"
+                                    : ""
+                            }`}
+                        >
+                            {t("admin")}
+                        </Link>
+                    )}
 
                     {currentUser ? (
                         <button
                             type="button"
                             className="nav-link nav-button"
-                            onClick={
-                                handleLogout
-                            }
+                            onClick={handleLogout}
                         >
                             {headerText.logout}
                         </button>
                     ) : (
-                        <Link
-                            href="/login"
-                            className={`nav-link ${
-    isActive("/login")
-        ? "active"
-        : ""
-}`}
-                        >
-                            {headerText.login}
-                        </Link>
+                        <>
+                            <Link
+                                href="/login"
+                                className={`nav-link ${
+                                    isActive("/login")
+                                        ? "active"
+                                        : ""
+                                }`}
+                            >
+                                {headerText.login}
+                            </Link>
+
+                            <Link
+                                href="/signup"
+                                className={`nav-link ${
+                                    isActive("/signup")
+                                        ? "active"
+                                        : ""
+                                }`}
+                                style={{
+                                    fontWeight: 400,
+                                }}
+                            >
+                                Sign up
+                            </Link>
+                        </>
                     )}
 
                     <button

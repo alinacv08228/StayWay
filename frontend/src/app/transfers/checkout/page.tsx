@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -6,11 +7,11 @@ import { useSearchParams } from "next/navigation";
 
 import {
     getTransferBookings,
+    getTransferDuration,
     saveTransferBooking,
 } from "@/services/transferService";
 
 import {
-    getTransferDriverBookings,
     getTransferDriversByCity,
 } from "@/services/transferDriverService";
 
@@ -55,6 +56,8 @@ export default function TransferCheckoutPage() {
         setSpecialRequests,
     ] = useState("");
 
+    const [availabilityError, setAvailabilityError] = useState("");
+
     /*
      * =========================================
      * TRANSFER DATA
@@ -76,10 +79,17 @@ export default function TransferCheckoutPage() {
             "optionTitle"
         ) || "Private transfer";
 
-    const price =
-        searchParams.get(
-            "price"
-        ) || "32";
+    const basePrice =
+        Number(
+            searchParams.get(
+                "price"
+            ) || "32"
+        );
+
+    const totalPrice =
+        transferType === "return"
+            ? basePrice * 2
+            : basePrice;
 
     const pickup =
         searchParams.get(
@@ -119,6 +129,38 @@ export default function TransferCheckoutPage() {
 
     /*
      * =========================================
+     * DISPLAY DATE FORMAT
+     * =========================================
+     *
+     * Keep the original ISO date in the booking
+     * data, but display it as DD.MM.YYYY.
+     */
+
+    const formatDisplayDate = (
+        value: string
+    ) => {
+        if (
+            !value ||
+            value === "—"
+        ) {
+            return value;
+        }
+
+        const parts =
+            value.split("-");
+
+        if (
+            parts.length !== 3
+        ) {
+            return value;
+        }
+
+        return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    };
+
+
+    /*
+     * =========================================
      * AUTHENTICATION
      * =========================================
      *
@@ -153,144 +195,168 @@ export default function TransferCheckoutPage() {
 
     /*
      * =========================================
-     * TRANSFER DURATION
+     * AVAILABILITY HELPERS
      * =========================================
+     *
+     * pending   -> occupies the pair
+     * confirmed -> occupies the pair
+     * cancelled -> frees the pair
+     *
+     * Older bookings without a status are treated
+     * as active for backwards compatibility.
      */
 
-    const getTransferDuration = (
-        title: string
+    const isActiveTransferBooking = (
+        booking: {
+            status?: "pending" | "confirmed" | "cancelled";
+        }
     ) => {
-        return title
-            .toLowerCase()
-            .includes("family")
-            ? 40
-            : 35;
+        return booking.status !== "cancelled";
     };
 
-
-    /*
-     * =========================================
-     * VEHICLE BOOKINGS
-     * =========================================
-     */
-
-    const getTransferBookingsForVehicle = (
-        vehicleId: string
+    const isTransferLegBusy = (
+        existingDate: string,
+        existingTime: string,
+        existingDuration: number,
+        requestedDate: string,
+        requestedTime: string,
+        requestedDuration: number
     ) => {
-        return getTransferBookings().filter(
-            (booking) =>
-                booking.vehicleId ===
-                vehicleId
-        );
-    };
+        const existingStart = new Date(
+            `${existingDate}T${existingTime}`
+        ).getTime();
 
-
-    /*
-     * =========================================
-     * AVAILABILITY
-     * =========================================
-     */
-
-    const isTransferAvailable = (
-        bookings: {
-            date: string;
-            time: string;
-            optionTitle: string;
-            transferType:
-                | "one-way"
-                | "return";
-            returnDate?: string;
-            returnTime?: string;
-        }[],
-        bookingDate: string,
-        bookingTime: string,
-        bookingDuration: number
-    ) => {
-        const requestedStart =
-            new Date(
-                `${bookingDate}T${bookingTime}`
-            ).getTime();
+        const requestedStart = new Date(
+            `${requestedDate}T${requestedTime}`
+        ).getTime();
 
         if (
-            Number.isNaN(
-                requestedStart
-            )
+            Number.isNaN(existingStart) ||
+            Number.isNaN(requestedStart)
         ) {
             return false;
         }
 
+        const existingEnd =
+            existingStart +
+            existingDuration * 60 * 1000;
+
         const requestedEnd =
             requestedStart +
-            bookingDuration *
-            60 *
-            1000;
+            requestedDuration * 60 * 1000;
+
+        return (
+            requestedStart < existingEnd &&
+            requestedEnd > existingStart
+        );
+    };
+
+    /*
+     * =========================================
+     * AVAILABILITY HELPERS
+     * =========================================
+     *
+     * A vehicle and its assigned driver are ONE
+     * availability pair.
+     *
+     * pending   -> occupies the pair
+     * confirmed -> occupies the pair
+     * cancelled -> frees the pair
+     *
+     * One-way:
+     *   check only the requested outbound leg.
+     *
+     * Return:
+     *   check BOTH requested legs against BOTH legs
+     *   of every active existing booking.
+     */
+
+    const getActiveTransferBookings = () => {
+        return getTransferBookings().filter(
+            (booking) =>
+                isActiveTransferBooking(booking)
+        );
+    };
+
+    const getTransferBookingsForVehicle = (
+        vehicleId: string
+    ) => {
+        return getActiveTransferBookings().filter(
+            (booking) =>
+                booking.vehicleId === vehicleId
+        );
+    };
+
+    const getTransferBookingsForDriver = (
+        driverId: string
+    ) => {
+        return getActiveTransferBookings().filter(
+            (booking) =>
+                booking.driverId === driverId
+        );
+    };
+
+    const isLegAvailable = (
+        bookings: ReturnType<
+            typeof getActiveTransferBookings
+        >,
+        requestedDate: string,
+        requestedTime: string,
+        requestedDuration: number
+    ) => {
+        if (
+            !requestedDate ||
+            requestedDate === "—" ||
+            !requestedTime ||
+            requestedTime === "—"
+        ) {
+            return false;
+        }
 
         return !bookings.some(
             (booking) => {
-                const existingStart =
-                    new Date(
-                        `${booking.date}T${booking.time}`
-                    ).getTime();
-
-                if (
-                    Number.isNaN(
-                        existingStart
-                    )
-                ) {
-                    return false;
-                }
-
                 const existingDuration =
                     getTransferDuration(
                         booking.optionTitle
                     );
 
-                const existingEnd =
-                    existingStart +
-                    existingDuration *
-                    60 *
-                    1000;
-
+                /*
+                 * Existing outbound leg.
+                 */
                 if (
-                    requestedStart <
-                    existingEnd &&
-                    requestedEnd >
-                    existingStart
+                    isTransferLegBusy(
+                        booking.date,
+                        booking.time,
+                        existingDuration,
+                        requestedDate,
+                        requestedTime,
+                        requestedDuration
+                    )
                 ) {
                     return true;
                 }
 
+                /*
+                 * Existing return leg.
+                 */
                 if (
                     booking.transferType ===
                     "return" &&
                     booking.returnDate &&
                     booking.returnTime
                 ) {
-                    const returnStart =
-                        new Date(
-                            `${booking.returnDate}T${booking.returnTime}`
-                        ).getTime();
-
                     if (
-                        Number.isNaN(
-                            returnStart
+                        isTransferLegBusy(
+                            booking.returnDate,
+                            booking.returnTime,
+                            existingDuration,
+                            requestedDate,
+                            requestedTime,
+                            requestedDuration
                         )
                     ) {
-                        return false;
+                        return true;
                     }
-
-                    const returnEnd =
-                        returnStart +
-                        existingDuration *
-                        60 *
-                        1000;
-
-                    return (
-                        requestedStart <
-                        returnEnd &&
-                        requestedEnd >
-                        returnStart
-                    );
                 }
 
                 return false;
@@ -298,6 +364,165 @@ export default function TransferCheckoutPage() {
         );
     };
 
+    const isPairAvailable = (
+        vehicleId: string,
+        driverId: string,
+        requiredCategory: string,
+        duration: number,
+        requestedPassengers: number,
+        requestedTransferType:
+            | "one-way"
+            | "return",
+        requestedDate: string,
+        requestedTime: string,
+        requestedReturnDate: string,
+        requestedReturnTime: string,
+        city: string
+    ) => {
+        /*
+         * Always read the current vehicle/driver data
+         * for this exact city.
+         */
+        const cityVehicles =
+            getTransferVehiclesByCity(
+                city
+            );
+
+        const cityDrivers =
+            getTransferDriversByCity(
+                city
+            );
+
+        const vehicle =
+            cityVehicles.find(
+                (item) =>
+                    item.id === vehicleId
+            );
+
+        const driver =
+            cityDrivers.find(
+                (item) =>
+                    item.id === driverId
+            );
+
+        if (
+            !vehicle ||
+            !driver
+        ) {
+            return false;
+        }
+
+        /*
+         * Category and capacity.
+         */
+        if (
+            vehicle.category !==
+            requiredCategory
+        ) {
+            return false;
+        }
+
+        if (
+            vehicle.passengers <
+            requestedPassengers
+        ) {
+            return false;
+        }
+
+        /*
+         * The driver MUST be the one assigned
+         * to this vehicle.
+         */
+        if (
+            vehicle.driverId !==
+            driver.id
+        ) {
+            return false;
+        }
+
+        /*
+         * An inactive driver can never be assigned.
+         * "busy" is NOT used here because scheduled
+         * availability is determined by bookings.
+         */
+        if (
+            driver.status ===
+            "inactive"
+        ) {
+            return false;
+        }
+
+        /*
+         * Both resources must be free.
+         */
+        const vehicleBookings =
+            getTransferBookingsForVehicle(
+                vehicle.id
+            );
+
+        const driverBookings =
+            getTransferBookingsForDriver(
+                driver.id
+            );
+
+        /*
+         * One-way: only outbound.
+         */
+        if (
+            !isLegAvailable(
+                vehicleBookings,
+                requestedDate,
+                requestedTime,
+                duration
+            )
+        ) {
+            return false;
+        }
+
+        if (
+            !isLegAvailable(
+                driverBookings,
+                requestedDate,
+                requestedTime,
+                duration
+            )
+        ) {
+            return false;
+        }
+
+        /*
+         * Return: the SAME vehicle + driver pair
+         * must also be free for the return leg.
+         */
+        if (
+            requestedTransferType ===
+            "return"
+        ) {
+            if (
+                !isLegAvailable(
+                    vehicleBookings,
+                    requestedReturnDate,
+                    requestedReturnTime,
+                    duration
+                )
+            ) {
+                return false;
+            }
+
+            if (
+                !isLegAvailable(
+                    driverBookings,
+                    requestedReturnDate,
+                    requestedReturnTime,
+                    duration
+                )
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    };
 
     /*
      * =========================================
@@ -307,6 +532,8 @@ export default function TransferCheckoutPage() {
 
     const handleConfirmTransfer =
         () => {
+
+            setAvailabilityError("");
 
             /*
              * DOUBLE CHECK AUTHENTICATION
@@ -453,13 +680,28 @@ export default function TransferCheckoutPage() {
 
 
             /*
-             * FIND AVAILABLE VEHICLE
+             * FIND AVAILABLE VEHICLE + DRIVER PAIR
+             *
+             * Each vehicle already contains its assigned driverId.
+             * We test the exact vehicle + driver pair.
+             *
+             * If pair #1 is occupied, .find() automatically
+             * continues to pair #2.
              */
 
             const availableVehicle =
                 vehicles.find(
                     (vehicle) => {
+                        if (
+                            !vehicle.driverId
+                        ) {
+                            return false;
+                        }
 
+                        /*
+                         * Skip vehicles that are not in
+                         * the requested category/capacity.
+                         */
                         if (
                             vehicle.category !==
                             requiredCategory
@@ -469,15 +711,7 @@ export default function TransferCheckoutPage() {
 
                         if (
                             vehicle.passengers <
-                            Number(
-                                passengers
-                            )
-                        ) {
-                            return false;
-                        }
-
-                        if (
-                            !vehicle.driverId
+                            Number(passengers)
                         ) {
                             return false;
                         }
@@ -490,111 +724,190 @@ export default function TransferCheckoutPage() {
                             );
 
                         if (
-                            !assignedDriver ||
-                            assignedDriver.status !==
-                            "available"
+                            !assignedDriver
                         ) {
                             return false;
                         }
 
-
                         /*
-                         * VEHICLE AVAILABILITY
+                         * Only an inactive driver is
+                         * permanently unavailable.
+                         * Busy is determined by bookings.
                          */
-
-                        const vehicleBookings =
-                            getTransferBookingsForVehicle(
-                                vehicle.id
-                            );
-
                         if (
-                            !isTransferAvailable(
-                                vehicleBookings,
-                                date,
-                                time,
-                                duration
-                            )
+                            assignedDriver.status ===
+                            "inactive"
                         ) {
                             return false;
                         }
 
-
-                        /*
-                         * DRIVER AVAILABILITY
-                         */
-
-                        const driverBookings =
-                            getTransferDriverBookings(
-                                vehicle.driverId
-                            );
-
-                        if (
-                            !isTransferAvailable(
-                                driverBookings,
-                                date,
-                                time,
-                                duration
-                            )
-                        ) {
-                            return false;
-                        }
-
-
-                        /*
-                         * RETURN JOURNEY
-                         */
-
-                        if (
+                        return isPairAvailable(
+                            vehicle.id,
+                            assignedDriver.id,
+                            requiredCategory,
+                            duration,
+                            Number(passengers),
                             transferType ===
                             "return"
-                        ) {
-                            if (
-                                !isTransferAvailable(
-                                    vehicleBookings,
-                                    returnDate,
-                                    returnTime,
-                                    duration
-                                )
-                            ) {
-                                return false;
-                            }
-
-                            if (
-                                !isTransferAvailable(
-                                    driverBookings,
-                                    returnDate,
-                                    returnTime,
-                                    duration
-                                )
-                            ) {
-                                return false;
-                            }
-                        }
-
-                        return true;
+                                ? "return"
+                                : "one-way",
+                            date,
+                            time,
+                            returnDate,
+                            returnTime,
+                            city
+                        );
                     }
                 );
-
-
-            /*
-             * NO VEHICLE
-             */
 
             if (
                 !availableVehicle
             ) {
-                alert(
-                    "No vehicle with an available assigned driver is available for the selected date and time."
+                /*
+                 * Tell the customer exactly which leg is unavailable.
+                 *
+                 * For a Return transfer we check the two legs separately
+                 * only for the purpose of the error message:
+                 * - departure
+                 * - return
+                 *
+                 * The real booking check above still requires the SAME
+                 * vehicle + driver pair to be available for BOTH legs.
+                 */
+
+                const hasAvailableDeparturePair =
+                    vehicles.some(
+                        (vehicle) => {
+                            if (
+                                !vehicle.driverId ||
+                                vehicle.category !==
+                                requiredCategory ||
+                                vehicle.passengers <
+                                Number(passengers)
+                            ) {
+                                return false;
+                            }
+
+                            const assignedDriver =
+                                drivers.find(
+                                    (driver) =>
+                                        driver.id ===
+                                        vehicle.driverId
+                                );
+
+                            if (
+                                !assignedDriver ||
+                                assignedDriver.status ===
+                                "inactive"
+                            ) {
+                                return false;
+                            }
+
+                            return isPairAvailable(
+                                vehicle.id,
+                                assignedDriver.id,
+                                requiredCategory,
+                                duration,
+                                Number(passengers),
+                                "one-way",
+                                date,
+                                time,
+                                "—",
+                                "—",
+                                city
+                            );
+                        }
+                    );
+
+                if (
+                    transferType === "return"
+                ) {
+                    const hasAvailableReturnPair =
+                        vehicles.some(
+                            (vehicle) => {
+                                if (
+                                    !vehicle.driverId ||
+                                    vehicle.category !==
+                                    requiredCategory ||
+                                    vehicle.passengers <
+                                    Number(passengers)
+                                ) {
+                                    return false;
+                                }
+
+                                const assignedDriver =
+                                    drivers.find(
+                                        (driver) =>
+                                            driver.id ===
+                                            vehicle.driverId
+                                    );
+
+                                if (
+                                    !assignedDriver ||
+                                    assignedDriver.status ===
+                                    "inactive"
+                                ) {
+                                    return false;
+                                }
+
+                                return isPairAvailable(
+                                    vehicle.id,
+                                    assignedDriver.id,
+                                    requiredCategory,
+                                    duration,
+                                    Number(passengers),
+                                    "one-way",
+                                    returnDate,
+                                    returnTime,
+                                    "—",
+                                    "—",
+                                    city
+                                );
+                            }
+                        );
+
+                    if (
+                        !hasAvailableDeparturePair
+                    ) {
+                        setAvailabilityError(
+                            `No vehicle with an available assigned driver is available for the departure on ${formatDisplayDate(date)} at ${time}. Please choose a different departure date or time.`
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        !hasAvailableReturnPair
+                    ) {
+                        setAvailabilityError(
+                            `No vehicle with an available assigned driver is available for the return on ${formatDisplayDate(returnDate)} at ${returnTime}. Please choose a different return date or time.`
+                        );
+
+                        return;
+                    }
+
+                    /*
+                     * Both individual legs have an available pair,
+                     * but no SINGLE pair is free for both legs.
+                     */
+                    setAvailabilityError(
+                        `No single vehicle and assigned driver pair is available for both the departure on ${formatDisplayDate(date)} at ${time} and the return on ${formatDisplayDate(returnDate)} at ${returnTime}. Please choose different departure or return date/time.`
+                    );
+
+                    return;
+                }
+
+                setAvailabilityError(
+                    `No vehicle with an available assigned driver is available for the transfer on ${formatDisplayDate(date)} at ${time}. Please choose a different date or time.`
                 );
 
                 return;
             }
 
-
             /*
-             * FIND DRIVER
+             * The selected driver is always the driver
+             * assigned to the selected vehicle.
              */
-
             const availableDriver =
                 drivers.find(
                     (driver) =>
@@ -612,6 +925,44 @@ export default function TransferCheckoutPage() {
                 return;
             }
 
+            /*
+             * FINAL CHECK
+             *
+             * Re-read bookings immediately before saving.
+             * This prevents the pair from being reused if
+             * another booking was created after the first check.
+             */
+            /*
+             * isPairAvailable() reads localStorage again here,
+             * so this is the final availability check immediately
+             * before the booking is saved.
+             */
+
+            const stillAvailable =
+                isPairAvailable(
+                    availableVehicle.id,
+                    availableDriver.id,
+                    requiredCategory,
+                    duration,
+                    Number(passengers),
+                    transferType ===
+                    "return"
+                        ? "return"
+                        : "one-way",
+                    date,
+                    time,
+                    returnDate,
+                    returnTime,
+                    city
+                );
+
+            if (!stillAvailable) {
+                setAvailabilityError(
+                    "This vehicle and driver pair is no longer available for the selected transfer. Please choose a different date or time."
+                );
+
+                return;
+            }
 
             /*
              * CREATE BOOKING
@@ -632,7 +983,7 @@ export default function TransferCheckoutPage() {
                 optionTitle,
 
                 price:
-                    Number(price),
+                    Number(totalPrice),
 
                 vehicleId:
                 availableVehicle.id,
@@ -686,6 +1037,9 @@ export default function TransferCheckoutPage() {
                 phone,
 
                 specialRequests,
+
+                status:
+                    "pending",
 
                 createdAt:
                     new Date().toISOString(),
@@ -752,6 +1106,56 @@ export default function TransferCheckoutPage() {
             <section className="transfer-checkout-content">
 
                 <div className="transfers-container">
+
+                    {availabilityError && (
+                        <div
+                            role="alert"
+                            style={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: "12px",
+                                marginBottom: "22px",
+                                padding: "14px 16px",
+                                border: "1px solid #f1b8b8",
+                                borderRadius: "12px",
+                                background: "#fff5f5",
+                                color: "#7f1d1d",
+                                fontSize: "14px",
+                                lineHeight: 1.5,
+                            }}
+                        >
+                            <span
+                                aria-hidden="true"
+                                style={{
+                                    flexShrink: 0,
+                                    width: "24px",
+                                    height: "24px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    borderRadius: "50%",
+                                    background: "#fee2e2",
+                                    color: "#dc2626",
+                                    fontWeight: 700,
+                                    fontSize: "13px",
+                                }}
+                            >
+                                !
+                            </span>
+                            <div>
+                                <strong
+                                    style={{
+                                        display: "block",
+                                        marginBottom: "3px",
+                                        color: "#b91c1c",
+                                    }}
+                                >
+                                    Transfer unavailable
+                                </strong>
+                                <span>{availabilityError}</span>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="transfer-checkout-layout">
 
@@ -954,7 +1358,7 @@ export default function TransferCheckoutPage() {
                                     </span>
 
                                     <strong>
-                                        €{price}
+                                        €{basePrice}
                                     </strong>
 
                                 </div>
@@ -1010,7 +1414,7 @@ export default function TransferCheckoutPage() {
                                     </span>
 
                                     <strong>
-                                        {date}
+                                        {formatDisplayDate(date)}
                                     </strong>
 
                                 </div>
@@ -1068,7 +1472,7 @@ export default function TransferCheckoutPage() {
                                                 </span>
 
                                                 <strong>
-                                                    {returnDate}
+                                                    {formatDisplayDate(returnDate)}
                                                 </strong>
 
                                             </div>
@@ -1092,7 +1496,9 @@ export default function TransferCheckoutPage() {
                                 )}
 
 
-                            <div className="transfer-summary-divider" />
+                            {transferType === "return" && (
+                                <div className="transfer-summary-divider" />
+                            )}
 
 
                             {/* TOTAL */}
@@ -1104,7 +1510,7 @@ export default function TransferCheckoutPage() {
                                 </span>
 
                                 <strong>
-                                    €{price}
+                                    €{totalPrice}
                                 </strong>
 
                             </div>

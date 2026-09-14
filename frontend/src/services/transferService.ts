@@ -27,10 +27,29 @@ export type TransferBooking = {
     phone: string;
     specialRequests: string;
 
+    status?: "pending" | "confirmed" | "cancelled";
+
     createdAt: string;
 };
 
 const STORAGE_KEY = "stayway_transfers";
+
+/**
+ * Only pending and confirmed bookings occupy a vehicle/driver.
+ * Cancelled bookings must never block availability.
+ *
+ * Older bookings without a status are treated as confirmed
+ * for backwards compatibility with existing localStorage data.
+ */
+export function isActiveTransferBooking(
+    booking: TransferBooking
+): boolean {
+    return (
+        booking.status === undefined ||
+        booking.status === "pending" ||
+        booking.status === "confirmed"
+    );
+}
 
 export function getTransferBookings(): TransferBooking[] {
     if (typeof window === "undefined") {
@@ -44,7 +63,13 @@ export function getTransferBookings(): TransferBooking[] {
     }
 
     try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+
+        if (!Array.isArray(parsed)) {
+            return [];
+        }
+
+        return parsed as TransferBooking[];
     } catch {
         return [];
     }
@@ -69,36 +94,175 @@ export function getTransferDriverBookings(
     driverId: string
 ): TransferBooking[] {
     return getTransferBookings().filter(
-        (booking) => booking.driverId === driverId
+        (booking) =>
+            booking.driverId === driverId &&
+            isActiveTransferBooking(booking)
     );
 }
 
+/**
+ * Returns the duration used for availability checks.
+ * Private and Comfort transfers take 35 minutes.
+ * Family transfers take 40 minutes.
+ */
+export function getTransferDuration(
+    optionTitle: string
+): number {
+    const normalizedTitle =
+        optionTitle.toLowerCase();
+
+    if (normalizedTitle.includes("family")) {
+        return 40;
+    }
+
+    return 35;
+}
+
+function getTimestamp(
+    date: string,
+    time: string
+): number | null {
+    const timestamp = new Date(
+        `${date}T${time}`
+    ).getTime();
+
+    return Number.isNaN(timestamp)
+        ? null
+        : timestamp;
+}
+
+function isTimeRangeOverlapping(
+    requestedStart: number,
+    requestedEnd: number,
+    existingStart: number,
+    existingEnd: number
+): boolean {
+    return (
+        requestedStart < existingEnd &&
+        requestedEnd > existingStart
+    );
+}
+
+/**
+ * Checks whether one requested transfer leg overlaps
+ * with one booking leg.
+ */
+export function isTransferLegBusy(
+    bookingDate: string,
+    bookingTime: string,
+    bookingDuration: number,
+    requestedDate: string,
+    requestedTime: string,
+    requestedDuration: number
+): boolean {
+    const existingStart = getTimestamp(
+        bookingDate,
+        bookingTime
+    );
+
+    const requestedStart = getTimestamp(
+        requestedDate,
+        requestedTime
+    );
+
+    if (
+        existingStart === null ||
+        requestedStart === null
+    ) {
+        return false;
+    }
+
+    const existingEnd =
+        existingStart +
+        bookingDuration * 60 * 1000;
+
+    const requestedEnd =
+        requestedStart +
+        requestedDuration * 60 * 1000;
+
+    return isTimeRangeOverlapping(
+        requestedStart,
+        requestedEnd,
+        existingStart,
+        existingEnd
+    );
+}
+
+/**
+ * Checks a requested leg against every occupied leg
+ * of the driver's existing bookings.
+ *
+ * For Return bookings, both the outbound and return
+ * legs are checked.
+ */
 export function isTransferDriverBusy(
     driverId: string,
     date: string,
     time: string,
-    durationMinutes: number = 60
+    durationMinutes: number = 60,
+    returnDate?: string,
+    returnTime?: string
 ): boolean {
-    const bookings = getTransferDriverBookings(driverId);
+    const bookings =
+        getTransferDriverBookings(driverId);
 
-    const requestedStart = new Date(
-        `${date}T${time}`
-    ).getTime();
+    const requestedLegs: {
+        date: string;
+        time: string;
+    }[] = [
+        {
+            date,
+            time,
+        },
+    ];
 
-    const requestedEnd =
-        requestedStart + durationMinutes * 60 * 1000;
+    if (returnDate && returnTime) {
+        requestedLegs.push({
+            date: returnDate,
+            time: returnTime,
+        });
+    }
 
     return bookings.some((booking) => {
-        const bookingStart = new Date(
-            `${booking.date}T${booking.time}`
-        ).getTime();
+        const existingDuration =
+            getTransferDuration(
+                booking.optionTitle
+            );
 
-        const bookingEnd =
-            bookingStart + durationMinutes * 60 * 1000;
+        const existingLegs: {
+            date: string;
+            time: string;
+        }[] = [
+            {
+                date: booking.date,
+                time: booking.time,
+            },
+        ];
 
-        return (
-            requestedStart < bookingEnd &&
-            requestedEnd > bookingStart
+        if (
+            booking.transferType === "return" &&
+            booking.returnDate &&
+            booking.returnTime
+        ) {
+            existingLegs.push({
+                date: booking.returnDate,
+                time: booking.returnTime,
+            });
+        }
+
+        return requestedLegs.some(
+            (requestedLeg) =>
+                existingLegs.some(
+                    (existingLeg) =>
+                        isTransferLegBusy(
+                            existingLeg.date,
+                            existingLeg.time,
+                            existingDuration,
+                            requestedLeg.date,
+                            requestedLeg.time,
+                            durationMinutes
+                        )
+                )
         );
     });
 }

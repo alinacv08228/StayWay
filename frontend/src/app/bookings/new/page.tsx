@@ -47,6 +47,7 @@ import {
 
 const bookingPageTranslations = {
     "English": {
+        pending: "Pending confirmation",
         backToProperty: "Back to property",
         bookYourStay: "Book your stay",
         checkIn: "Check-in",
@@ -81,6 +82,7 @@ const bookingPageTranslations = {
         capacity: "This room can accommodate up to {n} adults and children.",
         loggedIn: "You must be logged in to make a booking.",
         propertyMissing: "Property not found.",
+        roomUnavailable: "This room is already booked for the selected dates.",
         passengerDetails: "Passenger details",
         whoIsTravelling: "Who is travelling?",
         firstName: "First name",
@@ -96,6 +98,7 @@ const bookingPageTranslations = {
         invalidEmail: "Please enter a valid email address.",
     },
     "Română": {
+        pending: "În așteptarea confirmării",
         backToProperty: "Înapoi la proprietate",
         bookYourStay: "Rezervă cazarea",
         checkIn: "Check-in",
@@ -130,6 +133,7 @@ const bookingPageTranslations = {
         capacity: "Această cameră poate găzdui până la {n} adulți și copii.",
         loggedIn: "Trebuie să fii autentificat pentru a face o rezervare.",
         propertyMissing: "Proprietatea nu a fost găsită.",
+        roomUnavailable: "Această cameră este deja rezervată pentru datele selectate.",
         passengerDetails: "Datele pasagerului",
         whoIsTravelling: "Cine călătorește?",
         firstName: "Prenume",
@@ -145,6 +149,7 @@ const bookingPageTranslations = {
         invalidEmail: "Introdu o adresă de email validă.",
     },
     "Русский": {
+        pending: "Ожидает подтверждения",
         backToProperty: "Назад к объекту",
         bookYourStay: "Забронировать проживание",
         checkIn: "Заезд",
@@ -181,6 +186,7 @@ const bookingPageTranslations = {
         propertyMissing: "Объект размещения не найден.",
     },
     "Українська": {
+        pending: "Очікує підтвердження",
         backToProperty: "Назад до помешкання",
         bookYourStay: "Забронювати проживання",
         checkIn: "Заїзд",
@@ -217,6 +223,7 @@ const bookingPageTranslations = {
         propertyMissing: "Помешкання не знайдено.",
     },
     "Français": {
+        pending: "En attente de confirmation",
         backToProperty: "Retour à l’établissement",
         bookYourStay: "Réservez votre séjour",
         checkIn: "Arrivée",
@@ -253,6 +260,7 @@ const bookingPageTranslations = {
         propertyMissing: "Établissement introuvable.",
     },
     "Español": {
+        pending: "Pendiente de confirmación",
         backToProperty: "Volver al alojamiento",
         bookYourStay: "Reserva tu estancia",
         checkIn: "Entrada",
@@ -289,6 +297,7 @@ const bookingPageTranslations = {
         propertyMissing: "Alojamiento no encontrado.",
     },
     "Deutsch": {
+        pending: "Bestätigung ausstehend",
         backToProperty: "Zurück zur Unterkunft",
         bookYourStay: "Aufenthalt buchen",
         checkIn: "Check-in",
@@ -325,6 +334,7 @@ const bookingPageTranslations = {
         propertyMissing: "Unterkunft nicht gefunden.",
     },
     "Italiano": {
+        pending: "In attesa di conferma",
         backToProperty: "Torna alla struttura",
         bookYourStay: "Prenota il tuo soggiorno",
         checkIn: "Check-in",
@@ -361,6 +371,7 @@ const bookingPageTranslations = {
         propertyMissing: "Struttura non trovata.",
     },
     "Português": {
+        pending: "A aguardar confirmação",
         backToProperty: "Voltar ao alojamento",
         bookYourStay: "Reserve a sua estadia",
         checkIn: "Check-in",
@@ -397,6 +408,7 @@ const bookingPageTranslations = {
         propertyMissing: "Alojamento não encontrado.",
     },
     "Nederlands": {
+        pending: "Wacht op bevestiging",
         backToProperty: "Terug naar accommodatie",
         bookYourStay: "Boek je verblijf",
         checkIn: "Inchecken",
@@ -433,6 +445,7 @@ const bookingPageTranslations = {
         propertyMissing: "Accommodatie niet gevonden.",
     },
     "Norsk": {
+        pending: "Venter på bekreftelse",
         backToProperty: "Tilbake til overnattingsstedet",
         bookYourStay: "Bestill oppholdet ditt",
         checkIn: "Innsjekking",
@@ -469,6 +482,7 @@ const bookingPageTranslations = {
         propertyMissing: "Overnattingsstedet ble ikke funnet.",
     },
     "Svenska": {
+        pending: "Väntar på bekräftelse",
         backToProperty: "Tillbaka till boendet",
         bookYourStay: "Boka din vistelse",
         checkIn: "Incheckning",
@@ -505,6 +519,7 @@ const bookingPageTranslations = {
         propertyMissing: "Boendet hittades inte.",
     },
     "Dansk": {
+        pending: "Afventer bekræftelse",
         backToProperty: "Tilbage til overnatningsstedet",
         bookYourStay: "Book dit ophold",
         checkIn: "Indtjekning",
@@ -541,6 +556,7 @@ const bookingPageTranslations = {
         propertyMissing: "Overnatningsstedet blev ikke fundet.",
     },
     "Suomi": {
+        pending: "Odottaa vahvistusta",
         backToProperty: "Takaisin majoitukseen",
         bookYourStay: "Varaa majoitus",
         checkIn: "Sisäänkirjautuminen",
@@ -577,6 +593,7 @@ const bookingPageTranslations = {
         propertyMissing: "Majoitusta ei löytynyt.",
     },
     "Polski": {
+        pending: "Oczekuje na potwierdzenie",
         backToProperty: "Wróć do obiektu",
         bookYourStay: "Zarezerwuj pobyt",
         checkIn: "Zameldowanie",
@@ -613,6 +630,7 @@ const bookingPageTranslations = {
         propertyMissing: "Nie znaleziono obiektu.",
     },
     "Čeština": {
+        pending: "Čeká na potvrzení",
         backToProperty: "Zpět na ubytování",
         bookYourStay: "Rezervujte si pobyt",
         checkIn: "Příjezd",
@@ -649,6 +667,7 @@ const bookingPageTranslations = {
         propertyMissing: "Ubytování nebylo nalezeno.",
     },
     "Slovenčina": {
+        pending: "Čaká na potvrdenie",
         backToProperty: "Späť na ubytovanie",
         bookYourStay: "Rezervujte si pobyt",
         checkIn: "Príchod",
@@ -685,6 +704,7 @@ const bookingPageTranslations = {
         propertyMissing: "Ubytovanie sa nenašlo.",
     },
     "Magyar": {
+        pending: "Megerősítésre vár",
         backToProperty: "Vissza a szálláshelyhez",
         bookYourStay: "Foglalja le szállását",
         checkIn: "Bejelentkezés",
@@ -721,6 +741,7 @@ const bookingPageTranslations = {
         propertyMissing: "A szálláshely nem található.",
     },
     "Български": {
+        pending: "Очаква потвърждение",
         backToProperty: "Назад към мястото за настаняване",
         bookYourStay: "Резервирайте престоя си",
         checkIn: "Настаняване",
@@ -757,6 +778,7 @@ const bookingPageTranslations = {
         propertyMissing: "Мястото за настаняване не е намерено.",
     },
     "Hrvatski": {
+        pending: "Čeka potvrdu",
         backToProperty: "Natrag na smještaj",
         bookYourStay: "Rezervirajte svoj boravak",
         checkIn: "Prijava",
@@ -793,6 +815,7 @@ const bookingPageTranslations = {
         propertyMissing: "Smještaj nije pronađen.",
     },
     "Slovenščina": {
+        pending: "Čaka na potrditev",
         backToProperty: "Nazaj na nastanitev",
         bookYourStay: "Rezervirajte svoje bivanje",
         checkIn: "Prijava",
@@ -829,6 +852,7 @@ const bookingPageTranslations = {
         propertyMissing: "Nastanitev ni bila najdena.",
     },
     "Srpski": {
+        pending: "Čeka potvrdu",
         backToProperty: "Nazad na smeštaj",
         bookYourStay: "Rezervišite svoj boravak",
         checkIn: "Prijava",
@@ -865,6 +889,7 @@ const bookingPageTranslations = {
         propertyMissing: "Smeštaj nije pronađen.",
     },
     "Bosanski": {
+        pending: "Čeka potvrdu",
         backToProperty: "Nazad na smještaj",
         bookYourStay: "Rezervišite svoj boravak",
         checkIn: "Prijava",
@@ -901,6 +926,7 @@ const bookingPageTranslations = {
         propertyMissing: "Smještaj nije pronađen.",
     },
     "Ελληνικά": {
+        pending: "Αναμονή επιβεβαίωσης",
         backToProperty: "Επιστροφή στο κατάλυμα",
         bookYourStay: "Κάντε κράτηση για τη διαμονή σας",
         checkIn: "Άφιξη",
@@ -937,6 +963,7 @@ const bookingPageTranslations = {
         propertyMissing: "Το κατάλυμα δεν βρέθηκε.",
     },
     "Türkçe": {
+        pending: "Onay bekliyor",
         backToProperty: "Konaklama yerine dön",
         bookYourStay: "Konaklamanızı ayırtın",
         checkIn: "Giriş",
@@ -973,6 +1000,7 @@ const bookingPageTranslations = {
         propertyMissing: "Konaklama yeri bulunamadı.",
     },
     "العربية": {
+        pending: "في انتظار التأكيد",
         backToProperty: "العودة إلى مكان الإقامة",
         bookYourStay: "احجز إقامتك",
         checkIn: "تسجيل الوصول",
@@ -1009,6 +1037,7 @@ const bookingPageTranslations = {
         propertyMissing: "لم يتم العثور على مكان الإقامة.",
     },
     "עברית": {
+        pending: "ממתין לאישור",
         backToProperty: "חזרה למקום האירוח",
         bookYourStay: "הזמנת השהייה שלך",
         checkIn: "צ'ק-אין",
@@ -1045,6 +1074,7 @@ const bookingPageTranslations = {
         propertyMissing: "מקום האירוח לא נמצא.",
     },
     "हिन्दी": {
+        pending: "पुष्टि की प्रतीक्षा में",
         backToProperty: "आवास पर वापस जाएँ",
         bookYourStay: "अपना ठहराव बुक करें",
         checkIn: "चेक-इन",
@@ -1081,6 +1111,7 @@ const bookingPageTranslations = {
         propertyMissing: "आवास नहीं मिला।",
     },
     "ไทย": {
+        pending: "รอการยืนยัน",
         backToProperty: "กลับไปยังที่พัก",
         bookYourStay: "จองที่พักของคุณ",
         checkIn: "เช็กอิน",
@@ -1117,6 +1148,7 @@ const bookingPageTranslations = {
         propertyMissing: "ไม่พบที่พัก",
     },
     "Bahasa Indonesia": {
+        pending: "Menunggu konfirmasi",
         backToProperty: "Kembali ke akomodasi",
         bookYourStay: "Pesan penginapan Anda",
         checkIn: "Check-in",
@@ -1153,6 +1185,7 @@ const bookingPageTranslations = {
         propertyMissing: "Akomodasi tidak ditemukan.",
     },
     "Tiếng Việt": {
+        pending: "Đang chờ xác nhận",
         backToProperty: "Quay lại chỗ nghỉ",
         bookYourStay: "Đặt chỗ ở của bạn",
         checkIn: "Nhận phòng",
@@ -1189,6 +1222,7 @@ const bookingPageTranslations = {
         propertyMissing: "Không tìm thấy chỗ nghỉ.",
     },
     "한국어": {
+        pending: "확인 대기 중",
         backToProperty: "숙소로 돌아가기",
         bookYourStay: "숙박 예약하기",
         checkIn: "체크인",
@@ -1225,6 +1259,7 @@ const bookingPageTranslations = {
         propertyMissing: "숙소를 찾을 수 없습니다.",
     },
     "日本語": {
+        pending: "確認待ち",
         backToProperty: "宿泊施設に戻る",
         bookYourStay: "宿泊を予約する",
         checkIn: "チェックイン",
@@ -1261,6 +1296,7 @@ const bookingPageTranslations = {
         propertyMissing: "宿泊施設が見つかりません。",
     },
     "中文": {
+        pending: "等待确认",
         backToProperty: "返回住宿",
         bookYourStay: "预订您的住宿",
         checkIn: "入住",
@@ -1297,6 +1333,7 @@ const bookingPageTranslations = {
         propertyMissing: "未找到住宿。",
     },
     "繁體中文": {
+        pending: "等待確認",
         backToProperty: "返回住宿",
         bookYourStay: "預訂您的住宿",
         checkIn: "入住",
@@ -1333,6 +1370,7 @@ const bookingPageTranslations = {
         propertyMissing: "找不到住宿。",
     },
     "Català": {
+        pending: "Pendent de confirmació",
         backToProperty: "Torna a l'allotjament",
         bookYourStay: "Reserva la teva estada",
         checkIn: "Entrada",
@@ -1369,6 +1407,7 @@ const bookingPageTranslations = {
         propertyMissing: "Allotjament no trobat.",
     },
     "Eesti": {
+        pending: "Kinnituse ootel",
         backToProperty: "Tagasi majutuskohta",
         bookYourStay: "Broneeri oma peatumine",
         checkIn: "Sisseregistreerimine",
@@ -1405,6 +1444,7 @@ const bookingPageTranslations = {
         propertyMissing: "Majutuskohta ei leitud.",
     },
     "Latviešu": {
+        pending: "Gaida apstiprinājumu",
         backToProperty: "Atpakaļ uz naktsmītni",
         bookYourStay: "Rezervējiet savu uzturēšanos",
         checkIn: "Reģistrēšanās",
@@ -1441,6 +1481,7 @@ const bookingPageTranslations = {
         propertyMissing: "Naktsmītne nav atrasta.",
     },
     "Lietuvių": {
+        pending: "Laukiama patvirtinimo",
         backToProperty: "Grįžti į apgyvendinimo vietą",
         bookYourStay: "Užsakykite viešnagę",
         checkIn: "Atvykimas",
@@ -2006,7 +2047,7 @@ function NewBookingForm() {
                 totalPrice,
 
                 status:
-                    "confirmed" as const,
+                    "pending" as const,
 
                 firstName:
                     firstName.trim(),
@@ -2056,6 +2097,47 @@ function NewBookingForm() {
 
                 }
 
+            }
+
+
+            /* ---------------------------------------------
+               ROOM AVAILABILITY
+               --------------------------------------------- */
+
+            if (selectedRoom) {
+
+                const roomAlreadyBooked =
+                    bookings.some(
+                        (booking) =>
+                            booking.propertyId ===
+                                property.id &&
+                            booking.roomId ===
+                                selectedRoom.id &&
+                            booking.status !==
+                                "cancelled" &&
+                            Boolean(
+                                booking.checkIn &&
+                                booking.checkOut
+                            ) &&
+                            booking.checkIn <
+                                checkOut &&
+                            booking.checkOut >
+                                checkIn
+                    );
+
+                if (
+                    roomAlreadyBooked
+                ) {
+
+                    setError(
+                        getBookingText(
+                            language,
+                            "roomUnavailable"
+                        )
+                    );
+
+                    return;
+                }
             }
 
 

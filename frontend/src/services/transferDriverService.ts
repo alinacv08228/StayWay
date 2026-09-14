@@ -1,3 +1,4 @@
+
 import { getTransferBookings, TransferBooking } from "./transferService";
 
 export type TransferDriver = {
@@ -442,7 +443,13 @@ export function getTransferDriverBookings(
     driverId: string
 ): TransferBooking[] {
     return getTransferBookings().filter(
-        (booking) => booking.driverId === driverId
+        (booking) =>
+            booking.driverId === driverId &&
+            (
+                booking.status === undefined ||
+                booking.status === "pending" ||
+                booking.status === "confirmed"
+            )
     );
 }
 
@@ -450,22 +457,124 @@ export function getTransferDriverSchedule(
     driverId: string
 ): TransferBooking[] {
     return getTransferDriverBookings(driverId).filter(
-        (booking) => booking.date && booking.time
+        (booking) =>
+            Boolean(
+                booking.date &&
+                booking.time
+            )
     );
 }
 
+function getTransferDuration(
+    booking: TransferBooking
+): number {
+    return booking.optionTitle
+        .toLowerCase()
+        .includes("family")
+        ? 40
+        : 35;
+}
+
+function getTimestamp(
+    date: string,
+    time: string
+): number | null {
+    const timestamp = new Date(
+        `${date}T${time}`
+    ).getTime();
+
+    return Number.isNaN(timestamp)
+        ? null
+        : timestamp;
+}
+
+function isOverlapping(
+    bookingDate: string,
+    bookingTime: string,
+    duration: number,
+    requestedStart: number,
+    requestedEnd: number
+): boolean {
+    const bookingStart = getTimestamp(
+        bookingDate,
+        bookingTime
+    );
+
+    if (bookingStart === null) {
+        return false;
+    }
+
+    const bookingEnd =
+        bookingStart +
+        duration * 60 * 1000;
+
+    return (
+        requestedStart < bookingEnd &&
+        requestedEnd > bookingStart
+    );
+}
+
+function bookingOccupiesRequestedPeriod(
+    booking: TransferBooking,
+    requestedStart: number,
+    requestedEnd: number
+): boolean {
+    const duration =
+        getTransferDuration(booking);
+
+    /*
+     * Outbound leg
+     */
+    if (
+        isOverlapping(
+            booking.date,
+            booking.time,
+            duration,
+            requestedStart,
+            requestedEnd
+        )
+    ) {
+        return true;
+    }
+
+    /*
+     * Return leg
+     */
+    if (
+        booking.transferType === "return" &&
+        booking.returnDate &&
+        booking.returnTime
+    ) {
+        return isOverlapping(
+            booking.returnDate,
+            booking.returnTime,
+            duration,
+            requestedStart,
+            requestedEnd
+        );
+    }
+
+    return false;
+}
 
 export function getTransferDriverStatus(
     driverId: string,
     date?: string,
-    time?: string
+    time?: string,
+    durationMinutes: number = 35,
+    returnDate?: string,
+    returnTime?: string
 ): "available" | "busy" | "inactive" {
-    const driver = getTransferDriverById(driverId);
+    const driver =
+        getTransferDriverById(driverId);
 
     if (!driver) {
         return "available";
     }
 
+    /*
+     * Manual Admin status still has priority.
+     */
     if (driver.status === "inactive") {
         return "inactive";
     }
@@ -474,128 +583,97 @@ export function getTransferDriverStatus(
         return "busy";
     }
 
-    const bookings = getTransferDriverBookings(driverId);
+    /*
+     * Only active bookings are returned by
+     * getTransferDriverBookings():
+     *
+     * pending   -> occupies the driver
+     * confirmed -> occupies the driver
+     * cancelled -> ignored
+     */
 
-    const getDuration = (booking: TransferBooking) =>
-        booking.optionTitle
-            .toLowerCase()
-            .includes("family")
-            ? 40
-            : 35;
+    const bookings =
+        getTransferDriverBookings(driverId);
 
-    const isOverlapping = (
-        bookingDate: string,
-        bookingTime: string,
-        duration: number,
-        requestedStart: number,
-        requestedEnd: number
-    ) => {
-        const bookingStart = new Date(
-            `${bookingDate}T${bookingTime}`
-        ).getTime();
-
-        if (Number.isNaN(bookingStart)) {
-            return false;
-        }
-
-        const bookingEnd =
-            bookingStart + duration * 60 * 1000;
-
-        return (
-            requestedStart < bookingEnd &&
-            requestedEnd > bookingStart
-        );
-    };
-
-    // If a specific date/time is provided,
-    // check whether the driver is available for that period.
+    /*
+     * Specific date/time check.
+     *
+     * For a Return transfer, check BOTH requested
+     * outbound and requested return periods.
+     */
     if (date && time) {
-        const requestedStart = new Date(
-            `${date}T${time}`
-        ).getTime();
+        const requestedLegs: {
+            date: string;
+            time: string;
+        }[] = [
+            {
+                date,
+                time,
+            },
+        ];
 
-        if (Number.isNaN(requestedStart)) {
-            return "available";
+        if (returnDate && returnTime) {
+            requestedLegs.push({
+                date: returnDate,
+                time: returnTime,
+            });
         }
 
-        const requestedEnd =
-            requestedStart + 35 * 60 * 1000;
+        const hasOverlappingBooking =
+            requestedLegs.some(
+                (leg) => {
+                    const requestedStart =
+                        getTimestamp(
+                            leg.date,
+                            leg.time
+                        );
 
-        const hasOverlappingBooking = bookings.some(
-            (booking) => {
-                const duration = getDuration(booking);
+                    if (
+                        requestedStart === null
+                    ) {
+                        return false;
+                    }
 
-                if (
-                    isOverlapping(
-                        booking.date,
-                        booking.time,
-                        duration,
-                        requestedStart,
-                        requestedEnd
-                    )
-                ) {
-                    return true;
-                }
+                    const requestedEnd =
+                        requestedStart +
+                        durationMinutes *
+                        60 *
+                        1000;
 
-                if (
-                    booking.transferType === "return" &&
-                    booking.returnDate &&
-                    booking.returnTime
-                ) {
-                    return isOverlapping(
-                        booking.returnDate,
-                        booking.returnTime,
-                        duration,
-                        requestedStart,
-                        requestedEnd
+                    return bookings.some(
+                        (booking) =>
+                            bookingOccupiesRequestedPeriod(
+                                booking,
+                                requestedStart,
+                                requestedEnd
+                            )
                     );
                 }
-
-                return false;
-            }
-        );
+            );
 
         return hasOverlappingBooking
             ? "busy"
             : "available";
     }
 
-    // In Admin: show the driver's status for the current moment.
+    /*
+     * Admin/current status check.
+     *
+     * Use the current moment as a zero-length
+     * interval, so a driver is busy only while
+     * an active transfer is actually in progress.
+     */
     const now = Date.now();
 
-    const isCurrentlyBusy = bookings.some(
-        (booking) => {
-            const duration = getDuration(booking);
-
-            if (
-                isOverlapping(
-                    booking.date,
-                    booking.time,
-                    duration,
+    const isCurrentlyBusy =
+        bookings.some(
+            (booking) =>
+                bookingOccupiesRequestedPeriod(
+                    booking,
                     now,
                     now
                 )
-            ) {
-                return true;
-            }
-
-            if (
-                booking.transferType === "return" &&
-                booking.returnDate &&
-                booking.returnTime
-            ) {
-                return isOverlapping(
-                    booking.returnDate,
-                    booking.returnTime,
-                    duration,
-                    now,
-                    now
-                );
-            }
-
-            return false;
-        }
-    );
+        );
 
     return isCurrentlyBusy
         ? "busy"
