@@ -1484,23 +1484,24 @@ export default function Home() {
 .home-cta {
     position: relative;
     overflow: visible;
-    background: #f6f1ff;
+    background:
+        linear-gradient(
+            180deg,
+            #eee8ff 0%,
+            #f4efff 100%
+        );
+    border-top: none;
     border-radius: 0;
     box-shadow: none;
-    padding: 0 0 0;
+    padding: 0;
     margin-bottom: 0;
 }
 
+/* No decorative extension here:
+   it used to cover the footer in light mode. */
 .home-cta::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -64px;
-    height: 64px;
-    background: #f6f1ff;
-    pointer-events: none;
-    z-index: 0;
+    display: none;
+    content: none;
 }
 
 .home-cta .home-cta-inner {
@@ -1588,6 +1589,163 @@ export default function Home() {
         width: 100%;
         box-sizing: border-box;
     }
+}
+
+
+
+/* LIGHT THEME SECTION SEPARATION */
+:global(html:not([data-theme="dark"])) .home-stays {
+    background: #f7f4ff;
+}
+
+:global(html:not([data-theme="dark"])) .home-cta {
+    background:
+        linear-gradient(
+            180deg,
+            #eee8ff 0%,
+            #f4efff 100%
+        );
+    border-top: none;
+}
+
+/* =========================================================
+   HOME — DARK THEME FINAL
+========================================================= */
+
+:global(html[data-theme="dark"]) .home-page {
+    background: #0d1729;
+    color: #f7f8ff;
+}
+
+:global(html[data-theme="dark"]) .home-hero {
+    background: #0d1729;
+}
+
+:global(html[data-theme="dark"]) .home-carousel {
+    background: linear-gradient(
+        180deg,
+        #182342 0%,
+        #202a50 50%,
+        #182342 100%
+    );
+    border-top: 1px solid rgba(164, 143, 255, 0.10);
+    border-bottom: 1px solid rgba(164, 143, 255, 0.12);
+}
+
+:global(html[data-theme="dark"]) .home-destinations {
+    background: #0d1729;
+}
+
+:global(html[data-theme="dark"]) .home-stays {
+    background: #101a2d;
+}
+
+:global(html[data-theme="dark"]) .home-hero h1,
+:global(html[data-theme="dark"]) .home-section-heading h2,
+:global(html[data-theme="dark"]) .home-property-info h3 {
+    color: #f7f8ff;
+}
+
+:global(html[data-theme="dark"]) .hero-subtitle,
+:global(html[data-theme="dark"]) .home-section-heading > p,
+:global(html[data-theme="dark"]) .home-empty-state p {
+    color: #c5ccdc;
+}
+
+:global(html[data-theme="dark"]) .home-eyebrow {
+    color: #a998ff;
+}
+
+:global(html[data-theme="dark"]) .hero-badge {
+    border-color: rgba(150, 127, 255, 0.38);
+    background: rgba(31, 43, 70, 0.72);
+    color: #b9aaff;
+    box-shadow: none;
+}
+
+:global(html[data-theme="dark"]) .hero-stats > div {
+    border-color: rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: none;
+}
+
+:global(html[data-theme="dark"]) .hero-stats strong {
+    color: #ffffff;
+}
+
+:global(html[data-theme="dark"]) .hero-stats span {
+    color: #c1c8d8;
+}
+
+:global(html[data-theme="dark"]) .home-outline-button {
+    color: #cfc5ff;
+}
+
+:global(html[data-theme="dark"]) .home-property-card {
+    border-color: rgba(152, 130, 255, 0.18);
+    background: #1b2940;
+    box-shadow:
+        0 12px 34px rgba(0, 0, 0, 0.22),
+        0 2px 8px rgba(0, 0, 0, 0.14);
+}
+
+:global(html[data-theme="dark"]) .home-property-card:hover {
+    border-color: rgba(171, 151, 255, 0.36);
+    box-shadow:
+        0 22px 46px rgba(0, 0, 0, 0.30),
+        0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+:global(html[data-theme="dark"]) .home-property-content {
+    background: #1b2940;
+}
+
+:global(html[data-theme="dark"]) .property-location-row {
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+:global(html[data-theme="dark"]) .property-location {
+    color: #c4ccda;
+}
+
+:global(html[data-theme="dark"]) .property-location-arrow {
+    background: rgba(139, 111, 255, 0.18);
+    color: #b9a8ff;
+}
+
+:global(html[data-theme="dark"]) .home-property-card:hover .property-location-arrow {
+    background: rgba(139, 111, 255, 0.28);
+}
+
+:global(html[data-theme="dark"]) .home-property-price small {
+    color: #b3bbcb;
+}
+
+:global(html[data-theme="dark"]) .home-property-price strong {
+    color: #a996ff;
+}
+
+:global(html[data-theme="dark"]) .home-property-price span {
+    color: #c4ccda;
+}
+
+:global(html[data-theme="dark"]) .property-rating-badge {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(18, 28, 47, 0.88);
+    color: #f7f8ff;
+}
+
+:global(html[data-theme="dark"]) .property-view {
+    background: rgba(18, 28, 47, 0.92);
+    color: #c4b8ff;
+}
+
+:global(html[data-theme="dark"]) .home-cta {
+    background: #0d1729;
+}
+
+:global(html[data-theme="dark"]) .home-cta::after {
+    background: #0d1729;
 }
 
 @media (prefers-reduced-motion: reduce) {

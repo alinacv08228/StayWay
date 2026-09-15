@@ -184,6 +184,34 @@ export default function TransferLocationInput({
                     font-size: 11px;
                     color: #8a8499;
                 }
+
+                :global(html[data-theme="dark"]) .transfer-location-suggestions {
+                    background: #17243a !important;
+                    border-color: #3a4861 !important;
+                    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.30) !important;
+                }
+
+                :global(html[data-theme="dark"]) .transfer-location-suggestion {
+                    color: #f7f9ff !important;
+                }
+
+                :global(html[data-theme="dark"]) .transfer-location-suggestion:hover {
+                    background: #22314a !important;
+                }
+
+                :global(html[data-theme="dark"]) .transfer-location-icon {
+                    background: #26344f !important;
+                    color: #a997ff !important;
+                }
+
+                :global(html[data-theme="dark"]) .transfer-location-name {
+                    color: #f7f9ff !important;
+                }
+
+                :global(html[data-theme="dark"]) .transfer-location-meta {
+                    color: #bfc8d8 !important;
+                }
+                
             `}</style>
         </div>
     );

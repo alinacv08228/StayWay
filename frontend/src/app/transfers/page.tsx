@@ -2369,6 +2369,325 @@ export default function TransfersPage() {
         box-shadow 180ms ease;
 }
 
+
+
+/* =========================================================
+   TRANSFERS — DARK THEME
+   Colors only. No layout / spacing / sizing changes.
+========================================================= */
+
+:global(html[data-theme="dark"]) .transfers-page {
+    --tw-ink: #f7f9ff;
+    --tw-muted: #c8d0df;
+    --tw-border: #344158;
+    background: #0f1a2d;
+    color: #f7f9ff;
+}
+
+/* HERO */
+:global(html[data-theme="dark"]) .transfers-hero {
+    background:
+        linear-gradient(
+            135deg,
+            #0f1a2d 0%,
+            #15213a 52%,
+            #111c30 100%
+        );
+}
+
+:global(html[data-theme="dark"]) .transfers-hero::after {
+    background: rgba(155, 132, 255, 0.16);
+}
+
+:global(html[data-theme="dark"]) .transfers-eyebrow {
+    color: #9b87ff;
+}
+
+:global(html[data-theme="dark"]) .transfers-hero h1,
+:global(html[data-theme="dark"]) .transfers-section-heading h2,
+:global(html[data-theme="dark"]) .transfer-benefit-card h3,
+:global(html[data-theme="dark"]) .transfer-option-card h3,
+:global(html[data-theme="dark"]) .transfer-step h3,
+:global(html[data-theme="dark"]) .transfers-cta-card h2 {
+    color: #f8f9ff;
+}
+
+:global(html[data-theme="dark"]) .transfers-hero h1 span {
+    color: #8f79ff;
+}
+
+:global(html[data-theme="dark"]) .transfers-hero-content > p,
+:global(html[data-theme="dark"]) .transfer-benefit-card p,
+:global(html[data-theme="dark"]) .transfer-option-description,
+:global(html[data-theme="dark"]) .transfers-how-it-works .transfers-section-heading > p,
+:global(html[data-theme="dark"]) .transfer-step p {
+    color: #c8d0df;
+}
+
+/* SEARCH CARD */
+    :global(html[data-theme="dark"]) .transfers-search-card {
+        background: #1e2d46;
+        border: 1px solid #40516d;
+        box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.18);
+    }
+
+:global(html[data-theme="dark"]) .transfers-type-switch {
+    background: #17263d;
+}
+
+:global(html[data-theme="dark"]) .transfers-type-switch button {
+    color: #c5cddd;
+}
+
+:global(html[data-theme="dark"]) .transfers-type-switch button.active {
+    color: #a99cff;
+    background: #2b3d5c;
+    box-shadow: none;
+}
+
+:global(html[data-theme="dark"]) .transfer-radio {
+    border-color: #788399;
+}
+
+:global(html[data-theme="dark"]) .active .transfer-radio {
+    border-color: #836cff;
+    background: #7055e8;
+    color: #ffffff;
+}
+
+:global(html[data-theme="dark"]) .transfer-field {
+    background: #22324d;
+    border-color: #435574;
+}
+
+:global(html[data-theme="dark"]) .transfer-field:focus-within {
+    border-color: #8e7cff;
+    box-shadow: 0 0 0 4px rgba(142, 124, 255, 0.13);
+}
+
+:global(html[data-theme="dark"]) .transfer-field-icon {
+    background: #2a3c59;
+}
+
+:global(html[data-theme="dark"]) .transfer-field label {
+    color: #d0d6e3;
+}
+
+:global(html[data-theme="dark"]) .transfer-field input,
+:global(html[data-theme="dark"]) .transfer-field select {
+    color: #f7f9ff;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color-scheme: normal;
+}
+
+:global(html[data-theme="dark"]) .transfer-field input::placeholder {
+    color: #aeb8ca;
+    opacity: 1;
+}
+
+:global(html[data-theme="dark"]) .transfer-field option {
+    background: #17243a;
+    color: #f7f9ff;
+}
+
+
+:global(html[data-theme="dark"]) .transfer-field input[type="date"],
+:global(html[data-theme="dark"]) .transfer-field input[type="time"],
+:global(html[data-theme="dark"]) .transfer-field select {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background-color: transparent !important;
+}
+
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-fields-wrapper,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-text,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-month-field,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-day-field,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-year-field,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-hour-field,
+:global(html[data-theme="dark"]) .transfer-field input::-webkit-datetime-edit-minute-field {
+    background: transparent !important;
+    color: #f7f9ff !important;
+}
+
+/* TransferLocationInput lives in another component */
+:global(html[data-theme="dark"]) .transfer-location-input input {
+    color: #f7f9ff !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color-scheme: normal;
+}
+
+:global(html[data-theme="dark"]) .transfer-location-input input::placeholder {
+    color: #aeb8ca !important;
+    opacity: 1;
+}
+
+:global(html[data-theme="dark"]) .transfer-location-suggestions {
+    background: #17243a !important;
+    border-color: #3a4861 !important;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.30) !important;
+}
+
+:global(html[data-theme="dark"]) .transfer-location-suggestion:hover {
+    background: #22314a !important;
+}
+
+:global(html[data-theme="dark"]) .transfer-location-icon {
+    background: #293752 !important;
+    color: #a997ff !important;
+}
+
+:global(html[data-theme="dark"]) .transfer-location-name {
+    color: #f7f9ff !important;
+}
+
+:global(html[data-theme="dark"]) .transfer-location-meta {
+    color: #bdc7d8 !important;
+}
+
+/* BENEFITS */
+:global(html[data-theme="dark"]) .transfers-benefits {
+    background: #111c30;
+}
+
+:global(html[data-theme="dark"]) .transfer-benefit-card {
+    border-color: #3b4862;
+    background:
+        linear-gradient(
+            145deg,
+            #17243a,
+            #1b2942
+        );
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+:global(html[data-theme="dark"]) .transfer-benefit-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+}
+
+:global(html[data-theme="dark"]) .transfer-benefit-icon,
+:global(html[data-theme="dark"]) .transfer-car-icon {
+    color: #a18eff;
+    background: #25334d;
+}
+
+/* TRANSFER OPTIONS */
+:global(html[data-theme="dark"]) .transfers-options {
+    background:
+        linear-gradient(
+            180deg,
+            #0f1a2d 0%,
+            #131f34 100%
+        );
+}
+
+:global(html[data-theme="dark"]) .transfer-search-summary {
+    border-color: #3c4961;
+    color: #e0e5ef;
+    background: #19263d;
+}
+
+:global(html[data-theme="dark"]) .transfer-option-card {
+    border-color: #38465f;
+    background: #18253a;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.20);
+}
+
+:global(html[data-theme="dark"]) .transfer-option-card::before {
+    background: #22304a;
+}
+
+:global(html[data-theme="dark"]) .transfer-option-card:hover {
+    border-color: #6659a8;
+    box-shadow: 0 28px 58px rgba(0, 0, 0, 0.28);
+}
+
+:global(html[data-theme="dark"]) .transfer-option-badge {
+    color: #c2cad9;
+}
+
+:global(html[data-theme="dark"]) .transfer-option-price span {
+    color: #c1c9d8;
+}
+
+:global(html[data-theme="dark"]) .transfer-option-price strong {
+    color: #ffffff;
+}
+
+:global(html[data-theme="dark"]) .transfer-option-details {
+    border-top-color: #344159;
+    border-bottom-color: #344159;
+}
+
+:global(html[data-theme="dark"]) .transfer-option-details span {
+    color: #d8deea;
+}
+
+/* HOW IT WORKS */
+:global(html[data-theme="dark"]) .transfers-how-it-works {
+    background: #111c30;
+}
+
+:global(html[data-theme="dark"]) .transfer-steps::before {
+    background:
+        linear-gradient(
+            to bottom,
+            #4f4b7e,
+            #8b5cf6,
+            #4f4b7e
+        );
+}
+
+:global(html[data-theme="dark"]) .transfer-step {
+    background:
+        linear-gradient(
+            135deg,
+            #17243a 0%,
+            #1a2941 55%,
+            #1e2d48 100%
+        );
+    border-color: #3a4861;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+}
+
+:global(html[data-theme="dark"]) .transfer-step:hover {
+    border-color: #7c6be1;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.24);
+}
+
+:global(html[data-theme="dark"]) .transfer-step-number {
+    box-shadow:
+        0 8px 18px rgba(78, 60, 190, 0.28),
+        0 0 0 6px #1b2942;
+}
+
+/* CTA */
+:global(html[data-theme="dark"]) .transfers-cta {
+    background: #0f1a2d;
+}
+
+:global(html[data-theme="dark"]) .transfers-cta-card {
+    background:
+        radial-gradient(
+            circle at 88% 15%,
+            rgba(135, 111, 255, 0.18) 0 90px,
+            transparent 91px
+        ),
+        linear-gradient(
+            135deg,
+            #19263d,
+            #1e2c47
+        );
+    border: 1px solid #35435c;
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.20);
+}
+
 @media (max-width: 1180px) {
 
 .transfers-form {

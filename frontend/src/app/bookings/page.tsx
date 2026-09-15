@@ -1,4 +1,3 @@
-
 "use client";
 
 import ProtectedRoute from "../../components/ProtectedRoute";
@@ -260,8 +259,8 @@ function BookingsContent() {
             price * selectedCurrency.rate;
 
         return `${selectedCurrency.symbol}${Math.round(
-    convertedPrice
-).toLocaleString()}`;
+            convertedPrice
+        ).toLocaleString()}`;
     };
 
     const getStatusText = (status: string) => {
@@ -311,25 +310,25 @@ function BookingsContent() {
                 booking.infants ?? 0;
 
             return `${adults} ${
-    adults === 1
-        ? getBookingPageText(language, "adult")
-        : getBookingPageText(language, "adults")
-} · ${children} ${
-    children === 1
-        ? getBookingPageText(language, "child")
-        : getBookingPageText(language, "children")
-} · ${infants} ${
-    infants === 1
-        ? getBookingPageText(language, "infant")
-        : getBookingPageText(language, "infants")
-}`;
+                adults === 1
+                    ? getBookingPageText(language, "adult")
+                    : getBookingPageText(language, "adults")
+            } · ${children} ${
+                children === 1
+                    ? getBookingPageText(language, "child")
+                    : getBookingPageText(language, "children")
+            } · ${infants} ${
+                infants === 1
+                    ? getBookingPageText(language, "infant")
+                    : getBookingPageText(language, "infants")
+            }`;
         }
 
         return `${booking.guests} ${
-    booking.guests === 1
-        ? getBookingPageText(language, "guest")
-        : getBookingPageText(language, "guestsWord")
-}`;
+            booking.guests === 1
+                ? getBookingPageText(language, "guest")
+                : getBookingPageText(language, "guestsWord")
+        }`;
     };
 
     const bookingUserOptions = useMemo(() => {
@@ -828,7 +827,7 @@ function BookingsContent() {
     }
 
     return (
-        <main>
+        <main className="bookings-root">
             <style jsx global>{`
     .bookings-page {
 
@@ -1091,10 +1090,10 @@ function BookingsContent() {
                         <button
                             type="button"
                             className={`bookings-tab ${
-    activeBookingTab === "stays"
-        ? "active"
-        : ""
-}`}
+                                activeBookingTab === "stays"
+                                    ? "active"
+                                    : ""
+                            }`}
                             style={{
                                 position: "relative",
                                 display: "inline-flex",
@@ -1149,10 +1148,10 @@ function BookingsContent() {
                         <button
                             type="button"
                             className={`bookings-tab ${
-    activeBookingTab === "transfers"
-        ? "active"
-        : ""
-}`}
+                                activeBookingTab === "transfers"
+                                    ? "active"
+                                    : ""
+                            }`}
                             style={{
                                 position: "relative",
                                 display: "inline-flex",
@@ -3231,4 +3230,5 @@ export default function BookingsPage() {
         </ProtectedRoute>
     );
 }
+
 

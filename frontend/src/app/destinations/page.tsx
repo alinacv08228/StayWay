@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -940,6 +939,54 @@ export default function DestinationsPage() {
                     )}
                 </div>
             </section>
+
+            <style jsx global>{`
+                /* =========================================
+                   DESTINATIONS — DARK THEME COLORS ONLY
+                   ========================================= */
+
+                html[data-theme="dark"]
+                .destinations-page-header
+                .admin-label {
+                    color: #6c5ce7 !important;
+                }
+
+                html[data-theme="dark"]
+                .destinations-filters
+                .destination-clear-button {
+                    background: transparent !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
+                    color: #aaa4b4 !important;
+                }
+
+                html[data-theme="dark"]
+                .destinations-filters
+                .destination-clear-button:not(:disabled) {
+                    background: transparent !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
+                    color: #c8c2d4 !important;
+                }
+
+                html[data-theme="dark"]
+                .destinations-filters
+                .destination-clear-button:not(:disabled):hover {
+                    background: transparent !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
+                    color: #8b78ff !important;
+                }
+
+                html[data-theme="dark"]
+                .destinations-filters
+                .destination-clear-button:disabled {
+                    background: transparent !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
+                    color: #7f8798 !important;
+                }
+            `}</style>
         </main>
     );
 }

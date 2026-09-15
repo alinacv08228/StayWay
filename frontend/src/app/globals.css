@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 * {
@@ -5996,13 +5997,6 @@ html[data-theme="dark"] .booking-content strong {
     color: #e2e8f0 !important;
 }
 
-/* HELP */
-
-html[data-theme="dark"] .help-page,
-html[data-theme="dark"] .help-content {
-    background: #0f172a !important;
-}
-
 /* FORMS */
 
 html[data-theme="dark"] input,
@@ -7271,15 +7265,21 @@ html[data-theme="dark"] .login-demo {
     align-items: center;
     justify-content: center;
     border-radius: 18px;
+
     background: #7657e8;
     color: #ffffff;
+
     font-size: 30px;
-    box-shadow: 0 8px 20px rgba(118, 87, 232, 0.25);
+
+    box-shadow:
+            0 8px 20px rgba(118, 87, 232, 0.25);
 }
 
 .error-code {
     margin: 0 0 12px;
+
     color: #7657e8;
+
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 1.5px;
@@ -7287,7 +7287,9 @@ html[data-theme="dark"] .login-demo {
 
 .error-card h1 {
     margin: 0;
+
     color: #25232b;
+
     font-size: clamp(36px, 5vw, 56px);
     line-height: 1.1;
     letter-spacing: -1.5px;
@@ -7296,7 +7298,9 @@ html[data-theme="dark"] .login-demo {
 .error-message {
     max-width: 520px;
     margin: 18px auto 0;
+
     color: #706b78;
+
     font-size: 17px;
     line-height: 1.6;
 }
@@ -7306,24 +7310,33 @@ html[data-theme="dark"] .login-demo {
     justify-content: center;
     align-items: center;
     gap: 12px;
+
     margin-top: 32px;
+
     flex-wrap: wrap;
 }
 
 .error-home-button,
-.error-secondary-button {
+.error-secondary-button,
+.error-reset-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     min-height: 46px;
     padding: 0 22px;
+
     border-radius: 10px;
+
     text-decoration: none;
+
     font-size: 14px;
     font-weight: 600;
+
     transition:
             transform 0.2s ease,
-            opacity 0.2s ease;
+            opacity 0.2s ease,
+            background 0.2s ease;
 }
 
 .error-home-button {
@@ -7336,38 +7349,115 @@ html[data-theme="dark"] .login-demo {
     color: #5d45c9;
 }
 
+.error-reset-button {
+    border: none;
+    cursor: pointer;
+
+    background: #252525;
+    color: #ffffff;
+
+    font: inherit;
+    font-weight: 600;
+}
+
 .error-home-button:hover,
-.error-secondary-button:hover {
+.error-secondary-button:hover,
+.error-reset-button:hover {
     transform: translateY(-1px);
     opacity: 0.9;
 }
 
-/* DARK MODE */
+
+/* =========================================
+   ERROR PAGES — DARK MODE
+   401 / 403 / 404 / 500 / error.tsx
+   ========================================= */
 
 html[data-theme="dark"] .error-page {
-    background: #0f172a;
+    background: #0e172a;
+}
+
+html[data-theme="dark"] .error-section {
+    background: #0e172a;
 }
 
 html[data-theme="dark"] .error-card {
     background: #171f32;
-    border-color: #2b354a;
+
+    border: 1px solid #2b354a;
+
     box-shadow: none;
+
+    color: #f5f3fc;
+}
+
+/* mov ca în poza 2 */
+html[data-theme="dark"] .error-icon {
+    background: #7657e8;
+    color: #ffffff;
+
+    box-shadow:
+            0 8px 24px rgba(118, 87, 232, 0.22);
+}
+
+html[data-theme="dark"] .error-code {
+    color: #c9c5d7;
 }
 
 html[data-theme="dark"] .error-card h1 {
-    color: #f5f3fa;
+    color: #f5f3fc;
 }
 
 html[data-theme="dark"] .error-message {
     color: #aeb6c7;
 }
 
+
+/* Back to home */
+html[data-theme="dark"] .error-home-button {
+    background: #252525;
+
+    border: 1px solid #292929;
+
+    color: #ffffff;
+}
+
+html[data-theme="dark"] .error-home-button:hover {
+    background: #303030;
+}
+
+
+/* Log in */
 html[data-theme="dark"] .error-secondary-button {
     background: #292345;
+
+    border: 1px solid #30284f;
+
     color: #c9bcff;
 }
 
-/* RESPONSIVE */
+html[data-theme="dark"] .error-secondary-button:hover {
+    background: #352c59;
+}
+
+
+/* Try again */
+html[data-theme="dark"] .error-reset-button {
+    background: #292345;
+
+    border: 1px solid #30284f;
+
+    color: #c9bcff;
+}
+
+html[data-theme="dark"] .error-reset-button:hover {
+    background: #352c59;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
 
 @media (max-width: 600px) {
     .error-section {
@@ -7392,14 +7482,15 @@ html[data-theme="dark"] .error-secondary-button {
     }
 
     .error-home-button,
-    .error-secondary-button {
+    .error-secondary-button,
+    .error-reset-button {
         width: 100%;
     }
 }
 
-/* =========================================
-   HEADER NAV - BUTTONS
-   ========================================= */
+    /* =========================================
+       HEADER NAV - BUTTONS
+       ========================================= */
 
 .nav .logout-button,
 .nav .theme-button,
@@ -7523,7 +7614,7 @@ html[data-theme="dark"] .error-secondary-button {
 
 .admin-page {
     min-height: 100vh;
-    background: #f6f1ff;
+    background: transparent;
 }
 
 .admin-page .container {
@@ -15390,4 +15481,1411 @@ html.dark .transfers-cta-card {
     .transfer-summary-divider {
         margin-top: 18px;
     }
+}
+
+
+/* =========================================================
+   STAYWAY — DARK THEME FINAL OVERRIDES
+   Keep this block at the END of globals.css
+========================================================= */
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+    background: #0d1729;
+    color: #f7f8ff;
+}
+
+html[data-theme="dark"] body {
+    color-scheme: dark;
+}
+
+/* Remove the light strip between Home CTA and footer */
+main.home-page + footer {
+    margin-top: 0;
+}
+
+html[data-theme="dark"] main.home-page + footer {
+    margin-top: 0;
+}
+
+html[data-theme="dark"] .home-page {
+    background: #0d1729;
+}
+
+/* Header */
+html[data-theme="dark"] .header,
+html[data-theme="dark"] header {
+    background: #091426;
+    border-bottom-color: rgba(255, 255, 255, 0.10);
+}
+
+html[data-theme="dark"] .logo,
+html[data-theme="dark"] .logo-text {
+    color: #ffffff;
+}
+
+html[data-theme="dark"] .nav a,
+html[data-theme="dark"] .nav-link,
+html[data-theme="dark"] .nav-button,
+html[data-theme="dark"] .language-button {
+    color: #e5e9f3;
+}
+
+html[data-theme="dark"] .nav a:hover,
+html[data-theme="dark"] .nav-link:hover,
+html[data-theme="dark"] .nav-button:hover,
+html[data-theme="dark"] .language-button:hover,
+html[data-theme="dark"] .nav-link.active {
+    color: #9d83ff;
+}
+
+/* Search bar */
+html[data-theme="dark"] .search-bar,
+html[data-theme="dark"] .home-hero .search-bar {
+    background: rgba(22, 34, 56, 0.88);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.26);
+}
+
+html[data-theme="dark"] .search-destination,
+html[data-theme="dark"] .search-date,
+html[data-theme="dark"] .search-guests,
+html[data-theme="dark"] .search-bar input,
+html[data-theme="dark"] .search-bar select {
+    color: #eef1f8;
+}
+
+html[data-theme="dark"] .search-bar input::placeholder,
+html[data-theme="dark"] .search-destination::placeholder {
+    color: #9fa9bb;
+    opacity: 1;
+}
+
+html[data-theme="dark"] .search-date,
+html[data-theme="dark"] .search-guests {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Home sections — keep visual separation between blocks */
+html[data-theme="dark"] .home-hero {
+    background: #0d1729;
+}
+
+html[data-theme="dark"] .home-carousel {
+    background: linear-gradient(
+            180deg,
+            #182342 0%,
+            #202a50 50%,
+            #182342 100%
+    ) !important;
+    border-top: 1px solid rgba(164, 143, 255, 0.10);
+    border-bottom: 1px solid rgba(164, 143, 255, 0.12);
+}
+
+html[data-theme="dark"] .home-destinations {
+    background: #0d1729 !important;
+}
+
+html[data-theme="dark"] .home-stays,
+html[data-theme="dark"] .home-stays-section {
+    background: #101a2d !important;
+}
+
+html[data-theme="dark"] .home-cta {
+    background: #0d1729 !important;
+}
+
+html[data-theme="dark"] .home-hero h1,
+html[data-theme="dark"] .home-section-heading h2,
+html[data-theme="dark"] .section-heading h2 {
+    color: #f7f8ff;
+}
+
+html[data-theme="dark"] .hero-subtitle,
+html[data-theme="dark"] .home-section-heading p,
+html[data-theme="dark"] .section-heading p {
+    color: #c5ccdc;
+}
+
+html[data-theme="dark"] .home-eyebrow,
+html[data-theme="dark"] .section-eyebrow {
+    color: #a990ff;
+}
+
+/* Featured Home cards */
+html[data-theme="dark"] .home-property-card {
+    background: #1b2940;
+    border-color: rgba(154, 131, 255, 0.18);
+}
+
+html[data-theme="dark"] .home-property-content {
+    background: #1b2940;
+}
+
+html[data-theme="dark"] .property-location {
+    color: #c4ccda;
+}
+
+html[data-theme="dark"] .home-property-info h3 {
+    color: #ffffff;
+}
+
+html[data-theme="dark"] .home-property-price small {
+    color: #b4bdcc;
+}
+
+html[data-theme="dark"] .home-property-price strong {
+    color: #a991ff;
+}
+
+html[data-theme="dark"] .home-property-price span {
+    color: #c4ccda;
+}
+
+/* Footer */
+html[data-theme="dark"] footer {
+    position: relative;
+    z-index: 5;
+    margin-top: 0;
+    padding: 30px 0;
+    background: #091426;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+html[data-theme="dark"] footer p {
+    position: relative;
+    z-index: 6;
+    margin: 0;
+    color: #c7cfdd !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* In dark mode the decorative 64px extension would sit on top of the footer.
+   Remove it completely so the copyright remains visible. */
+html[data-theme="dark"] .home-cta::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* General muted text readability in dark mode */
+html[data-theme="dark"] .page-header > p:last-child,
+html[data-theme="dark"] .admin-description,
+html[data-theme="dark"] .destination-content p,
+html[data-theme="dark"] .property-content p,
+html[data-theme="dark"] .stay-address,
+html[data-theme="dark"] .booking-content p,
+html[data-theme="dark"] .booking-form > p,
+html[data-theme="dark"] .booking-summary > p,
+html[data-theme="dark"] .booking-total p {
+    color: #bdc6d6;
+}
+
+
+/* =========================================================
+   HOME FOOTER + LIGHT SECTION SEPARATION — FINAL
+========================================================= */
+
+/* The old CTA pseudo-element extended 64px downward and covered
+   the footer in light mode. Disable it for every theme. */
+.home-cta::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Footer should sit directly after the Home page in both themes. */
+main.home-page + footer {
+    position: relative;
+    z-index: 10;
+    margin-top: 0 !important;
+    padding: 30px 0;
+}
+
+html:not([data-theme="dark"]) main.home-page + footer {
+    background: #202024;
+    border-top: 1px solid #2d2d34;
+    color: #ffffff;
+}
+
+html:not([data-theme="dark"]) main.home-page + footer p {
+    margin: 0;
+    color: #c9c6d0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Stronger but still soft separation in LIGHT mode */
+html:not([data-theme="dark"]) .home-stays,
+html:not([data-theme="dark"]) .home-stays-section {
+    background: #f7f4ff !important;
+}
+
+html:not([data-theme="dark"]) .home-cta {
+    background:
+            linear-gradient(
+                    180deg,
+                    #eee8ff 0%,
+                    #f4efff 100%
+            ) !important;
+    border-top: none;
+}
+
+/* Preserve the dark separation from the previous version. */
+html[data-theme="dark"] .home-stays,
+html[data-theme="dark"] .home-stays-section {
+    background: #101a2d !important;
+}
+
+html[data-theme="dark"] .home-cta {
+    background: #0d1729 !important;
+}
+
+
+/* =========================================================
+   HOME CTA — REMOVE FULL-WIDTH SEPARATOR LINE
+========================================================= */
+
+.home-cta,
+html[data-theme="dark"] .home-cta,
+html:not([data-theme="dark"]) .home-cta {
+    border-top: none !important;
+    outline: none !important;
+}
+
+/* =========================================================
+   STAYS + ROOM CARD — DARK MODE COLOR FIX
+   ========================================================= */
+
+/* STAYWAY label on /stays */
+html[data-theme="dark"] .stays-page-label {
+    color: #8b7cf6 !important;
+}
+
+/*
+   Room card:
+   remove the burgundy/plum tint and keep it in the same
+   blue-slate family as the rest of StayWay dark mode.
+*/
+html[data-theme="dark"] .room-card {
+    background: #1e293b !important;
+    border-color: #3a4760 !important;
+    box-shadow: none !important;
+}
+
+/* Feature pills inside the room card */
+html[data-theme="dark"] .room-card .room-features span {
+    background: #202a3d !important;
+    border-color: #46536d !important;
+    color: #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   STAY DETAILS ROOM CARD — DARKER BLUE OVERRIDE
+   ========================================================= */
+
+html[data-theme="dark"] .room-card {
+    background: #172033 !important;
+    border-color: #2f3b52 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .room-card .room-features span {
+    background: #1b2638 !important;
+    border-color: #3a4760 !important;
+    color: #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   TRANSFERS — REMOVE INNER INPUT BACKGROUNDS
+========================================================= */
+
+html[data-theme="dark"] .transfers-page .transfer-field input,
+html[data-theme="dark"] .transfers-page .transfer-field select,
+html[data-theme="dark"] .transfers-page .transfer-location-input input {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+html[data-theme="dark"] .transfers-page .transfer-field input::placeholder,
+html[data-theme="dark"] .transfers-page .transfer-location-input input::placeholder {
+    color: #aeb8ca !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .transfers-page .transfer-field input,
+html[data-theme="dark"] .transfers-page .transfer-field select {
+    color: #f7f9ff !important;
+}
+
+html[data-theme="dark"] .transfers-page .transfer-field input[type="date"],
+html[data-theme="dark"] .transfers-page .transfer-field input[type="time"] {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-fields-wrapper,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-text,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-month-field,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-day-field,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-year-field,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-hour-field,
+html[data-theme="dark"] .transfers-page
+.transfer-field input::-webkit-datetime-edit-minute-field {
+    background: transparent !important;
+}
+
+/* =========================================================
+   TRANSFERS — DATE/TIME ICONS IN DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+.transfers-page
+input[type="date"]::-webkit-calendar-picker-indicator,
+html[data-theme="dark"]
+.transfers-page
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.8);
+    opacity: 0.95;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   MY BOOKINGS — DARK THEME REFINEMENT
+   Softer navy/slate palette; reduce bright white/lavender blocks.
+========================================================= */
+
+html[data-theme="dark"] .bookings-root {
+    background: #172033 !important;
+    color: #f4f7fb;
+}
+
+/* Header */
+html[data-theme="dark"] .bookings-root .bookings-page-header span {
+    color: #8b7cf6 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-page-header h1 {
+    color: #f8fafc !important;
+}
+
+/* Tabs */
+html[data-theme="dark"] .bookings-root .bookings-tabs {
+    background: #1b283c !important;
+    border-color: #344258 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-tab {
+    background: transparent !important;
+    color: #9da8ba !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-tab.active {
+    background: #26344b !important;
+    color: #a997ff !important;
+    box-shadow: inset 0 0 0 1px #3a4860 !important;
+}
+
+/* Stay + transfer filter shells */
+html[data-theme="dark"] .bookings-root .bookings-filters > div,
+html[data-theme="dark"] .bookings-root .bookings-transfer-filters > div,
+html[data-theme="dark"] .bookings-root .bookings-transfer-results-bar > div {
+    background: #1b283d !important;
+    border-color: #3a4860 !important;
+    box-shadow: none !important;
+}
+
+/* Inputs/selects: no bright inner blocks */
+html[data-theme="dark"] .bookings-root .bookings-filters input,
+html[data-theme="dark"] .bookings-root .bookings-filters select,
+html[data-theme="dark"] .bookings-root .bookings-transfer-filters input,
+html[data-theme="dark"] .bookings-root .bookings-transfer-filters select,
+html[data-theme="dark"] .bookings-root .bookings-transfer-results-bar select {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #eef2f8 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root input::placeholder {
+    color: #8d99ad !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .bookings-root select option {
+    background: #1b283d;
+    color: #eef2f8;
+}
+
+/* Clear button */
+html[data-theme="dark"] .bookings-root .bookings-clear-button {
+    background: #202d42 !important;
+    border-color: #3a4860 !important;
+    color: #cbd3df !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-clear-button:disabled {
+    background: #1a2537 !important;
+    border-color: #303d52 !important;
+    color: #778399 !important;
+}
+
+/* Results text */
+html[data-theme="dark"] .bookings-root .bookings-transfer-results-bar,
+html[data-theme="dark"] .bookings-root .bookings-transfer-results-bar strong,
+html[data-theme="dark"] .bookings-root .bookings-filters + div,
+html[data-theme="dark"] .bookings-root .bookings-filters + div strong {
+    color: #c8d0dc !important;
+}
+
+/* Stay booking cards */
+html[data-theme="dark"] .bookings-root .booking-card {
+    background: #1d2a3f !important;
+    border-color: #36445a !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-card h2,
+html[data-theme="dark"] .bookings-root .booking-info-row strong {
+    color: #f4f7fb !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-info-row span:not(.booking-status) {
+    color: #c4ccda !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-info-row {
+    border-color: #3b485c !important;
+}
+
+/* Pending stay state — muted amber, not a bright cream block */
+html[data-theme="dark"] .bookings-root .booking-info-row[style*="fffaf0"] {
+    background: #2b2a25 !important;
+    border-color: #574c31 !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-status.status-pending {
+    background: #3a321f !important;
+    color: #e0b55f !important;
+}
+
+/* Transfer booking cards */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card {
+    background: #1d2a3f !important;
+    border-color: #36445a !important;
+    box-shadow: none !important;
+}
+
+/* Main transfer title + secondary text */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card h3 {
+    color: #f5f7fb !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:first-child > div:first-child > div:last-child > div {
+    color: #cbd3df !important;
+}
+
+/* Return / one-way pill */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card h3 + span {
+    background: #2a3850 !important;
+    color: #b4a7ff !important;
+}
+
+/* Driver icon and small purple icon shells */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card span[style*="#f1edff"],
+html[data-theme="dark"] .bookings-root .bookings-transfer-card span[style*="#f0ebff"],
+html[data-theme="dark"] .bookings-root .bookings-transfer-card span[style*="#f4f0ff"] {
+    background: #26344b !important;
+    color: #a997ff !important;
+}
+
+/* Total block */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:first-child > div:last-child {
+    background: #202d42 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:first-child > div:last-child span {
+    color: #aeb8c8 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:first-child > div:last-child strong {
+    color: #a997ff !important;
+}
+
+/* Pick-up / destination / passengers strip */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(2) {
+    background: #18253a !important;
+    border-color: #344258 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(2) > div {
+    border-color: #344258 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(2) span {
+    color: #9da8ba !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(2) strong {
+    color: #eef2f8 !important;
+}
+
+/* Date/time cards */
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(3) > div {
+    background: #18253a !important;
+    border-color: #344258 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(3) span {
+    color: #9da8ba !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card > div:nth-child(3) strong {
+    color: #eef2f8 !important;
+}
+
+/* Transfer footer */
+html[data-theme="dark"] .bookings-root .bookings-transfer-footer {
+    border-top-color: #344258 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-footer > span:last-child {
+    background: #202d42 !important;
+    border-color: #36445a !important;
+    color: #c7d0de !important;
+}
+
+/* Status pills: keep meaning, lower saturation */
+html[data-theme="dark"] .bookings-root .bookings-transfer-footer > div > span:first-child {
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root .cancel-button {
+    background: #32252b !important;
+    border-color: #5a3541 !important;
+    color: #e7a8b7 !important;
+}
+
+html[data-theme="dark"] .bookings-root .cancel-button:hover {
+    background: #3b2930 !important;
+}
+
+/* Empty states */
+html[data-theme="dark"] .bookings-root .bookings-empty,
+html[data-theme="dark"] .bookings-root .home-empty-state {
+    background: #1d2a3f !important;
+    border-color: #36445a !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-empty h3,
+html[data-theme="dark"] .bookings-root .home-empty-state h3 {
+    color: #f4f7fb !important;
+}
+
+html[data-theme="dark"] .bookings-root .home-empty-state p {
+    color: #b9c3d3 !important;
+}
+
+/* =========================================================
+   MY BOOKINGS — DARK ICONS
+========================================================= */
+
+html[data-theme="dark"] .bookings-root .bookings-transfer-card span[style*="#f1edff"],
+html[data-theme="dark"] .bookings-root .bookings-transfer-card span[style*="#f0ebff"],
+html[data-theme="dark"] .bookings-root .bookings-transfer-card span[style*="#f4f0ff"] {
+    background: #26344b !important;
+    color: #8f82f5 !important;
+}
+
+/* pickup / destination / passengers icons */
+html[data-theme="dark"] .bookings-root
+.bookings-transfer-card > div:nth-child(2) span[style*="width: 48px"] {
+    background: #243148 !important;
+    color: #8f82f5 !important;
+}
+
+/* date / time / return date / return time icons */
+html[data-theme="dark"] .bookings-root
+.bookings-transfer-card > div:nth-child(3) span[style*="width: 44px"] {
+    background: #243148 !important;
+    color: #8f82f5 !important;
+}
+
+/* driver + user icons */
+html[data-theme="dark"] .bookings-root
+.bookings-transfer-card span[style*="width: 28px"] {
+    background: #243148 !important;
+    color: #8f82f5 !important;
+}
+
+
+/* =========================================================
+   HELP & SUPPORT — DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .help-page {
+    background:
+            radial-gradient(circle at 12% 18%, rgba(123, 96, 246, 0.08), transparent 28%),
+            radial-gradient(circle at 86% 74%, rgba(91, 108, 175, 0.10), transparent 32%),
+            #101b2e !important;
+    color: #f4f7fb !important;
+}
+
+html[data-theme="dark"] .help-page .help-hero {
+    background:
+            radial-gradient(circle at 50% -8%, rgba(124, 96, 246, 0.18), transparent 36%),
+            linear-gradient(135deg, #132139 0%, #111d31 56%, #16233a 100%) !important;
+    border-bottom-color: #273750 !important;
+}
+
+html[data-theme="dark"] .help-page .help-hero h1,
+html[data-theme="dark"] .help-page .section-heading h2,
+html[data-theme="dark"] .help-page .support-info h3 {
+    color: #f7f9fc !important;
+}
+
+html[data-theme="dark"] .help-page .help-hero p,
+html[data-theme="dark"] .help-page .help-description {
+    color: #c5cedd !important;
+}
+
+html[data-theme="dark"] .help-page .section-label {
+    background: #1a2840 !important;
+    color: #9b8cff !important;
+}
+
+html[data-theme="dark"] .help-page .faq-item {
+    background: #1b2940 !important;
+    border-color: #33435c !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14) !important;
+}
+
+html[data-theme="dark"] .help-page .faq-item:hover,
+html[data-theme="dark"] .help-page .faq-item-open {
+    border-color: #4b5f7d !important;
+    background: #1d2c44 !important;
+}
+
+html[data-theme="dark"] .help-page .faq-question {
+    color: #f2f5fa !important;
+}
+
+html[data-theme="dark"] .help-page .faq-arrow {
+    background: #24344f !important;
+    color: #9a8cff !important;
+}
+
+html[data-theme="dark"] .help-page .faq-answer {
+    color: #c4cede !important;
+}
+
+html[data-theme="dark"] .help-page .support-card {
+    background: #1b2940 !important;
+    border-color: #3a4a63 !important;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18) !important;
+}
+
+html[data-theme="dark"] .help-page .support-info {
+    background:
+            radial-gradient(circle at 90% 10%, rgba(158, 137, 255, 0.22), transparent 34%),
+            linear-gradient(145deg, #5645c7, #6751dc 55%, #725de6) !important;
+}
+
+html[data-theme="dark"] .help-page .support-form {
+    background: #1b2940 !important;
+}
+
+html[data-theme="dark"] .help-page .form-field label {
+    color: #e7ebf3 !important;
+}
+
+html[data-theme="dark"] .help-page .form-field input,
+html[data-theme="dark"] .help-page .form-field textarea {
+    background: #111d31 !important;
+    color: #f4f7fb !important;
+    border-color: #3b4b64 !important;
+}
+
+html[data-theme="dark"] .help-page .form-field input::placeholder,
+html[data-theme="dark"] .help-page .form-field textarea::placeholder {
+    color: #8f9cb1 !important;
+}
+
+html[data-theme="dark"] .help-page .form-field input:hover,
+html[data-theme="dark"] .help-page .form-field textarea:hover {
+    background: #142238 !important;
+    border-color: #53647e !important;
+}
+
+html[data-theme="dark"] .help-page .form-field input:focus,
+html[data-theme="dark"] .help-page .form-field textarea:focus {
+    background: #142238 !important;
+    border-color: #7b68e8 !important;
+    box-shadow: 0 0 0 4px rgba(123, 104, 232, 0.12) !important;
+}
+
+html[data-theme="dark"] .help-page .support-success {
+    background: #193729 !important;
+    border-color: #315a45 !important;
+    color: #a8ddba !important;
+}
+
+/* =========================================================
+   HELP PAGE — BACKGROUNDS
+========================================================= */
+
+/* LIGHT MODE — partea de SUS mai închisă */
+.help-page .help-hero {
+    background:
+            radial-gradient(
+                    circle at 50% 0%,
+                    rgba(123, 96, 246, 0.13),
+                    transparent 40%
+            ),
+            #eee8fb !important;
+
+    border-bottom: 1px solid #ddd4ef !important;
+}
+
+/* LIGHT MODE — partea de JOS mai deschisă */
+.help-page {
+    background: #f7f4fc !important;
+}
+
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+/* DARK — partea de SUS mai închisă */
+html[data-theme="dark"] .help-page .help-hero {
+    background:
+            radial-gradient(
+                    circle at 50% 0%,
+                    rgba(123, 96, 246, 0.12),
+                    transparent 40%
+            ),
+            #101c31 !important;
+
+    border-bottom: 1px solid #293750 !important;
+}
+
+/* DARK — partea de JOS mai deschisă */
+html[data-theme="dark"] .help-page {
+    background: #18243d !important;
+}
+/* REMOVE DECORATIVE CIRCLES FROM HELP PAGE */
+.help-page::before,
+.help-page::after,
+.help-content::before,
+.help-content::after,
+.help-section::before,
+.help-section::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+.help-page,
+.help-content,
+.help-section {
+    background-image: none !important;
+}
+
+/* HELP PAGE — remove dark rectangle behind content */
+html[data-theme="dark"] .help-page {
+    background: #18243d !important;
+}
+
+html[data-theme="dark"] .help-content {
+    background: transparent !important;
+}
+
+/* =========================================================
+   ADMIN DASHBOARD — DARK MODE FINAL FIX
+   ========================================================= */
+
+html[data-theme="dark"] .admin-page {
+    background: transparent !important;
+    color: #f8fafc !important;
+}
+
+/* Elimină dreptunghiul foarte întunecat din centrul paginii */
+html[data-theme="dark"] .admin-page > .container,
+html[data-theme="dark"] .admin-dashboard,
+html[data-theme="dark"] .admin-dashboard-shell,
+html[data-theme="dark"] .admin-dashboard-content,
+html[data-theme="dark"] .admin-content {
+    background: transparent !important;
+}
+
+/* Header Admin Dashboard */
+html[data-theme="dark"] .admin-header {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .admin-header h1 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-label {
+    color: #a99df5 !important;
+}
+
+html[data-theme="dark"] .admin-description {
+    color: #b8c1d1 !important;
+}
+
+
+/* =========================================================
+   ADMIN STAT CARDS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-stat-card {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .admin-stat-card span {
+    color: #b9c2d1 !important;
+}
+
+html[data-theme="dark"] .admin-stat-card strong {
+    color: #f8fafc !important;
+}
+
+
+/* =========================================================
+   ADMIN SECTIONS / TITLES
+   ========================================================= */
+
+html[data-theme="dark"] .admin-section {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .admin-section-header h2,
+html[data-theme="dark"] .admin-section h2,
+html[data-theme="dark"] .admin-section h3 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-section-header p,
+html[data-theme="dark"] .admin-section > p {
+    color: #b8c1d1 !important;
+}
+
+
+/* =========================================================
+   ADMIN TABLES — PROPERTIES / USERS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-table {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-table-header {
+    background: #172236 !important;
+    color: #b8c1d1 !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-table-row {
+    background: #202c42 !important;
+    color: #d4dae5 !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-table-row:hover {
+    background: #25334b !important;
+}
+
+html[data-theme="dark"] .admin-table-row strong {
+    color: #f8fafc !important;
+}
+
+
+/* =========================================================
+   ADMIN INPUTS / SELECTS / FILTERS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-page input,
+html[data-theme="dark"] .admin-page select,
+html[data-theme="dark"] .admin-page textarea {
+    background: #172236 !important;
+    color: #f8fafc !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-page input::placeholder,
+html[data-theme="dark"] .admin-page textarea::placeholder {
+    color: #8f9aaf !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .admin-page select option {
+    background: #172236 !important;
+    color: #f8fafc !important;
+}
+
+
+/* =========================================================
+   ADMIN FILTER / FORM BOXES
+   ========================================================= */
+
+html[data-theme="dark"] .admin-filters,
+html[data-theme="dark"] .admin-booking-filters,
+html[data-theme="dark"] .admin-transfer-filters,
+html[data-theme="dark"] .admin-property-form,
+html[data-theme="dark"] .admin-room-form {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+}
+
+
+/* =========================================================
+   BOOKINGS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-bookings-section,
+html[data-theme="dark"] .admin-bookings-container {
+    background: transparent !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-booking-card {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-booking-card strong,
+html[data-theme="dark"] .admin-booking-card h3,
+html[data-theme="dark"] .admin-booking-card h4 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-booking-card p,
+html[data-theme="dark"] .admin-booking-card span {
+    color: #b8c1d1;
+}
+
+
+/* =========================================================
+   TRANSFER MANAGEMENT
+   ========================================================= */
+
+html[data-theme="dark"] .admin-transfer-management,
+html[data-theme="dark"] .admin-transfer-section {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .admin-transfer-card,
+html[data-theme="dark"] .admin-vehicle-card,
+html[data-theme="dark"] .admin-driver-card {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-transfer-card h3,
+html[data-theme="dark"] .admin-vehicle-card h3,
+html[data-theme="dark"] .admin-driver-card h3,
+html[data-theme="dark"] .admin-transfer-card strong,
+html[data-theme="dark"] .admin-vehicle-card strong,
+html[data-theme="dark"] .admin-driver-card strong {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-transfer-card p,
+html[data-theme="dark"] .admin-vehicle-card p,
+html[data-theme="dark"] .admin-driver-card p {
+    color: #b8c1d1 !important;
+}
+
+
+/* =========================================================
+   USERS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-users-section,
+html[data-theme="dark"] .admin-users-layout {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .admin-users-card,
+html[data-theme="dark"] .admin-current-user-card,
+html[data-theme="dark"] .admin-user-card {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-users-card h2,
+html[data-theme="dark"] .admin-users-card h3,
+html[data-theme="dark"] .admin-current-user-card h2,
+html[data-theme="dark"] .admin-current-user-card h3,
+html[data-theme="dark"] .admin-user-card h2 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .admin-users-card p,
+html[data-theme="dark"] .admin-current-user-card p,
+html[data-theme="dark"] .admin-user-card p {
+    color: #b8c1d1 !important;
+}
+
+
+/* =========================================================
+   ROOM MANAGEMENT
+   ========================================================= */
+
+html[data-theme="dark"] .admin-room-management {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-room-management h2,
+html[data-theme="dark"] .admin-room-management h3 {
+    color: #f8fafc !important;
+}
+
+
+/* =========================================================
+   ADMIN TABS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-tabs,
+html[data-theme="dark"] .admin-management-tabs {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+}
+
+html[data-theme="dark"] .admin-tabs button,
+html[data-theme="dark"] .admin-management-tabs button {
+    color: #aeb8cc !important;
+}
+
+html[data-theme="dark"] .admin-tabs button.active,
+html[data-theme="dark"] .admin-management-tabs button.active {
+    background: #f8fafc !important;
+    color: #5848d6 !important;
+}
+
+
+/* =========================================================
+   EMPTY STATES
+   ========================================================= */
+
+html[data-theme="dark"] .admin-empty-state {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+    color: #b8c1d1 !important;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+html[data-theme="dark"] .admin-add-button,
+html[data-theme="dark"] .admin-save-button {
+    background: #6c5ce7 !important;
+    color: #ffffff !important;
+    border-color: #6c5ce7 !important;
+}
+
+html[data-theme="dark"] .admin-add-button:hover,
+html[data-theme="dark"] .admin-save-button:hover {
+    background: #7b68ee !important;
+}
+
+html[data-theme="dark"] .admin-edit-button {
+    background: #292342 !important;
+    color: #b7aaff !important;
+    border-color: #3c315d !important;
+}
+
+html[data-theme="dark"] .admin-delete-button {
+    background: #351c21 !important;
+    color: #ff9292 !important;
+    border-color: #593039 !important;
+}
+
+/* =========================================================
+   ADMIN BOOKINGS FILTER BOX — DARK MODE FIX
+========================================================= */
+
+html[data-theme="dark"]
+.admin-bookings-section > div[style*="grid-template-columns"] {
+    background: #202c42 !important;
+    border-color: #35445d !important;
+    box-shadow: none !important;
+}
+
+/* =========================================================
+   STAY DETAILS — DARK BLUE CARDS
+   ========================================================= */
+
+html[data-theme="dark"] .stay-main-section {
+    background: #171f32 !important;
+}
+
+
+/* FACILITIES */
+
+html[data-theme="dark"] .selected-facility {
+    background: #0f172a !important;
+    border: 1px solid #2b3a52 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .selected-facility strong {
+    color: #e2e8f0 !important;
+}
+
+
+/* ROOM CARDS */
+
+html[data-theme="dark"] .room-card {
+    background: #0f172a !important;
+    border: 1px solid #2b3a52 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .room-card h3 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .room-card p,
+html[data-theme="dark"] .room-card .room-description,
+html[data-theme="dark"] .room-card .room-meta,
+html[data-theme="dark"] .room-card .room-meta span {
+    color: #cbd5e1 !important;
+}
+
+
+/* FEATURES INSIDE ROOM CARDS */
+
+html[data-theme="dark"] .room-card .room-features span {
+    background: transparent !important;
+    border: none !important;
+    color: #dbe4f0 !important;
+}
+
+
+/* ROOM PRICE */
+
+html[data-theme="dark"] .room-card .room-price strong {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .room-card .room-price > span {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .room-card .room-price small {
+    color: #94a3b8 !important;
+}
+
+/* =========================================================
+   STAY DETAILS — REVIEWS DARK BLUE
+   ========================================================= */
+
+/* Review cards */
+html[data-theme="dark"] .review-card {
+    background: #0f172a !important;
+    border: 1px solid #2b3a52 !important;
+    box-shadow: none !important;
+}
+
+/* Review text */
+html[data-theme="dark"] .review-card .review-comment,
+html[data-theme="dark"] .review-card p {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .review-author strong {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .review-author span {
+    color: #aab4c5 !important;
+}
+
+html[data-theme="dark"] .review-card-footer {
+    color: #94a3b8 !important;
+    border-top-color: #2b3a52 !important;
+}
+
+
+/* 4.8 / Excellent card */
+html[data-theme="dark"] .review-score {
+    background: #0f172a !important;
+    border: 1px solid #2b3a52 !important;
+}
+
+html[data-theme="dark"] .review-score strong {
+    color: #8b7cf6 !important;
+}
+
+html[data-theme="dark"] .review-score span {
+    color: #8b7cf6 !important;
+}
+
+html[data-theme="dark"] .review-score small {
+    color: #aab4c5 !important;
+}
+
+/* =========================================================
+   BOOKING / NEW — DARK MODE FINAL
+   ========================================================= */
+
+/* SCOATE dreptunghiul mare din spatele paginii */
+html[data-theme="dark"] .booking-page {
+    background: transparent !important;
+}
+
+/* Card formular */
+html[data-theme="dark"] .booking-form {
+    background: #172033 !important;
+    border-color: #2f3b52 !important;
+    box-shadow: none !important;
+}
+
+/* Card hotel din dreapta */
+html[data-theme="dark"] .booking-summary {
+    background: #172033 !important;
+    border-color: #2f3b52 !important;
+    box-shadow: none !important;
+}
+
+/* Caseta albă cu Boudoir Room */
+html[data-theme="dark"] .booking-room-summary {
+    background: #0f172a !important;
+    border: 1px solid #2f3b52 !important;
+}
+
+html[data-theme="dark"] .booking-room-summary strong {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .booking-room-summary p {
+    color: #aab4c5 !important;
+}
+
+/* Titlul hotelului */
+html[data-theme="dark"] .booking-summary h2 {
+    color: #f8fafc !important;
+}
+
+/* Adresa */
+html[data-theme="dark"] .booking-summary > p {
+    color: #aab4c5 !important;
+}
+
+/* Prețul */
+html[data-theme="dark"] .booking-summary > p:last-of-type {
+    color: #e2e8f0 !important;
+}
+
+
+/* INPUTURI */
+html[data-theme="dark"] .booking-form input,
+html[data-theme="dark"] .booking-form textarea,
+html[data-theme="dark"] .booking-form select {
+    background: #0f172a !important;
+    border-color: #3a4760 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .booking-form input::placeholder,
+html[data-theme="dark"] .booking-form textarea::placeholder {
+    color: #7f8ca3 !important;
+}
+
+
+/* LABELURI */
+html[data-theme="dark"] .booking-form label,
+html[data-theme="dark"] .booking-form label > span {
+    color: #e2e8f0 !important;
+}
+
+
+/* Mesajul:
+   Your booking details will be reviewed...
+   În page.tsx are background inline #f7f3ff,
+   de aceea folosim !important.
+*/
+html[data-theme="dark"] .booking-form div[style*="background: rgb(247, 243, 255)"],
+html[data-theme="dark"] .booking-form div[style*="background: #f7f3ff"] {
+    background: #0f172a !important;
+    border: 1px solid #2f3b52 !important;
+    color: #cbd5e1 !important;
+}
+
+
+/* Guest section */
+html[data-theme="dark"] .guests-section {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .guest-row {
+    border-color: #3a4760 !important;
+}
+
+html[data-theme="dark"] .guest-row strong {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .guest-row > div:first-child span {
+    color: #94a3b8 !important;
+}
+
+
+/* +/- buttons — fără alb puternic */
+html[data-theme="dark"] .guest-counter button {
+    background: #0f172a !important;
+    border: 1px solid #3a4760 !important;
+    color: #9b8cff !important;
+}
+
+html[data-theme="dark"] .guest-counter button:hover:not(:disabled) {
+    background: #18253a !important;
+}
+
+html[data-theme="dark"] .guest-counter button:disabled {
+    background: #111827 !important;
+    color: #64748b !important;
+    opacity: 1 !important;
+}
+
+
+/* Guest summary */
+html[data-theme="dark"] .guest-summary {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .guest-capacity {
+    color: #aab4c5 !important;
 }

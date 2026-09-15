@@ -1,3 +1,5 @@
+// src/app/not-found.tsx
+
 import ErrorPage from "../components/ErrorPage";
 
 export default function NotFound() {

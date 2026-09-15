@@ -1225,15 +1225,10 @@ export default function PropertyCard({
                 )
                 .property-room {
                     background:
-                        #25212e;
+                        #182235;
 
                     border-color:
-                        rgba(
-                            145,
-                            120,
-                            255,
-                            0.15
-                        );
+                        #334155;
                 }
 
                 :global(
@@ -1257,18 +1252,13 @@ export default function PropertyCard({
                 )
                 .feature-chip {
                     background:
-                        #2c2735;
+                        #1e293b;
 
                     border-color:
-                        rgba(
-                            145,
-                            120,
-                            255,
-                            0.18
-                        );
+                        #3b4a61;
 
                     color:
-                        #d5cfdb;
+                        #d5dbea;
                 }
 
                 :global(

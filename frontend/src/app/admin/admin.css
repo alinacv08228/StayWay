@@ -1,0 +1,860 @@
+/* ADMIN PAGE LOAD ANIMATIONS */
+@keyframes adminPageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-load-in {
+    opacity: 0;
+    animation: adminPageEnter 0.8s ease both;
+    will-change: opacity, transform;
+}
+
+.admin-load-1 { animation-delay: 0s; }
+.admin-load-2 { animation-delay: 0.12s; }
+.admin-load-3 { animation-delay: 0.18s; }
+.admin-load-4 { animation-delay: 0.24s; }
+.admin-load-5 { animation-delay: 0.30s; }
+.admin-load-6 { animation-delay: 0.36s; }
+.admin-load-7 { animation-delay: 0.44s; }
+.admin-load-8 { animation-delay: 0.52s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-load-in {
+        opacity: 1 !important;
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .admin-analytics-primary,
+    .admin-analytics-secondary,
+    .admin-users-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .admin-user-overview {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .admin-transfer-analytics-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-user-overview {
+        grid-template-columns: 1fr !important;
+    }
+
+    .admin-transfer-analytics-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+
+/* =========================================================
+   ADMIN COLOR PALETTE
+   All Admin page color values live here; page.tsx only references variables.
+========================================================= */
+.admin-page {
+    --admin-background-22a05a: #22a05a;
+    --admin-background-7059e8: #7059e8;
+    --admin-background-a08cf2: #a08cf2;
+    --admin-background-b9aaf7: #b9aaf7;
+    --admin-background-eaf8f0: #eaf8f0;
+    --admin-background-eee8ff: #eee8ff;
+    --admin-background-eeeaf6: #eeeaf6;
+    --admin-background-ef4444: #ef4444;
+    --admin-background-f0ebff: #f0ebff;
+    --admin-background-f1edff: #f1edff;
+    --admin-background-f1eef8: #f1eef8;
+    --admin-background-f2effa: #f2effa;
+    --admin-background-f3efff: #f3efff;
+    --admin-background-f59e0b: #f59e0b;
+    --admin-background-f7f4ff: #f7f4ff;
+    --admin-background-f7f5ff: #f7f5ff;
+    --admin-background-faf8ff: #faf8ff;
+    --admin-background-faf9fc: #faf9fc;
+    --admin-background-fbf9ff: #fbf9ff;
+    --admin-background-fef0f0: #fef0f0;
+    --admin-background-fff0f0: #fff0f0;
+    --admin-background-fff7e6: #fff7e6;
+    --admin-background-ffffff: #ffffff;
+    --admin-background-rgba-255-255-255-0-58: rgba(255, 255, 255, 0.58);
+    --admin-background-rgba-255-255-255-0-72: rgba(255,255,255,0.72);
+    --admin-background-rgba-255-255-255-0-76: rgba(255,255,255,0.76);
+    --admin-background-rgba-255-255-255-0-92: rgba(255,255,255,0.92);
+    --admin-background-rgba-255-255-255-0-94: rgba(255,255,255,0.94);
+    --admin-background-rgba-39-32-57-0-42: rgba(39, 32, 57, 0.42);
+    --admin-border-e7e0f5: #e7e0f5;
+    --admin-border-e8e2f2: #e8e2f2;
+    --admin-border-e9e4f3: #e9e4f3;
+    --admin-border-ebe5f5: #ebe5f5;
+    --admin-border-ebe6f5: #ebe6f5;
+    --admin-border-ece7f5: #ece7f5;
+    --admin-border-eee9f7: #eee9f7;
+    --admin-border-eeeaf6: #eeeaf6;
+    --admin-border-rgba-108-92-231-0-12: rgba(108, 92, 231, 0.12);
+    --admin-border-rgba-108-92-231-0-14: rgba(108,92,231,0.14);
+    --admin-boxshadow-eee9f6: #eee9f6;
+    --admin-boxshadow-rgba-112-89-232-0-10: rgba(112, 89, 232, 0.10);
+    --admin-boxshadow-rgba-43-32-72-0-24: rgba(43, 32, 72, 0.24);
+    --admin-boxshadow-rgba-73-55-116-0-04: rgba(73, 55, 116, 0.04);
+    --admin-boxshadow-rgba-73-55-116-0-055: rgba(73, 55, 116, 0.055);
+    --admin-boxshadow-rgba-75-55-125-0-07: rgba(75, 55, 125, 0.07);
+    --admin-boxshadow-rgba-78-64-125-0-05: rgba(78, 64, 125, 0.05);
+    --admin-boxshadow-rgba-78-64-125-0-07: rgba(78, 64, 125, 0.07);
+    --admin-boxshadow-rgba-78-64-125-0-08: rgba(78, 64, 125, 0.08);
+    --admin-boxshadow-rgba-78-64-125-0-10: rgba(78, 64, 125, 0.10);
+    --admin-color-16804a: #16804a;
+    --admin-color-16a34a: #16a34a;
+    --admin-color-292532: #292532;
+    --admin-color-2c2935: #2c2935;
+    --admin-color-302a3d: #302a3d;
+    --admin-color-302c3a: #302c3a;
+    --admin-color-373241: #373241;
+    --admin-color-3b3645: #3b3645;
+    --admin-color-403b4a: #403b4a;
+    --admin-color-4a4453: #4a4453;
+    --admin-color-5b4bc4: #5b4bc4;
+    --admin-color-5e5868: #5e5868;
+    --admin-color-5f586c: #5f586c;
+    --admin-color-5f596d: #5f596d;
+    --admin-color-654fe0: #654fe0;
+    --admin-color-6552d7: #6552d7;
+    --admin-color-6652d7: #6652d7;
+    --admin-color-665f72: #665f72;
+    --admin-color-6854df: #6854df;
+    --admin-color-6954db: #6954db;
+    --admin-color-6d6678: #6d6678;
+    --admin-color-6e6878: #6e6878;
+    --admin-color-7055e8: #7055e8;
+    --admin-color-7059e8: #7059e8;
+    --admin-color-746d80: #746d80;
+    --admin-color-777182: #777182;
+    --admin-color-777184: #777184;
+    --admin-color-817b90: #817b90;
+    --admin-color-8a8298: #8a8298;
+    --admin-color-8b8499: #8b8499;
+    --admin-color-91899d: #91899d;
+    --admin-color-91899f: #91899f;
+    --admin-color-938da0: #938da0;
+    --admin-color-9a93a5: #9a93a5;
+    --admin-color-b77900: #b77900;
+    --admin-color-b9aaf7: #b9aaf7;
+    --admin-color-c73535: #c73535;
+    --admin-color-d5cfdf: #d5cfdf;
+    --admin-color-d7d1e3: #d7d1e3;
+    --admin-color-dc2626: #dc2626;
+    --admin-color-f2b94b: #f2b94b;
+    --admin-color-f59e0b: #f59e0b;
+    --admin-fill-ffffff: #ffffff;
+    --admin-fill-rgba-111-88-232-0-09: rgba(111,88,232,0.09);
+    --admin-misc-16804a: #16804a;
+    --admin-misc-b77900: #b77900;
+    --admin-misc-c73535: #c73535;
+    --admin-misc-dc2626: #dc2626;
+    --admin-misc-eaf8f0: #eaf8f0;
+    --admin-misc-eee9f6: #eee9f6;
+    --admin-misc-eeeaf6: #eeeaf6;
+    --admin-misc-ef4444: #ef4444;
+    --admin-misc-f0ecf6: #f0ecf6;
+    --admin-misc-f1edf6: #f1edf6;
+    --admin-misc-fff0f0: #fff0f0;
+    --admin-misc-fff7e6: #fff7e6;
+    --admin-stroke-7059e8: #7059e8;
+    --admin-stroke-eeeaf6: #eeeaf6;
+}
+
+html[data-theme="dark"] .admin-page {
+    --admin-background-22a05a: #42bf75;
+    --admin-background-7059e8: #4f7fb8;
+    --admin-background-a08cf2: #6f9bc8;
+    --admin-background-b9aaf7: #6a8fb8;
+    --admin-background-eaf8f0: #20382b;
+    --admin-background-eee8ff: #243a55;
+    --admin-background-eeeaf6: #3a4f69;
+    --admin-background-f0ebff: #243a55;
+    --admin-background-f1edff: #243a55;
+    --admin-background-f1eef8: #243a55;
+    --admin-background-f2effa: #243a55;
+    --admin-background-f3efff: #243a55;
+    --admin-background-f7f4ff: #243a55;
+    --admin-background-f7f5ff: #22344d;
+    --admin-background-faf8ff: #22344d;
+    --admin-background-faf9fc: #22344d;
+    --admin-background-fbf9ff: #22344d;
+    --admin-background-fef0f0: #3a2228;
+    --admin-background-fff0f0: #3a2228;
+    --admin-background-fff7e6: #3a3020;
+    --admin-background-ffffff: #1f3047;
+    --admin-background-rgba-255-255-255-0-58: #22364f;
+    --admin-background-rgba-255-255-255-0-72: #22364f;
+    --admin-background-rgba-255-255-255-0-76: #22364f;
+    --admin-background-rgba-255-255-255-0-92: #22364f;
+    --admin-background-rgba-255-255-255-0-94: #22364f;
+    --admin-background-rgba-39-32-57-0-42: rgba(12, 10, 16, 0.62);
+    --admin-border-e7e0f5: #344a64;
+    --admin-border-e8e2f2: #344a64;
+    --admin-border-e9e4f3: #344a64;
+    --admin-border-ebe5f5: #344a64;
+    --admin-border-ebe6f5: #344a64;
+    --admin-border-ece7f5: #344a64;
+    --admin-border-eee9f7: #344a64;
+    --admin-border-eeeaf6: #344a64;
+    --admin-border-rgba-108-92-231-0-12: #344a64;
+    --admin-border-rgba-108-92-231-0-14: #344a64;
+    --admin-boxshadow-rgba-112-89-232-0-10: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-43-32-72-0-24: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-73-55-116-0-04: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-73-55-116-0-055: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-75-55-125-0-07: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-78-64-125-0-05: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-78-64-125-0-07: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-78-64-125-0-08: rgba(0, 0, 0, 0.22);
+    --admin-boxshadow-rgba-78-64-125-0-10: rgba(0, 0, 0, 0.22);
+    --admin-color-16804a: #7ee2a8;
+    --admin-color-16a34a: #7ee2a8;
+    --admin-color-292532: #ffffff;
+    --admin-color-2c2935: #ffffff;
+    --admin-color-302c3a: #ffffff;
+    --admin-color-373241: #ffffff;
+    --admin-color-3b3645: #ffffff;
+    --admin-color-403b4a: #ffffff;
+    --admin-color-4a4453: #ffffff;
+    --admin-color-5b4bc4: #8fb8e0;
+    --admin-color-5e5868: #d6e2ef;
+    --admin-color-5f586c: #d6e2ef;
+    --admin-color-5f596d: #d6e2ef;
+    --admin-color-654fe0: #8fb8e0;
+    --admin-color-6552d7: #8fb8e0;
+    --admin-color-6652d7: #8fb8e0;
+    --admin-color-665f72: #d6e2ef;
+    --admin-color-6854df: #8fb8e0;
+    --admin-color-6954db: #8fb8e0;
+    --admin-color-6d6678: #d6e2ef;
+    --admin-color-6e6878: #d6e2ef;
+    --admin-color-7055e8: #8fb8e0;
+    --admin-color-7059e8: #8fb8e0;
+    --admin-color-746d80: #d6e2ef;
+    --admin-color-777182: #d6e2ef;
+    --admin-color-777184: #d6e2ef;
+    --admin-color-817b90: #d6e2ef;
+    --admin-color-8a8298: #d6e2ef;
+    --admin-color-91899d: #d6e2ef;
+    --admin-color-91899f: #d6e2ef;
+    --admin-color-938da0: #d6e2ef;
+    --admin-color-9a93a5: #d6e2ef;
+    --admin-color-b77900: #ffd27a;
+    --admin-color-b9aaf7: #aac7e5;
+    --admin-color-c73535: #ff9ca8;
+    --admin-color-d5cfdf: #8ea0b5;
+    --admin-color-d7d1e3: #8ea0b5;
+    --admin-color-dc2626: #ff9ca8;
+    --admin-color-f2b94b: #ffd27a;
+    --admin-color-f59e0b: #ffd27a;
+    --admin-stroke-7059e8: #8fb8e0;
+    --admin-stroke-eeeaf6: #3a4f69;
+}
+
+
+/* =========================================================
+   ADMIN — DARK MODE COLORS ONLY
+   Light mode and all layout/functionality remain unchanged.
+========================================================= */
+html[data-theme="dark"] .admin-page {
+    color: #f4f8fc !important;
+}
+
+/* Header status badge — dark mode only */
+html[data-theme="dark"] .admin-page .admin-management-badge {
+    background: #243a55 !important;
+    border-color: #3d5775 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-control-center-text {
+    color: #f1f6fb !important;
+}
+
+html[data-theme="dark"] .admin-page h1,
+html[data-theme="dark"] .admin-page h2,
+html[data-theme="dark"] .admin-page h3,
+html[data-theme="dark"] .admin-page h4,
+html[data-theme="dark"] .admin-page h5,
+html[data-theme="dark"] .admin-page h6,
+html[data-theme="dark"] .admin-page strong,
+html[data-theme="dark"] .admin-page p,
+html[data-theme="dark"] .admin-page span,
+html[data-theme="dark"] .admin-page small,
+html[data-theme="dark"] .admin-page label,
+html[data-theme="dark"] .admin-page td,
+html[data-theme="dark"] .admin-page th {
+    color: #f1f6fb;
+}
+
+html[data-theme="dark"] .admin-page div[style*="background: rgb(255, 255, 255)"],
+html[data-theme="dark"] .admin-page section[style*="background: rgb(255, 255, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #ffffff"],
+html[data-theme="dark"] .admin-page section[style*="background: #ffffff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(251, 249, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #fbf9ff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(250, 249, 252)"],
+html[data-theme="dark"] .admin-page div[style*="background: #faf9fc"] {
+    background: #1f3047 !important;
+    border-color: #344a64 !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.76)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.76)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.92)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.92)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.94)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.94)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.58)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.58)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.72)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.72)"] {
+    background: #22364f !important;
+    border-color: #344a64 !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="linear-gradient(135deg, #ffffff"],
+html[data-theme="dark"] .admin-page section[style*="linear-gradient(135deg, #ffffff"],
+html[data-theme="dark"] .admin-page div[style*="linear-gradient(145deg, #faf8ff"],
+html[data-theme="dark"] .admin-page section[style*="linear-gradient(145deg, #faf8ff"] {
+    background: linear-gradient(135deg, #1f3047 0%, #22344d 100%) !important;
+    border-color: #344a64 !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="background: rgb(250, 248, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #faf8ff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(248, 246, 253)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f8f6fd"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(247, 245, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f7f5ff"] {
+    background: #22344d !important;
+    border-color: #344a64 !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="background: rgb(240, 235, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f0ebff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(241, 237, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f1edff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(243, 239, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f3efff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(242, 239, 250)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f2effa"] {
+    background: #243a55 !important;
+    border-color: #3b536e !important;
+}
+
+html[data-theme="dark"] .admin-page [style*="border: 1px solid rgb(235, 230, 245)"],
+html[data-theme="dark"] .admin-page [style*="border: 1px solid #ebe6f5"],
+html[data-theme="dark"] .admin-page [style*="border: 1px solid rgb(238, 233, 247)"],
+html[data-theme="dark"] .admin-page [style*="border: 1px solid #eee9f7"],
+html[data-theme="dark"] .admin-page [style*="border: 1px solid #eeeaf6"],
+html[data-theme="dark"] .admin-page [style*="border: 1px solid #e9e4f3"] {
+    border-color: #344a64 !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-card,
+html[data-theme="dark"] .admin-page .admin-stat-card,
+html[data-theme="dark"] .admin-page .admin-table,
+html[data-theme="dark"] .admin-page .admin-transfer-card,
+html[data-theme="dark"] .admin-page .admin-transfer-form,
+html[data-theme="dark"] .admin-page .admin-empty-state,
+html[data-theme="dark"] .admin-page .admin-room-form,
+html[data-theme="dark"] .admin-page .admin-property-form {
+    background: #1f3047 !important;
+    border-color: #344a64 !important;
+    color: #f1f6fb !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-table-header {
+    background: #253952 !important;
+    border-color: #344a64 !important;
+    color: #f1f6fb !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-table-row,
+html[data-theme="dark"] .admin-page .admin-transfer-item {
+    background: #1e3047 !important;
+    border-color: #344a64 !important;
+    color: #f1f6fb !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-table-row:hover,
+html[data-theme="dark"] .admin-page .admin-transfer-item:hover {
+    background: #253952 !important;
+}
+
+html[data-theme="dark"] .admin-page input,
+html[data-theme="dark"] .admin-page select,
+html[data-theme="dark"] .admin-page textarea {
+    background: #16263a !important;
+    color: #ffffff !important;
+    border-color: #3a516d !important;
+}
+
+html[data-theme="dark"] .admin-page input::placeholder,
+html[data-theme="dark"] .admin-page textarea::placeholder {
+    color: #b7c5d5 !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .admin-page input:focus,
+html[data-theme="dark"] .admin-page select:focus,
+html[data-theme="dark"] .admin-page textarea:focus {
+    border-color: #5f91c7 !important;
+    box-shadow: 0 0 0 3px rgba(95, 145, 199, 0.16) !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-action-button,
+html[data-theme="dark"] .admin-page .admin-save-button {
+    background: #4f7fb8 !important;
+    color: #ffffff !important;
+    border-color: #4f7fb8 !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-edit-button,
+html[data-theme="dark"] .admin-page .admin-cancel-button {
+    background: #263a52 !important;
+    color: #dce8f4 !important;
+    border-color: #3b536e !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-delete-button {
+    background: #3a2228 !important;
+    color: #ff9ca8 !important;
+    border-color: #63333d !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-revenue-card {
+    background: #1f3047 !important;
+    border-color: #344a64 !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-revenue-card strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-revenue-card span {
+    color: #d6e2ef !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-revenue-card svg line {
+    stroke: #3a4f69 !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-revenue-card svg circle {
+    fill: #1f3047 !important;
+}
+
+html[data-theme="dark"] .admin-page svg line {
+    stroke: #3a4f69 !important;
+}
+
+html[data-theme="dark"] .admin-page svg text {
+    fill: #d5e1ed !important;
+}
+
+html[data-theme="dark"] .admin-page [style*="color: rgb(41, 37, 50)"],
+html[data-theme="dark"] .admin-page [style*="color: #292532"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(48, 44, 58)"],
+html[data-theme="dark"] .admin-page [style*="color: #302c3a"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(74, 68, 83)"],
+html[data-theme="dark"] .admin-page [style*="color: #4a4453"] {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-page [style*="color: rgb(129, 123, 144)"],
+html[data-theme="dark"] .admin-page [style*="color: #817b90"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(138, 130, 152)"],
+html[data-theme="dark"] .admin-page [style*="color: #8a8298"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(119, 113, 130)"],
+html[data-theme="dark"] .admin-page [style*="color: #777182"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(95, 89, 109)"],
+html[data-theme="dark"] .admin-page [style*="color: #5f596d"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(145, 137, 157)"],
+html[data-theme="dark"] .admin-page [style*="color: #91899d"] {
+    color: #d6e2ef !important;
+}
+
+html[data-theme="dark"] .admin-page [style*="color: rgb(101, 79, 224)"],
+html[data-theme="dark"] .admin-page [style*="color: #654fe0"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(104, 84, 223)"],
+html[data-theme="dark"] .admin-page [style*="color: #6854df"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(102, 82, 215)"],
+html[data-theme="dark"] .admin-page [style*="color: #6652d7"],
+html[data-theme="dark"] .admin-page [style*="color: rgb(112, 85, 232)"],
+html[data-theme="dark"] .admin-page [style*="color: #7055e8"] {
+    color: #8fb8e0 !important;
+}
+/* Scoate dreptunghiul mare din spatele Admin Dashboard */
+.admin-page,
+.admin-container,
+.admin-dashboard,
+.admin-content {
+    background: transparent !important;
+}
+
+
+/* =========================================================
+   ADMIN DARK BLUE PALETTE — FINAL OVERRIDES
+   Keeps the main page slightly lighter and removes purple cast.
+========================================================= */
+html[data-theme="dark"] .section:has(.admin-page) {
+    background: #1c2a40 !important;
+}
+
+html[data-theme="dark"] .admin-page,
+html[data-theme="dark"] .admin-container,
+html[data-theme="dark"] .admin-dashboard,
+html[data-theme="dark"] .admin-content {
+    background: transparent !important;
+}
+
+/* =========================================================
+   ADMIN DARK MODE — HEADER NAVY CARDS
+   Final override: cards/boxes use dark navy tones like the header.
+========================================================= */
+html[data-theme="dark"] .section:has(.admin-page) {
+    background: #171f32 !important;
+}
+
+html[data-theme="dark"] .admin-page {
+    --admin-background-eee8ff: #0e1b2d;
+    --admin-background-eeeaf6: #12243a;
+    --admin-background-f0ebff: #0e1b2d;
+    --admin-background-f1edff: #0e1b2d;
+    --admin-background-f1eef8: #0e1b2d;
+    --admin-background-f2effa: #102036;
+    --admin-background-f3efff: #102036;
+    --admin-background-f7f4ff: #102036;
+    --admin-background-f7f5ff: #0f1f34;
+    --admin-background-faf8ff: #0f1f34;
+    --admin-background-faf9fc: #0f1f34;
+    --admin-background-fbf9ff: #0f1f34;
+    --admin-background-ffffff: #0d1b2d;
+    --admin-background-rgba-255-255-255-0-58: #10223a;
+    --admin-background-rgba-255-255-255-0-72: #10223a;
+    --admin-background-rgba-255-255-255-0-76: #10223a;
+    --admin-background-rgba-255-255-255-0-92: #10223a;
+    --admin-background-rgba-255-255-255-0-94: #10223a;
+
+    --admin-border-e7e0f5: #2a3d57;
+    --admin-border-e8e2f2: #2a3d57;
+    --admin-border-e9e4f3: #2a3d57;
+    --admin-border-ebe5f5: #2a3d57;
+    --admin-border-ebe6f5: #2a3d57;
+    --admin-border-ece7f5: #2a3d57;
+    --admin-border-eee9f7: #2a3d57;
+    --admin-border-eeeaf6: #2a3d57;
+    --admin-border-rgba-108-92-231-0-12: #2a3d57;
+    --admin-border-rgba-108-92-231-0-14: #2a3d57;
+}
+
+html[data-theme="dark"] .admin-page .admin-card,
+html[data-theme="dark"] .admin-page .admin-stat-card,
+html[data-theme="dark"] .admin-page .admin-table,
+html[data-theme="dark"] .admin-page .admin-transfer-card,
+html[data-theme="dark"] .admin-page .admin-transfer-form,
+html[data-theme="dark"] .admin-page .admin-empty-state,
+html[data-theme="dark"] .admin-page .admin-room-form,
+html[data-theme="dark"] .admin-page .admin-property-form,
+html[data-theme="dark"] .admin-page .admin-revenue-card {
+    background: #0d1b2d !important;
+    border-color: #2a3d57 !important;
+    color: #f4f8fc !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-table-header {
+    background: #10223a !important;
+    border-color: #2a3d57 !important;
+    color: #f4f8fc !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-table-row,
+html[data-theme="dark"] .admin-page .admin-transfer-item {
+    background: #0f1f34 !important;
+    border-color: #2a3d57 !important;
+    color: #f4f8fc !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-table-row:hover,
+html[data-theme="dark"] .admin-page .admin-transfer-item:hover {
+    background: #132842 !important;
+}
+
+html[data-theme="dark"] .admin-page input,
+html[data-theme="dark"] .admin-page select,
+html[data-theme="dark"] .admin-page textarea {
+    background: #091727 !important;
+    color: #ffffff !important;
+    border-color: #2a3d57 !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="background: rgb(255, 255, 255)"],
+html[data-theme="dark"] .admin-page section[style*="background: rgb(255, 255, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #ffffff"],
+html[data-theme="dark"] .admin-page section[style*="background: #ffffff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(251, 249, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #fbf9ff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(250, 249, 252)"],
+html[data-theme="dark"] .admin-page div[style*="background: #faf9fc"] {
+    background: #0d1b2d !important;
+    border-color: #2a3d57 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.76)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.76)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.92)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.92)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.94)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.94)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.58)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.58)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255,255,255,0.72)"],
+html[data-theme="dark"] .admin-page div[style*="rgba(255, 255, 255, 0.72)"] {
+    background: #10223a !important;
+    border-color: #2a3d57 !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="linear-gradient(135deg, #ffffff"],
+html[data-theme="dark"] .admin-page section[style*="linear-gradient(135deg, #ffffff"],
+html[data-theme="dark"] .admin-page div[style*="linear-gradient(145deg, #faf8ff"],
+html[data-theme="dark"] .admin-page section[style*="linear-gradient(145deg, #faf8ff"] {
+    background: linear-gradient(135deg, #0d1b2d 0%, #10223a 100%) !important;
+    border-color: #2a3d57 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .admin-page div[style*="background: rgb(250, 248, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #faf8ff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(248, 246, 253)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f8f6fd"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(247, 245, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f7f5ff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(240, 235, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f0ebff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(241, 237, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f1edff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(243, 239, 255)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f3efff"],
+html[data-theme="dark"] .admin-page div[style*="background: rgb(242, 239, 250)"],
+html[data-theme="dark"] .admin-page div[style*="background: #f2effa"] {
+    background: #10223a !important;
+    border-color: #2a3d57 !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-revenue-card svg circle {
+    fill: #0d1b2d !important;
+}
+
+html[data-theme="dark"] .admin-page svg line {
+    stroke: #2a3d57 !important;
+}
+
+/* =========================================================
+   ADMIN TRANSFERS — REMOVE WHITE CITY SELECTOR IN DARK MODE
+   ========================================================= */
+html[data-theme="dark"] .admin-page .admin-transfer-city-selector {
+    background: #0d1b2d !important;
+    background-color: #0d1b2d !important;
+    border: 1px solid #2a3d57 !important;
+    box-shadow: none !important;
+    color: #f4f8fc !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-transfer-city-selector label {
+    color: #d7e3ef !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-transfer-city-selector select {
+    background: #091727 !important;
+    background-color: #091727 !important;
+    border: 1px solid #2a3d57 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================
+   ADMIN DARK — INPUTURI FĂRĂ FUNDAL INTERIOR
+========================================= */
+
+html[data-theme="dark"] .admin-page input,
+html[data-theme="dark"] .admin-page select {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #f4f8fc !important;
+}
+
+/* placeholder */
+html[data-theme="dark"] .admin-page input::placeholder {
+    color: #b9c8da !important;
+    opacity: 1;
+}
+
+/* =========================================================
+   ADMIN DARK — CURRENT LOGGED USER TEXT
+========================================================= */
+
+html[data-theme="dark"] .admin-page {
+    /* CURRENT LOGGED USER */
+    --admin-color-8b8499: #b9c9dc;
+
+    /* Admin */
+    --admin-color-292532: #ffffff;
+
+    /* EMAIL / ROLE labels */
+    --admin-color-91899f: #c7d5e5;
+
+    /* admin@stayway.com */
+    --admin-color-302a3d: #f4f8fc;
+}
+
+/* =========================================================
+   ADMIN DRIVER SCHEDULE MODAL — DARK MODE
+   The modal lives inside .admin-page so it inherits the same
+   navy palette as the rest of the Admin Dashboard.
+========================================================= */
+html[data-theme="dark"] .admin-page {
+    --admin-misc-eaf8f0: #173626;
+    --admin-misc-eee9f6: #2a3d57;
+    --admin-misc-f0ecf6: #2a3d57;
+    --admin-misc-f1edf6: #2a3d57;
+    --admin-misc-fff0f0: #3a2228;
+    --admin-misc-fff7e6: #3a3020;
+
+    --admin-misc-16804a: #7ee2a8;
+    --admin-misc-b77900: #ffd27a;
+    --admin-misc-c73535: #ff9ca8;
+}
+
+/* =========================================================
+   DRIVER SCHEDULE MODAL — CONTRAST PALETTE
+   Light: white + soft violet layers
+   Dark: navy + lighter blue layers + small violet accents
+========================================================= */
+
+/* ---------- LIGHT MODE ---------- */
+.driver-schedule-overlay {
+    background: rgba(45, 35, 72, 0.40) !important;
+}
+
+.driver-schedule-modal {
+    background: #ffffff !important;
+    border: 1px solid #d9cff2 !important;
+    box-shadow: 0 30px 90px rgba(55, 38, 95, 0.24) !important;
+}
+
+.driver-schedule-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f3eeff 100%) !important;
+    border-bottom: 1px solid #ded4f4 !important;
+}
+
+.driver-schedule-content {
+    background: #fbf9ff !important;
+}
+
+.driver-schedule-booking {
+    background: #f7f3ff !important;
+    border: 1px solid #d8cdf3 !important;
+    box-shadow:
+            inset 4px 0 0 #7657e8,
+            0 6px 18px rgba(74, 52, 125, 0.06) !important;
+}
+
+.driver-schedule-return {
+    background: #eee8ff !important;
+    border-top: 1px solid #d4c7f2 !important;
+}
+
+.driver-schedule-empty {
+    background: #f5f0ff !important;
+    border-color: #d8cdf3 !important;
+}
+
+.driver-schedule-close {
+    background: #eee8ff !important;
+    border-color: #d4c7f2 !important;
+    color: #654fe0 !important;
+}
+
+.driver-schedule-close:hover {
+    background: #e5dcff !important;
+}
+
+.driver-schedule-eyebrow,
+.driver-schedule-return-label {
+    color: #7055e8 !important;
+}
+
+/* ---------- DARK MODE ---------- */
+html[data-theme="dark"] .admin-page .driver-schedule-overlay {
+    background: rgba(2, 8, 18, 0.76) !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-modal {
+    background: #0b192a !important;
+    border-color: #36506f !important;
+    box-shadow: 0 32px 95px rgba(0, 0, 0, 0.46) !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-header {
+    background: linear-gradient(135deg, #132843 0%, #172f4d 100%) !important;
+    border-bottom-color: #3b5574 !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-content {
+    background: #0e1e32 !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-booking {
+    background: #172d49 !important;
+    border-color: #415d7e !important;
+    box-shadow:
+            inset 4px 0 0 #8f79ff,
+            0 8px 22px rgba(0, 0, 0, 0.15) !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-return {
+    background: #1d3656 !important;
+    border-top-color: #486686 !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-empty {
+    background: #172d49 !important;
+    border-color: #415d7e !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-close {
+    background: #203b5d !important;
+    border-color: #4a6889 !important;
+    color: #e6eef8 !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-close:hover {
+    background: #29496f !important;
+}
+
+html[data-theme="dark"] .admin-page .driver-schedule-eyebrow,
+html[data-theme="dark"] .admin-page .driver-schedule-return-label {
+    color: #a998ff !important;
+}
+

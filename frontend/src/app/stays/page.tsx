@@ -587,7 +587,7 @@ export default function StaysPage() {
 
                     {/* PAGE TITLE */}
 
-                    <p className="admin-label stayway-load-in stayway-load-1">
+                    <p className="admin-label stays-page-label stayway-load-in stayway-load-1">
                         STAYWAY
                     </p>
 

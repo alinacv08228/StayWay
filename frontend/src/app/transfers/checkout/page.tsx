@@ -1546,6 +1546,163 @@ export default function TransferCheckoutPage() {
 
             </section>
 
+
+            <style jsx global>{`
+                /* =========================================================
+                   TRANSFER CHECKOUT — DARK MODE
+                   Removes the white/light surfaces and keeps the page navy.
+                ========================================================= */
+
+                html[data-theme="dark"] .transfer-checkout-page {
+                    background: #172338 !important;
+                    color: #f5f8fc !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-hero {
+                    background: #101d30 !important;
+                    border-bottom: 1px solid #2d4059 !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-hero h1 {
+                    color: #f7f9fc !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-hero h1 span {
+                    color: #9b8cff !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-hero p {
+                    color: #aebed1 !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-content {
+                    background: #172338 !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-content .transfers-container {
+                    background: transparent !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-layout {
+                    background: transparent !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-form-card,
+                html[data-theme="dark"] .transfer-summary-card {
+                    background: #0d1c2f !important;
+                    border: 1px solid #304660 !important;
+                    color: #f5f8fc !important;
+                    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18) !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-form-card h2,
+                html[data-theme="dark"] .transfer-summary-card h2 {
+                    color: #f7f9fc !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-form-card .transfers-eyebrow,
+                html[data-theme="dark"] .transfer-summary-card .transfers-eyebrow {
+                    color: #9b8cff !important;
+                }
+
+                html[data-theme="dark"] .transfer-form-field label {
+                    color: #dce6f2 !important;
+                }
+
+                html[data-theme="dark"] .transfer-form-field input,
+                html[data-theme="dark"] .transfer-form-field textarea {
+                    background: #16263d !important;
+                    border: 1px solid #3c526d !important;
+                    color: #f5f8fc !important;
+                    box-shadow: none !important;
+                }
+
+                html[data-theme="dark"] .transfer-form-field input::placeholder,
+                html[data-theme="dark"] .transfer-form-field textarea::placeholder {
+                    color: #8295ad !important;
+                    opacity: 1 !important;
+                }
+
+                html[data-theme="dark"] .transfer-form-field input:focus,
+                html[data-theme="dark"] .transfer-form-field textarea:focus {
+                    border-color: #6e7fa0 !important;
+                    outline: none !important;
+                    box-shadow: 0 0 0 3px rgba(124, 109, 255, 0.10) !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-note {
+                    background: #16263d !important;
+                    border: 1px solid #38506c !important;
+                    color: #c9d5e4 !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-note p {
+                    color: #c9d5e4 !important;
+                }
+
+                html[data-theme="dark"] .transfer-checkout-note > span {
+                    background: #2b3e5b !important;
+                    color: #a99cff !important;
+                }
+
+                html[data-theme="dark"] .transfer-summary-price span,
+                html[data-theme="dark"] .transfer-summary-route span,
+                html[data-theme="dark"] .transfer-summary-details span,
+                html[data-theme="dark"] .transfer-summary-return-details span,
+                html[data-theme="dark"] .transfer-summary-total > span {
+                    color: #91a3ba !important;
+                }
+
+                html[data-theme="dark"] .transfer-summary-price strong,
+                html[data-theme="dark"] .transfer-summary-route strong,
+                html[data-theme="dark"] .transfer-summary-details strong,
+                html[data-theme="dark"] .transfer-summary-return-details strong,
+                html[data-theme="dark"] .transfer-summary-total strong {
+                    color: #f7f9fc !important;
+                }
+
+                html[data-theme="dark"] .transfer-summary-route,
+                html[data-theme="dark"] .transfer-summary-details,
+                html[data-theme="dark"] .transfer-summary-return,
+                html[data-theme="dark"] .transfer-summary-divider,
+                html[data-theme="dark"] .transfer-summary-total {
+                    border-color: #2e435d !important;
+                }
+
+                html[data-theme="dark"] .transfer-summary-arrow {
+                    background: #203752 !important;
+                    color: #a99cff !important;
+                }
+
+                html[data-theme="dark"] .transfer-summary-back {
+                    color: #9fb2c8 !important;
+                }
+
+                html[data-theme="dark"] .transfer-summary-back:hover {
+                    color: #ffffff !important;
+                }
+
+                html[data-theme="dark"] .transfer-confirm-button {
+                    background: #6d55e8 !important;
+                    color: #ffffff !important;
+                }
+
+                html[data-theme="dark"] .transfer-confirm-button:hover {
+                    background: #7a63ef !important;
+                }
+
+                /* Availability error in dark mode */
+                html[data-theme="dark"] [role="alert"] {
+                    background: #2a1b22 !important;
+                    border-color: #6b3342 !important;
+                    color: #ffd5dc !important;
+                }
+
+                html[data-theme="dark"] [role="alert"] strong {
+                    color: #ff9eab !important;
+                }
+            `}</style>
+
         </main>
     );
 }

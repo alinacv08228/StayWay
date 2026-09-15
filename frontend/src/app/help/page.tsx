@@ -1664,10 +1664,10 @@ export default function HelpPage() {
                                 return (
                                     <div
                                         className={`faq-item ${
-    isOpen
-        ? "faq-item-open"
-        : ""
-}`}
+                                            isOpen
+                                                ? "faq-item-open"
+                                                : ""
+                                        }`}
                                         key={question}
                                     >
                                         <button
@@ -1687,10 +1687,10 @@ export default function HelpPage() {
 
                                             <span
                                                 className={`faq-arrow ${
-    isOpen
-        ? "faq-arrow-open"
-        : ""
-}`}
+                                                    isOpen
+                                                        ? "faq-arrow-open"
+                                                        : ""
+                                                }`}
                                             >
                                                 {isOpen
                                                     ? "−"
@@ -1700,10 +1700,10 @@ export default function HelpPage() {
 
                                         <div
                                             className={`faq-answer-wrapper ${
-    isOpen
-        ? "faq-answer-wrapper-open"
-        : ""
-}`}
+                                                isOpen
+                                                    ? "faq-answer-wrapper-open"
+                                                    : ""
+                                            }`}
                                         >
                                             <div className="faq-answer">
                                                 {
@@ -2066,7 +2066,10 @@ export default function HelpPage() {
             <style jsx>{`
     .help-page {
     min-height: 100vh;
-    background: #fff;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(123, 96, 246, 0.08), transparent 28%),
+        radial-gradient(circle at 88% 72%, rgba(116, 87, 232, 0.06), transparent 30%),
+        #f3f0fb;
     color: #29253f;
     overflow: hidden;
 }
@@ -2082,12 +2085,13 @@ export default function HelpPage() {
     overflow: hidden;
 
     background:
+        radial-gradient(circle at 50% -10%, rgba(124, 96, 246, 0.16), transparent 36%),
         linear-gradient(
             135deg,
-        #f7f3ff 0%,
-        #f3efff 52%,
-        #faf8ff 100%
-);
+            #eee9fb 0%,
+            #f4f0fc 52%,
+            #ece7f8 100%
+        );
 
     border-bottom:
     1px solid
@@ -2188,9 +2192,24 @@ export default function HelpPage() {
     width: min(900px, calc(100% - 40px));
     margin: 0 auto;
     padding: 54px 0 76px;
+    position: relative;
 }
 
 .help-section {
+    position: relative;
+}
+
+.help-section::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    left: -140px;
+    top: 30px;
+    border-radius: 50%;
+    background: rgba(112, 87, 232, 0.05);
+    filter: blur(4px);
+    pointer-events: none;
 }
 
 .contact-section {
@@ -2243,9 +2262,9 @@ export default function HelpPage() {
 }
 
 .faq-item {
-    background: #ffffff;
-    border: 1px solid
-    rgba(110, 91, 171, 0.13);
+    background: rgba(250, 248, 255, 0.92);
+    border: 1px solid rgba(110, 91, 171, 0.16);
+    backdrop-filter: blur(10px);
     border-radius: 15px;
     overflow: hidden;
     box-shadow:
@@ -2409,7 +2428,7 @@ export default function HelpPage() {
     border: 1px solid
     rgba(105, 88, 160, 0.13);
     border-radius: 20px;
-    background: #ffffff;
+    background: #f8f6ff;
     box-shadow:
     0 14px 40px
     rgba(48, 39, 79, 0.07);
@@ -2546,6 +2565,7 @@ export default function HelpPage() {
     flex-direction: column;
     gap: 20px;
     padding: 38px 38px 34px;
+    background: #f8f6ff;
 }
 
 .form-row {
@@ -2574,7 +2594,7 @@ export default function HelpPage() {
     #e1ddea;
     border-radius: 11px;
     outline: none;
-    background: #fdfcff;
+    background: #f2effa;
     color: #302b45;
     font-family: inherit;
     font-size: 14px;

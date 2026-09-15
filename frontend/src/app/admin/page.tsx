@@ -1,5 +1,6 @@
-
 "use client";
+
+import "./admin.css";
 
 import {
     FormEvent,
@@ -2426,68 +2427,7 @@ export default function AdminPage() {
 
     return (
         <main>
-            <style>{`
-    /* ADMIN PAGE LOAD ANIMATIONS */
-    @keyframes adminPageEnter {
-    from {
-        opacity: 0;
-        transform: translateY(22px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-.admin-load-in {
-    opacity: 0;
-    animation: adminPageEnter 0.8s ease both;
-    will-change: opacity, transform;
-}
-
-.admin-load-1 { animation-delay: 0s; }
-.admin-load-2 { animation-delay: 0.12s; }
-.admin-load-3 { animation-delay: 0.18s; }
-.admin-load-4 { animation-delay: 0.24s; }
-.admin-load-5 { animation-delay: 0.30s; }
-.admin-load-6 { animation-delay: 0.36s; }
-.admin-load-7 { animation-delay: 0.44s; }
-.admin-load-8 { animation-delay: 0.52s; }
-
-@media (prefers-reduced-motion: reduce) {
-.admin-load-in {
-        opacity: 1 !important;
-        animation: none !important;
-        transform: none !important;
-    }
-}
-
-@media (max-width: 900px) {
-.admin-analytics-primary,
-.admin-analytics-secondary,
-.admin-users-grid {
-        grid-template-columns: 1fr !important;
-    }
-
-.admin-user-overview {
-        grid-template-columns: 1fr 1fr !important;
-    }
-
-.admin-transfer-analytics-grid {
-        grid-template-columns: 1fr 1fr !important;
-    }
-}
-
-@media (max-width: 600px) {
-.admin-user-overview {
-        grid-template-columns: 1fr !important;
-    }
-
-.admin-transfer-analytics-grid {
-        grid-template-columns: 1fr !important;
-    }
-}
-`}</style>
 
             <section className="section">
                 <div className="container admin-page">
@@ -2508,7 +2448,7 @@ export default function AdminPage() {
                                 alignItems: "center",
                                 gap: "9px",
                                 marginBottom: "12px",
-                                color: "#777184",
+                                color: "var(--admin-color-777184)",
                                 fontSize: "13px",
                                 fontWeight: 900,
                                 letterSpacing: "0.12em",
@@ -2520,8 +2460,8 @@ export default function AdminPage() {
                                     width: "9px",
                                     height: "9px",
                                     borderRadius: "50%",
-                                    background: "#7059e8",
-                                    boxShadow: "0 0 0 5px rgba(112, 89, 232, 0.10)",
+                                    background: "var(--admin-background-7059e8)",
+                                    boxShadow: "0 0 0 5px var(--admin-boxshadow-rgba-112-89-232-0-10)",
                                     flexShrink: 0,
                                 }}
                             />
@@ -2531,7 +2471,7 @@ export default function AdminPage() {
                         <h1
                             style={{
                                 margin: 0,
-                                color: "#292532",
+                                color: "var(--admin-color-292532)",
                                 fontSize: "52px",
                                 lineHeight: 1.04,
                                 fontWeight: 800,
@@ -2547,7 +2487,7 @@ export default function AdminPage() {
                                 marginTop: "16px",
                                 marginBottom: 0,
                                 maxWidth: "720px",
-                                color: "#746d80",
+                                color: "var(--admin-color-746d80)",
                                 fontSize: "19px",
                                 lineHeight: 1.55,
                                 fontWeight: 500,
@@ -2556,7 +2496,7 @@ export default function AdminPage() {
                             Manage users, stays and bookings on{" "}
                             <strong
                                 style={{
-                                    color: "#654fe0",
+                                    color: "var(--admin-color-654fe0)",
                                     fontWeight: 800,
                                 }}
                             >
@@ -2574,6 +2514,7 @@ export default function AdminPage() {
                             }}
                         >
                             <span
+                                className="admin-management-badge"
                                 style={{
                                     display: "inline-flex",
                                     alignItems: "center",
@@ -2581,10 +2522,10 @@ export default function AdminPage() {
                                     minHeight: "32px",
                                     padding: "0 12px",
                                     borderRadius: "999px",
-                                    background: "rgba(255,255,255,0.72)",
-                                    border: "1px solid rgba(108,92,231,0.14)",
-                                    boxShadow: "0 6px 18px rgba(78,64,125,0.05)",
-                                    color: "#5f596d",
+                                    background: "var(--admin-background-rgba-255-255-255-0-72)",
+                                    border: "1px solid var(--admin-border-rgba-108-92-231-0-14)",
+                                    boxShadow: "0 6px 18px var(--admin-boxshadow-rgba-78-64-125-0-05)",
+                                    color: "var(--admin-color-5f596d)",
                                     fontSize: "11px",
                                     fontWeight: 800,
                                 }}
@@ -2595,15 +2536,16 @@ export default function AdminPage() {
                                         width: "6px",
                                         height: "6px",
                                         borderRadius: "50%",
-                                        background: "#22a05a",
+                                        background: "var(--admin-background-22a05a)",
                                     }}
                                 />
                                 Management overview
                             </span>
 
                             <span
+                                className="admin-control-center-text"
                                 style={{
-                                    color: "#938da0",
+                                    color: "var(--admin-color-938da0)",
                                     fontSize: "12px",
                                     fontWeight: 700,
                                 }}
@@ -2691,7 +2633,7 @@ export default function AdminPage() {
                                 <span
                                     style={{
                                         display: "block",
-                                        color: "#817b90",
+                                        color: "var(--admin-color-817b90)",
                                         fontSize: "12px",
                                         fontWeight: 900,
                                         textTransform: "uppercase",
@@ -2704,7 +2646,7 @@ export default function AdminPage() {
                                     style={{
                                         display: "block",
                                         marginTop: "4px",
-                                        color: "#292532",
+                                        color: "var(--admin-color-292532)",
                                         fontSize: "22px",
                                     }}
                                 >
@@ -2718,8 +2660,8 @@ export default function AdminPage() {
                                     gap: "4px",
                                     padding: "4px",
                                     borderRadius: "14px",
-                                    background: "rgba(255,255,255,0.72)",
-                                    border: "1px solid rgba(108,92,231,0.12)",
+                                    background: "var(--admin-background-rgba-255-255-255-0-72)",
+                                    border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
                                 }}
                             >
                                 {(
@@ -2739,18 +2681,18 @@ export default function AdminPage() {
                                             padding: "9px 13px",
                                             background:
                                                 analyticsPeriod === value
-                                                    ? "#ffffff"
+                                                    ? "var(--admin-background-ffffff)"
                                                     : "transparent",
                                             color:
                                                 analyticsPeriod === value
-                                                    ? "#5b4bc4"
-                                                    : "#817b90",
+                                                    ? "var(--admin-color-5b4bc4)"
+                                                    : "var(--admin-color-817b90)",
                                             fontSize: "12px",
                                             fontWeight: 800,
                                             cursor: "pointer",
                                             boxShadow:
                                                 analyticsPeriod === value
-                                                    ? "0 5px 16px rgba(78,64,125,0.10)"
+                                                    ? "0 5px 16px var(--admin-boxshadow-rgba-78-64-125-0-10)"
                                                     : "none",
                                         }}
                                     >
@@ -2770,13 +2712,14 @@ export default function AdminPage() {
                             className="admin-analytics-primary"
                         >
                             <div
+                                className="admin-revenue-card"
                                 style={{
                                     minWidth: 0,
                                     padding: "24px",
                                     borderRadius: "24px",
-                                    background: "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
-                                    border: "1px solid rgba(108,92,231,0.12)",
-                                    boxShadow: "0 14px 38px rgba(78,64,125,0.07)",
+                                    background: "linear-gradient(135deg, var(--admin-background-ffffff) 0%, var(--admin-background-faf8ff) 100%)",
+                                    border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
+                                    boxShadow: "0 14px 38px var(--admin-boxshadow-rgba-78-64-125-0-07)",
                                 }}
                             >
                                 <div
@@ -2790,7 +2733,7 @@ export default function AdminPage() {
                                     <div>
                                         <span
                                             style={{
-                                                color: "#817b90",
+                                                color: "var(--admin-color-817b90)",
                                                 fontSize: "12px",
                                                 fontWeight: 900,
                                                 textTransform: "uppercase",
@@ -2803,7 +2746,7 @@ export default function AdminPage() {
                                             style={{
                                                 display: "block",
                                                 marginTop: "7px",
-                                                color: "#292532",
+                                                color: "var(--admin-color-292532)",
                                                 fontSize: "30px",
                                                 lineHeight: 1.1,
                                             }}
@@ -2814,7 +2757,7 @@ export default function AdminPage() {
                                             style={{
                                                 display: "block",
                                                 marginTop: "5px",
-                                                color: "#8a8298",
+                                                color: "var(--admin-color-8a8298)",
                                                 fontSize: "12px",
                                             }}
                                         >
@@ -2829,8 +2772,8 @@ export default function AdminPage() {
                                             borderRadius: "14px",
                                             display: "grid",
                                             placeItems: "center",
-                                            background: "#f0ebff",
-                                            color: "#6854df",
+                                            background: "var(--admin-background-f0ebff)",
+                                            color: "var(--admin-color-6854df)",
                                             fontSize: "20px",
                                             flexShrink: 0,
                                         }}
@@ -2861,21 +2804,21 @@ export default function AdminPage() {
                                                 x2="724"
                                                 y1={28 + line * 64.7}
                                                 y2={28 + line * 64.7}
-                                                stroke="#eeeaf6"
+                                                stroke="var(--admin-stroke-eeeaf6)"
                                                 strokeWidth="1"
                                             />
                                         ))}
 
                                         <path
                                             d={`${revenuePath} L ${revenueChartPoints[revenueChartPoints.length - 1]?.x ?? 724} 222 L ${revenueChartPoints[0]?.x ?? 36} 222 Z`}
-                                            fill="rgba(111,88,232,0.09)"
+                                            fill="var(--admin-fill-rgba-111-88-232-0-09)"
                                             stroke="none"
                                         />
 
                                         <path
                                             d={revenuePath}
                                             fill="none"
-                                            stroke="#7059e8"
+                                            stroke="var(--admin-stroke-7059e8)"
                                             strokeWidth="4"
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -2887,8 +2830,8 @@ export default function AdminPage() {
                                                 cx={point.x}
                                                 cy={point.y}
                                                 r="5"
-                                                fill="#ffffff"
-                                                stroke="#7059e8"
+                                                fill="var(--admin-fill-ffffff)"
+                                                stroke="var(--admin-stroke-7059e8)"
                                                 strokeWidth="3"
                                             >
                                                 <title>
@@ -2905,7 +2848,7 @@ export default function AdminPage() {
                                         justifyContent: "space-between",
                                         gap: "8px",
                                         marginTop: "-2px",
-                                        color: "#91899d",
+                                        color: "var(--admin-color-91899d)",
                                         fontSize: "10px",
                                         fontWeight: 700,
                                     }}
@@ -2920,14 +2863,14 @@ export default function AdminPage() {
                                 style={{
                                     padding: "24px",
                                     borderRadius: "24px",
-                                    background: "#ffffff",
-                                    border: "1px solid rgba(108,92,231,0.12)",
-                                    boxShadow: "0 14px 38px rgba(78,64,125,0.07)",
+                                    background: "var(--admin-background-ffffff)",
+                                    border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
+                                    boxShadow: "0 14px 38px var(--admin-boxshadow-rgba-78-64-125-0-07)",
                                 }}
                             >
                                 <span
                                     style={{
-                                        color: "#817b90",
+                                        color: "var(--admin-color-817b90)",
                                         fontSize: "12px",
                                         fontWeight: 900,
                                         textTransform: "uppercase",
@@ -2951,7 +2894,7 @@ export default function AdminPage() {
                                             borderRadius: "50%",
                                             display: "grid",
                                             placeItems: "center",
-                                            background: `conic-gradient(#7059e8 0 ${analyticsData.confirmationRate}%, #eeeaf6 ${analyticsData.confirmationRate}% 100%)`,
+                                            background: `conic-gradient(var(--admin-background-7059e8) 0 ${analyticsData.confirmationRate}%, var(--admin-background-eeeaf6) ${analyticsData.confirmationRate}% 100%)`,
                                         }}
                                     >
                                         <div
@@ -2961,7 +2904,7 @@ export default function AdminPage() {
                                                 borderRadius: "50%",
                                                 display: "grid",
                                                 placeItems: "center",
-                                                background: "#ffffff",
+                                                background: "var(--admin-background-ffffff)",
                                                 textAlign: "center",
                                             }}
                                         >
@@ -2969,7 +2912,7 @@ export default function AdminPage() {
                                                 <strong
                                                     style={{
                                                         display: "block",
-                                                        color: "#292532",
+                                                        color: "var(--admin-color-292532)",
                                                         fontSize: "26px",
                                                     }}
                                                 >
@@ -2977,7 +2920,7 @@ export default function AdminPage() {
                                                 </strong>
                                                 <span
                                                     style={{
-                                                        color: "#8a8298",
+                                                        color: "var(--admin-color-8a8298)",
                                                         fontSize: "10px",
                                                         fontWeight: 800,
                                                     }}
@@ -3002,14 +2945,14 @@ export default function AdminPage() {
                                             justifyContent: "space-between",
                                             padding: "10px 12px",
                                             borderRadius: "12px",
-                                            background: "#f7f5ff",
+                                            background: "var(--admin-background-f7f5ff)",
                                         }}
                                     >
-                                        <span style={{ color: "#5e5868", fontSize: "12px", fontWeight: 700 }}>
-                                            <span style={{ color: "#7059e8", marginRight: "7px" }}>●</span>
+                                        <span style={{ color: "var(--admin-color-5e5868)", fontSize: "12px", fontWeight: 700 }}>
+                                            <span style={{ color: "var(--admin-color-7059e8)", marginRight: "7px" }}>●</span>
                                             Confirmed
                                         </span>
-                                        <strong style={{ color: "#292532", fontSize: "14px" }}>
+                                        <strong style={{ color: "var(--admin-color-292532)", fontSize: "14px" }}>
                                             {analyticsData.confirmed}
                                         </strong>
                                     </div>
@@ -3020,14 +2963,14 @@ export default function AdminPage() {
                                             justifyContent: "space-between",
                                             padding: "10px 12px",
                                             borderRadius: "12px",
-                                            background: "#faf9fc",
+                                            background: "var(--admin-background-faf9fc)",
                                         }}
                                     >
-                                        <span style={{ color: "#5e5868", fontSize: "12px", fontWeight: 700 }}>
-                                            <span style={{ color: "#d7d1e3", marginRight: "7px" }}>●</span>
+                                        <span style={{ color: "var(--admin-color-5e5868)", fontSize: "12px", fontWeight: 700 }}>
+                                            <span style={{ color: "var(--admin-color-d7d1e3)", marginRight: "7px" }}>●</span>
                                             Cancelled
                                         </span>
-                                        <strong style={{ color: "#292532", fontSize: "14px" }}>
+                                        <strong style={{ color: "var(--admin-color-292532)", fontSize: "14px" }}>
                                             {analyticsData.cancelled}
                                         </strong>
                                     </div>
@@ -3050,9 +2993,9 @@ export default function AdminPage() {
                                     minWidth: 0,
                                     padding: "24px",
                                     borderRadius: "24px",
-                                    background: "#ffffff",
-                                    border: "1px solid rgba(108,92,231,0.12)",
-                                    boxShadow: "0 14px 38px rgba(78,64,125,0.07)",
+                                    background: "var(--admin-background-ffffff)",
+                                    border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
+                                    boxShadow: "0 14px 38px var(--admin-boxshadow-rgba-78-64-125-0-07)",
                                 }}
                             >
                                 <div
@@ -3065,14 +3008,14 @@ export default function AdminPage() {
                                     }}
                                 >
                                     <div>
-                                        <span style={{ color: "#817b90", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                        <span style={{ color: "var(--admin-color-817b90)", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                             Bookings over time
                                         </span>
-                                        <strong style={{ display: "block", marginTop: "5px", color: "#292532", fontSize: "21px" }}>
+                                        <strong style={{ display: "block", marginTop: "5px", color: "var(--admin-color-292532)", fontSize: "21px" }}>
                                             Stays vs transfers
                                         </strong>
                                     </div>
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 700 }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 700 }}>
                                         {analyticsData.totalBookings} total
                                     </span>
                                 </div>
@@ -3084,7 +3027,7 @@ export default function AdminPage() {
                                         gap: analyticsPeriod === "12m" ? "10px" : "16px",
                                         height: "230px",
                                         padding: "8px 4px 0",
-                                        borderBottom: "1px solid #eeeaf6",
+                                        borderBottom: "1px solid var(--admin-misc-eeeaf6)",
                                     }}
                                 >
                                     {analyticsData.buckets.map((bucket) => {
@@ -3122,16 +3065,16 @@ export default function AdminPage() {
                                                         flexDirection: "column-reverse",
                                                         borderRadius: "10px 10px 4px 4px",
                                                         overflow: "hidden",
-                                                        background: "#f1eef8",
+                                                        background: "var(--admin-background-f1eef8)",
                                                     }}
                                                     title={`${bucket.label}: ${bucket.stays} stays, ${bucket.transfers} transfers`}
                                                 >
-                                                    <div style={{ height: `${stayHeight}px`, background: "#7059e8" }} />
-                                                    <div style={{ height: `${transferHeight}px`, background: "#b9aaf7" }} />
+                                                    <div style={{ height: `${stayHeight}px`, background: "var(--admin-background-7059e8)" }} />
+                                                    <div style={{ height: `${transferHeight}px`, background: "var(--admin-background-b9aaf7)" }} />
                                                 </div>
                                                 <span
                                                     style={{
-                                                        color: "#91899d",
+                                                        color: "var(--admin-color-91899d)",
                                                         fontSize: analyticsPeriod === "12m" ? "9px" : "10px",
                                                         fontWeight: 700,
                                                         whiteSpace: "nowrap",
@@ -3145,11 +3088,11 @@ export default function AdminPage() {
                                 </div>
 
                                 <div style={{ display: "flex", gap: "18px", marginTop: "16px" }}>
-                                    <span style={{ color: "#6e6878", fontSize: "11px", fontWeight: 700 }}>
-                                        <span style={{ color: "#7059e8", marginRight: "6px" }}>●</span> Stays
+                                    <span style={{ color: "var(--admin-color-6e6878)", fontSize: "11px", fontWeight: 700 }}>
+                                        <span style={{ color: "var(--admin-color-7059e8)", marginRight: "6px" }}>●</span> Stays
                                     </span>
-                                    <span style={{ color: "#6e6878", fontSize: "11px", fontWeight: 700 }}>
-                                        <span style={{ color: "#b9aaf7", marginRight: "6px" }}>●</span> Transfers
+                                    <span style={{ color: "var(--admin-color-6e6878)", fontSize: "11px", fontWeight: 700 }}>
+                                        <span style={{ color: "var(--admin-color-b9aaf7)", marginRight: "6px" }}>●</span> Transfers
                                     </span>
                                 </div>
                             </div>
@@ -3158,21 +3101,21 @@ export default function AdminPage() {
                                 style={{
                                     padding: "24px",
                                     borderRadius: "24px",
-                                    background: "#ffffff",
-                                    border: "1px solid rgba(108,92,231,0.12)",
-                                    boxShadow: "0 14px 38px rgba(78,64,125,0.07)",
+                                    background: "var(--admin-background-ffffff)",
+                                    border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
+                                    boxShadow: "0 14px 38px var(--admin-boxshadow-rgba-78-64-125-0-07)",
                                 }}
                             >
-                                <span style={{ color: "#817b90", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                <span style={{ color: "var(--admin-color-817b90)", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                     Popular destinations
                                 </span>
-                                <strong style={{ display: "block", marginTop: "5px", color: "#292532", fontSize: "21px" }}>
+                                <strong style={{ display: "block", marginTop: "5px", color: "var(--admin-color-292532)", fontSize: "21px" }}>
                                     Where guests stay
                                 </strong>
 
                                 <div style={{ display: "grid", gap: "15px", marginTop: "22px" }}>
                                     {analyticsData.popularDestinations.length === 0 ? (
-                                        <span style={{ color: "#91899d", fontSize: "12px" }}>
+                                        <span style={{ color: "var(--admin-color-91899d)", fontSize: "12px" }}>
                                             No destination data yet.
                                         </span>
                                     ) : (
@@ -3181,13 +3124,13 @@ export default function AdminPage() {
                                             return (
                                                 <div key={name}>
                                                     <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "6px" }}>
-                                                        <span style={{ color: "#5e5868", fontSize: "12px", fontWeight: 700 }}>
+                                                        <span style={{ color: "var(--admin-color-5e5868)", fontSize: "12px", fontWeight: 700 }}>
                                                             {index + 1}. {name}
                                                         </span>
-                                                        <strong style={{ color: "#292532", fontSize: "12px" }}>{count}</strong>
+                                                        <strong style={{ color: "var(--admin-color-292532)", fontSize: "12px" }}>{count}</strong>
                                                     </div>
-                                                    <div style={{ height: "7px", borderRadius: "999px", background: "#eeeaf6", overflow: "hidden" }}>
-                                                        <div style={{ width: `${(count / max) * 100}%`, height: "100%", borderRadius: "999px", background: "linear-gradient(90deg, #7059e8, #a08cf2)" }} />
+                                                    <div style={{ height: "7px", borderRadius: "999px", background: "var(--admin-background-eeeaf6)", overflow: "hidden" }}>
+                                                        <div style={{ width: `${(count / max) * 100}%`, height: "100%", borderRadius: "999px", background: "linear-gradient(90deg, var(--admin-background-7059e8), var(--admin-background-a08cf2))" }} />
                                                     </div>
                                                 </div>
                                             );
@@ -3203,21 +3146,21 @@ export default function AdminPage() {
                                 marginTop: "16px",
                                 padding: "24px",
                                 borderRadius: "24px",
-                                background: "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
-                                border: "1px solid rgba(108,92,231,0.12)",
-                                boxShadow: "0 14px 38px rgba(78,64,125,0.07)",
+                                background: "linear-gradient(135deg, var(--admin-background-ffffff) 0%, var(--admin-background-faf8ff) 100%)",
+                                border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
+                                boxShadow: "0 14px 38px var(--admin-boxshadow-rgba-78-64-125-0-07)",
                             }}
                         >
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
                                 <div>
-                                    <span style={{ color: "#817b90", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                    <span style={{ color: "var(--admin-color-817b90)", fontSize: "12px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                         Transfer analytics
                                     </span>
-                                    <strong style={{ display: "block", marginTop: "5px", color: "#292532", fontSize: "21px" }}>
+                                    <strong style={{ display: "block", marginTop: "5px", color: "var(--admin-color-292532)", fontSize: "21px" }}>
                                         {dashboardStatistics.totalTransferBookings} transfer reservations
                                     </strong>
                                 </div>
-                                <div style={{ padding: "8px 12px", borderRadius: "999px", background: "#f0ebff", color: "#6854df", fontSize: "11px", fontWeight: 800 }}>
+                                <div style={{ padding: "8px 12px", borderRadius: "999px", background: "var(--admin-background-f0ebff)", color: "var(--admin-color-6854df)", fontSize: "11px", fontWeight: 800 }}>
                                     Top city: {dashboardStatistics.topTransferCity}
                                 </div>
                             </div>
@@ -3231,28 +3174,28 @@ export default function AdminPage() {
                                 }}
                                 className="admin-transfer-analytics-grid"
                             >
-                                <div style={{ padding: "16px", borderRadius: "16px", background: "rgba(255,255,255,0.76)", border: "1px solid #eeeaf6" }}>
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 800 }}>ONE-WAY</span>
-                                    <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "24px" }}>{analyticsData.oneWayTransfers}</strong>
-                                    <div style={{ height: "6px", marginTop: "10px", borderRadius: "999px", background: "#eeeaf6", overflow: "hidden" }}>
-                                        <div style={{ width: `${allTransferBookings.length ? (analyticsData.oneWayTransfers / allTransferBookings.length) * 100 : 0}%`, height: "100%", borderRadius: "999px", background: "#7059e8" }} />
+                                <div style={{ padding: "16px", borderRadius: "16px", background: "var(--admin-background-rgba-255-255-255-0-76)", border: "1px solid var(--admin-border-eeeaf6)" }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 800 }}>ONE-WAY</span>
+                                    <strong style={{ display: "block", marginTop: "7px", color: "var(--admin-color-292532)", fontSize: "24px" }}>{analyticsData.oneWayTransfers}</strong>
+                                    <div style={{ height: "6px", marginTop: "10px", borderRadius: "999px", background: "var(--admin-background-eeeaf6)", overflow: "hidden" }}>
+                                        <div style={{ width: `${allTransferBookings.length ? (analyticsData.oneWayTransfers / allTransferBookings.length) * 100 : 0}%`, height: "100%", borderRadius: "999px", background: "var(--admin-background-7059e8)" }} />
                                     </div>
                                 </div>
 
-                                <div style={{ padding: "16px", borderRadius: "16px", background: "rgba(255,255,255,0.76)", border: "1px solid #eeeaf6" }}>
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 800 }}>RETURN</span>
-                                    <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "24px" }}>{analyticsData.returnTransfers}</strong>
-                                    <div style={{ height: "6px", marginTop: "10px", borderRadius: "999px", background: "#eeeaf6", overflow: "hidden" }}>
-                                        <div style={{ width: `${allTransferBookings.length ? (analyticsData.returnTransfers / allTransferBookings.length) * 100 : 0}%`, height: "100%", borderRadius: "999px", background: "#a08cf2" }} />
+                                <div style={{ padding: "16px", borderRadius: "16px", background: "var(--admin-background-rgba-255-255-255-0-76)", border: "1px solid var(--admin-border-eeeaf6)" }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 800 }}>RETURN</span>
+                                    <strong style={{ display: "block", marginTop: "7px", color: "var(--admin-color-292532)", fontSize: "24px" }}>{analyticsData.returnTransfers}</strong>
+                                    <div style={{ height: "6px", marginTop: "10px", borderRadius: "999px", background: "var(--admin-background-eeeaf6)", overflow: "hidden" }}>
+                                        <div style={{ width: `${allTransferBookings.length ? (analyticsData.returnTransfers / allTransferBookings.length) * 100 : 0}%`, height: "100%", borderRadius: "999px", background: "var(--admin-background-a08cf2)" }} />
                                     </div>
                                 </div>
 
-                                <div style={{ padding: "16px", borderRadius: "16px", background: "rgba(255,255,255,0.76)", border: "1px solid #eeeaf6" }}>
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 800 }}>TRANSFER REVENUE</span>
-                                    <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "24px" }}>
+                                <div style={{ padding: "16px", borderRadius: "16px", background: "var(--admin-background-rgba-255-255-255-0-76)", border: "1px solid var(--admin-border-eeeaf6)" }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 800 }}>TRANSFER REVENUE</span>
+                                    <strong style={{ display: "block", marginTop: "7px", color: "var(--admin-color-292532)", fontSize: "24px" }}>
                                         {formatPrice(analyticsData.transferRevenue)}
                                     </strong>
-                                    <span style={{ display: "block", marginTop: "5px", color: "#91899d", fontSize: "10px" }}>
+                                    <span style={{ display: "block", marginTop: "5px", color: "var(--admin-color-91899d)", fontSize: "10px" }}>
                                         confirmed transfer reservations
                                     </span>
                                 </div>
@@ -3270,9 +3213,9 @@ export default function AdminPage() {
                             padding: "5px",
                             marginBottom: "30px",
                             borderRadius: "18px",
-                            background: "rgba(255, 255, 255, 0.58)",
-                            border: "1px solid rgba(108, 92, 231, 0.12)",
-                            boxShadow: "0 8px 28px rgba(78, 64, 125, 0.07)",
+                            background: "var(--admin-background-rgba-255-255-255-0-58)",
+                            border: "1px solid var(--admin-border-rgba-108-92-231-0-12)",
+                            boxShadow: "0 8px 28px var(--admin-boxshadow-rgba-78-64-125-0-07)",
                             backdropFilter: "blur(12px)",
                             WebkitBackdropFilter: "blur(12px)",
                         }}
@@ -3291,18 +3234,18 @@ export default function AdminPage() {
                                 borderRadius: "13px",
                                 background:
                                     activeAdminTab === "stays"
-                                        ? "#ffffff"
+                                        ? "var(--admin-background-ffffff)"
                                         : "transparent",
                                 color:
                                     activeAdminTab === "stays"
-                                        ? "#5b4bc4"
-                                        : "#777184",
+                                        ? "var(--admin-color-5b4bc4)"
+                                        : "var(--admin-color-777184)",
                                 fontSize: "15px",
                                 fontWeight: 800,
                                 cursor: "pointer",
                                 boxShadow:
                                     activeAdminTab === "stays"
-                                        ? "0 6px 18px rgba(78, 64, 125, 0.10)"
+                                        ? "0 6px 18px var(--admin-boxshadow-rgba-78-64-125-0-10)"
                                         : "none",
                                 transition: "all 0.2s ease",
                             }}
@@ -3326,18 +3269,18 @@ export default function AdminPage() {
                                 borderRadius: "13px",
                                 background:
                                     activeAdminTab === "transfers"
-                                        ? "#ffffff"
+                                        ? "var(--admin-background-ffffff)"
                                         : "transparent",
                                 color:
                                     activeAdminTab === "transfers"
-                                        ? "#5b4bc4"
-                                        : "#777184",
+                                        ? "var(--admin-color-5b4bc4)"
+                                        : "var(--admin-color-777184)",
                                 fontSize: "15px",
                                 fontWeight: 800,
                                 cursor: "pointer",
                                 boxShadow:
                                     activeAdminTab === "transfers"
-                                        ? "0 6px 18px rgba(78, 64, 125, 0.10)"
+                                        ? "0 6px 18px var(--admin-boxshadow-rgba-78-64-125-0-10)"
                                         : "none",
                                 transition: "all 0.2s ease",
                             }}
@@ -3361,18 +3304,18 @@ export default function AdminPage() {
                                 borderRadius: "13px",
                                 background:
                                     activeAdminTab === "users"
-                                        ? "#ffffff"
+                                        ? "var(--admin-background-ffffff)"
                                         : "transparent",
                                 color:
                                     activeAdminTab === "users"
-                                        ? "#5b4bc4"
-                                        : "#777184",
+                                        ? "var(--admin-color-5b4bc4)"
+                                        : "var(--admin-color-777184)",
                                 fontSize: "15px",
                                 fontWeight: 800,
                                 cursor: "pointer",
                                 boxShadow:
                                     activeAdminTab === "users"
-                                        ? "0 6px 18px rgba(78, 64, 125, 0.10)"
+                                        ? "0 6px 18px var(--admin-boxshadow-rgba-78-64-125-0-10)"
                                         : "none",
                                 transition: "all 0.2s ease",
                             }}
@@ -4511,15 +4454,15 @@ export default function AdminPage() {
                                     style={{
                                         padding: "18px 20px",
                                         borderRadius: "18px",
-                                        background: "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
-                                        border: "1px solid #ebe6f5",
-                                        boxShadow: "0 8px 24px rgba(78, 64, 125, 0.05)",
+                                        background: "linear-gradient(135deg, var(--admin-background-ffffff) 0%, var(--admin-background-faf8ff) 100%)",
+                                        border: "1px solid var(--admin-border-ebe6f5)",
+                                        boxShadow: "0 8px 24px var(--admin-boxshadow-rgba-78-64-125-0-05)",
                                     }}
                                 >
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                         Total users
                                     </span>
-                                    <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "26px", lineHeight: 1 }}>
+                                    <strong style={{ display: "block", marginTop: "7px", color: "var(--admin-color-292532)", fontSize: "26px", lineHeight: 1 }}>
                                         {adminUsers.length}
                                     </strong>
                                 </div>
@@ -4528,15 +4471,15 @@ export default function AdminPage() {
                                     style={{
                                         padding: "18px 20px",
                                         borderRadius: "18px",
-                                        background: "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
-                                        border: "1px solid #ebe6f5",
-                                        boxShadow: "0 8px 24px rgba(78, 64, 125, 0.05)",
+                                        background: "linear-gradient(135deg, var(--admin-background-ffffff) 0%, var(--admin-background-faf8ff) 100%)",
+                                        border: "1px solid var(--admin-border-ebe6f5)",
+                                        boxShadow: "0 8px 24px var(--admin-boxshadow-rgba-78-64-125-0-05)",
                                     }}
                                 >
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                         Admin accounts
                                     </span>
-                                    <strong style={{ display: "block", marginTop: "7px", color: "#292532", fontSize: "26px", lineHeight: 1 }}>
+                                    <strong style={{ display: "block", marginTop: "7px", color: "var(--admin-color-292532)", fontSize: "26px", lineHeight: 1 }}>
                                         {adminAccounts.length}
                                     </strong>
                                 </div>
@@ -4545,19 +4488,19 @@ export default function AdminPage() {
                                     style={{
                                         padding: "18px 20px",
                                         borderRadius: "18px",
-                                        background: "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
-                                        border: "1px solid #ebe6f5",
-                                        boxShadow: "0 8px 24px rgba(78, 64, 125, 0.05)",
+                                        background: "linear-gradient(135deg, var(--admin-background-ffffff) 0%, var(--admin-background-faf8ff) 100%)",
+                                        border: "1px solid var(--admin-border-ebe6f5)",
+                                        boxShadow: "0 8px 24px var(--admin-boxshadow-rgba-78-64-125-0-05)",
                                     }}
                                 >
-                                    <span style={{ color: "#8a8298", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                    <span style={{ color: "var(--admin-color-8a8298)", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                         Current account
                                     </span>
                                     <strong
                                         style={{
                                             display: "block",
                                             marginTop: "7px",
-                                            color: "#654fe0",
+                                            color: "var(--admin-color-654fe0)",
                                             fontSize: "16px",
                                             lineHeight: 1.25,
                                             overflow: "hidden",
@@ -4585,10 +4528,10 @@ export default function AdminPage() {
                                     style={{
                                         minWidth: 0,
                                         padding: "22px",
-                                        border: "1px solid #ebe6f5",
+                                        border: "1px solid var(--admin-border-ebe6f5)",
                                         borderRadius: "20px",
-                                        background: "#ffffff",
-                                        boxShadow: "0 8px 24px rgba(78, 64, 125, 0.05)",
+                                        background: "var(--admin-background-ffffff)",
+                                        boxShadow: "0 8px 24px var(--admin-boxshadow-rgba-78-64-125-0-05)",
                                     }}
                                 >
                                     <div
@@ -4601,10 +4544,10 @@ export default function AdminPage() {
                                         }}
                                     >
                                         <div>
-                                            <h3 style={{ margin: 0, color: "#292532", fontSize: "20px" }}>
+                                            <h3 style={{ margin: 0, color: "var(--admin-color-292532)", fontSize: "20px" }}>
                                                 Registered users
                                             </h3>
-                                            <p style={{ margin: "5px 0 0", color: "#817b90", fontSize: "13px" }}>
+                                            <p style={{ margin: "5px 0 0", color: "var(--admin-color-817b90)", fontSize: "13px" }}>
                                                 Search and filter StayWay accounts.
                                             </p>
                                         </div>
@@ -4678,8 +4621,8 @@ export default function AdminPage() {
                                                                 display: "inline-flex",
                                                                 alignItems: "center",
                                                                 justifyContent: "center",
-                                                                background: "#f0ebff",
-                                                                color: "#6954db",
+                                                                background: "var(--admin-background-f0ebff)",
+                                                                color: "var(--admin-color-6954db)",
                                                                 fontSize: "12px",
                                                                 fontWeight: 900,
                                                                 flexShrink: 0,
@@ -4716,10 +4659,10 @@ export default function AdminPage() {
                                     style={{
                                         minWidth: 0,
                                         padding: "24px",
-                                        border: "1px solid #ebe6f5",
+                                        border: "1px solid var(--admin-border-ebe6f5)",
                                         borderRadius: "20px",
-                                        background: "linear-gradient(145deg, #faf8ff 0%, #f3efff 100%)",
-                                        boxShadow: "0 8px 24px rgba(78, 64, 125, 0.05)",
+                                        background: "linear-gradient(145deg, var(--admin-background-faf8ff) 0%, var(--admin-background-f3efff) 100%)",
+                                        boxShadow: "0 8px 24px var(--admin-boxshadow-rgba-78-64-125-0-05)",
                                     }}
                                 >
                                     <div
@@ -4738,11 +4681,11 @@ export default function AdminPage() {
                                                 display: "flex",
                                                 alignItems: "center",
                                                 justifyContent: "center",
-                                                background: "#ffffff",
-                                                color: "#6652d7",
+                                                background: "var(--admin-background-ffffff)",
+                                                color: "var(--admin-color-6652d7)",
                                                 fontSize: "20px",
                                                 fontWeight: 900,
-                                                boxShadow: "0 8px 20px rgba(78, 64, 125, 0.08)",
+                                                boxShadow: "0 8px 20px var(--admin-boxshadow-rgba-78-64-125-0-08)",
                                             }}
                                         >
                                             {currentUser.name
@@ -4760,7 +4703,7 @@ export default function AdminPage() {
                                                     fontWeight: 900,
                                                     letterSpacing: "0.08em",
                                                     textTransform: "uppercase",
-                                                    color: "#8b8499",
+                                                    color: "var(--admin-color-8b8499)",
                                                     marginBottom: "4px",
                                                 }}
                                             >
@@ -4770,7 +4713,7 @@ export default function AdminPage() {
                                                 style={{
                                                     margin: 0,
                                                     fontSize: "20px",
-                                                    color: "#292532",
+                                                    color: "var(--admin-color-292532)",
                                                     overflow: "hidden",
                                                     textOverflow: "ellipsis",
                                                     whiteSpace: "nowrap",
@@ -4786,14 +4729,14 @@ export default function AdminPage() {
                                             style={{
                                                 padding: "15px 16px",
                                                 borderRadius: "14px",
-                                                background: "#ffffff",
-                                                border: "1px solid #eee9f7",
+                                                background: "var(--admin-background-ffffff)",
+                                                border: "1px solid var(--admin-border-eee9f7)",
                                             }}
                                         >
-                                            <div style={{ fontSize: "11px", fontWeight: 800, color: "#91899f", textTransform: "uppercase", marginBottom: "5px" }}>
+                                            <div style={{ fontSize: "11px", fontWeight: 800, color: "var(--admin-color-91899f)", textTransform: "uppercase", marginBottom: "5px" }}>
                                                 Email
                                             </div>
-                                            <div style={{ fontSize: "14px", fontWeight: 700, color: "#302a3d", overflowWrap: "anywhere" }}>
+                                            <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--admin-color-302a3d)", overflowWrap: "anywhere" }}>
                                                 {currentUser.email}
                                             </div>
                                         </div>
@@ -4802,11 +4745,11 @@ export default function AdminPage() {
                                             style={{
                                                 padding: "15px 16px",
                                                 borderRadius: "14px",
-                                                background: "#ffffff",
-                                                border: "1px solid #eee9f7",
+                                                background: "var(--admin-background-ffffff)",
+                                                border: "1px solid var(--admin-border-eee9f7)",
                                             }}
                                         >
-                                            <div style={{ fontSize: "11px", fontWeight: 800, color: "#91899f", textTransform: "uppercase", marginBottom: "5px" }}>
+                                            <div style={{ fontSize: "11px", fontWeight: 800, color: "var(--admin-color-91899f)", textTransform: "uppercase", marginBottom: "5px" }}>
                                                 Role
                                             </div>
                                             <span
@@ -4912,8 +4855,8 @@ export default function AdminPage() {
                                                 marginTop: "16px",
                                                 padding: "12px",
                                                 borderRadius: "14px",
-                                                background: "#faf8ff",
-                                                border: "1px solid #eee9f7",
+                                                background: "var(--admin-background-faf8ff)",
+                                                border: "1px solid var(--admin-border-eee9f7)",
                                             }}
                                         >
                                             <div className="form-group" style={{ margin: 0 }}>
@@ -4924,7 +4867,7 @@ export default function AdminPage() {
                                                         marginBottom: "7px",
                                                         fontSize: "12px",
                                                         fontWeight: 800,
-                                                        color: "#5f596d",
+                                                        color: "var(--admin-color-5f596d)",
                                                     }}
                                                 >
                                                     Search vehicles
@@ -4949,7 +4892,7 @@ export default function AdminPage() {
                                                         marginBottom: "7px",
                                                         fontSize: "12px",
                                                         fontWeight: 800,
-                                                        color: "#5f596d",
+                                                        color: "var(--admin-color-5f596d)",
                                                     }}
                                                 >
                                                     Category
@@ -5217,7 +5160,7 @@ export default function AdminPage() {
                                                                     borderRadius: "10px",
                                                                     objectFit: "cover",
                                                                     flexShrink: 0,
-                                                                    background: "#f1edff",
+                                                                    background: "var(--admin-background-f1edff)",
                                                                 }}
                                                             />
                                                         ) : (
@@ -5229,7 +5172,7 @@ export default function AdminPage() {
                                                                     display: "flex",
                                                                     alignItems: "center",
                                                                     justifyContent: "center",
-                                                                    background: "#f1edff",
+                                                                    background: "var(--admin-background-f1edff)",
                                                                     fontSize: "22px",
                                                                     flexShrink: 0,
                                                                 }}
@@ -5242,7 +5185,7 @@ export default function AdminPage() {
                                                                 style={{
                                                                     display: "block",
                                                                     fontSize: "14px",
-                                                                    color: "#302c3a",
+                                                                    color: "var(--admin-color-302c3a)",
                                                                 }}
                                                             >
                                                                 {vehicle.name}
@@ -5252,7 +5195,7 @@ export default function AdminPage() {
                                                                 style={{
                                                                     display: "block",
                                                                     marginTop: "4px",
-                                                                    color: "#777182",
+                                                                    color: "var(--admin-color-777182)",
                                                                     fontSize: "12px",
                                                                 }}
                                                             >
@@ -5274,7 +5217,7 @@ export default function AdminPage() {
                                                                         style={{
                                                                             display: "block",
                                                                             marginTop: "4px",
-                                                                            color: "#8a8298",
+                                                                            color: "var(--admin-color-8a8298)",
                                                                             fontSize: "11px",
                                                                         }}
                                                                     >
@@ -5366,8 +5309,8 @@ export default function AdminPage() {
                                                 marginTop: "16px",
                                                 padding: "12px",
                                                 borderRadius: "14px",
-                                                background: "#faf8ff",
-                                                border: "1px solid #eee9f7",
+                                                background: "var(--admin-background-faf8ff)",
+                                                border: "1px solid var(--admin-border-eee9f7)",
                                             }}
                                         >
                                             <div className="form-group" style={{ margin: 0 }}>
@@ -5378,7 +5321,7 @@ export default function AdminPage() {
                                                         marginBottom: "7px",
                                                         fontSize: "12px",
                                                         fontWeight: 800,
-                                                        color: "#5f596d",
+                                                        color: "var(--admin-color-5f596d)",
                                                     }}
                                                 >
                                                     Search drivers
@@ -5403,7 +5346,7 @@ export default function AdminPage() {
                                                         marginBottom: "7px",
                                                         fontSize: "12px",
                                                         fontWeight: 800,
-                                                        color: "#5f596d",
+                                                        color: "var(--admin-color-5f596d)",
                                                     }}
                                                 >
                                                     Status
@@ -5647,10 +5590,10 @@ export default function AdminPage() {
                                                                 style={{
                                                                     color:
                                                                         getTransferDriverStatus(driver.id) === "available"
-                                                                            ? "#16a34a"
+                                                                            ? "var(--admin-color-16a34a)"
                                                                             : getTransferDriverStatus(driver.id) === "busy"
-                                                                                ? "#f59e0b"
-                                                                                : "#dc2626",
+                                                                                ? "var(--admin-color-f59e0b)"
+                                                                                : "var(--admin-misc-dc2626)",
                                                                     fontWeight: 700,
                                                                 }}
                                                             >
@@ -5670,7 +5613,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "5px",
-                                                                        color: "#5f596d",
+                                                                        color: "var(--admin-color-5f596d)",
                                                                         fontSize: "12px",
                                                                     }}
                                                                 >
@@ -5697,7 +5640,7 @@ export default function AdminPage() {
                                                                 padding: 0,
                                                                 border: "none",
                                                                 background: "transparent",
-                                                                color: "#6652d7",
+                                                                color: "var(--admin-color-6652d7)",
                                                                 fontSize: "12px",
                                                                 fontWeight: 800,
                                                                 cursor: "pointer",
@@ -5744,9 +5687,9 @@ export default function AdminPage() {
                                          marginTop: "34px",
                                          padding: "28px",
                                          borderRadius: "24px",
-                                         background: "rgba(255,255,255,0.92)",
-                                         border: "1px solid #e7e0f5",
-                                         boxShadow: "0 16px 40px rgba(75, 55, 125, 0.07)",
+                                         background: "var(--admin-background-rgba-255-255-255-0-92)",
+                                         border: "1px solid var(--admin-border-e7e0f5)",
+                                         boxShadow: "0 16px 40px var(--admin-boxshadow-rgba-75-55-125-0-07)",
                                      }}
                             >
 
@@ -5755,7 +5698,7 @@ export default function AdminPage() {
                                     style={{
                                         marginBottom: "22px",
                                         paddingBottom: "20px",
-                                        borderBottom: "1px solid #eee9f6",
+                                        borderBottom: "1px solid var(--admin-boxshadow-eee9f6)",
                                     }}
                                 >
                                     <div>
@@ -5775,7 +5718,7 @@ export default function AdminPage() {
                                                     display: "inline-flex",
                                                     alignItems: "center",
                                                     justifyContent: "center",
-                                                    background: "#f0ebff",
+                                                    background: "var(--admin-background-f0ebff)",
                                                     fontSize: "21px",
                                                 }}
                                             >
@@ -5794,8 +5737,8 @@ export default function AdminPage() {
                                         marginBottom: "18px",
                                         padding: "16px",
                                         borderRadius: "18px",
-                                        border: "1px solid #ebe5f5",
-                                        background: "#fbf9ff",
+                                        border: "1px solid var(--admin-border-ebe5f5)",
+                                        background: "var(--admin-background-fbf9ff)",
                                         display: "grid",
                                         gridTemplateColumns: "minmax(260px, 1fr) 170px 170px",
                                         gap: "12px",
@@ -5810,7 +5753,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             Search bookings
@@ -5835,7 +5778,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             Status
@@ -5865,7 +5808,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             Transfer type
@@ -5923,9 +5866,9 @@ export default function AdminPage() {
                                                         position: "relative",
                                                         padding: "16px 18px",
                                                         borderRadius: "20px",
-                                                        border: "1px solid #ebe5f5",
-                                                        background: "#ffffff",
-                                                        boxShadow: "0 8px 24px rgba(73, 55, 116, 0.055)",
+                                                        border: "1px solid var(--admin-border-ebe5f5)",
+                                                        background: "var(--admin-background-ffffff)",
+                                                        boxShadow: "0 8px 24px var(--admin-boxshadow-rgba-73-55-116-0-055)",
                                                     }}
                                                 >
                                                     <div
@@ -5954,8 +5897,8 @@ export default function AdminPage() {
                                                                     display: "flex",
                                                                     alignItems: "center",
                                                                     justifyContent: "center",
-                                                                    background: "linear-gradient(135deg, #eee8ff, #f7f4ff)",
-                                                                    color: "#7055e8",
+                                                                    background: "linear-gradient(135deg, var(--admin-background-eee8ff), var(--admin-background-f7f4ff))",
+                                                                    color: "var(--admin-color-7055e8)",
                                                                     fontSize: "19px",
                                                                     fontWeight: 800,
                                                                 }}
@@ -5967,7 +5910,7 @@ export default function AdminPage() {
                                                                 <strong
                                                                     style={{
                                                                         display: "block",
-                                                                        color: "#2c2935",
+                                                                        color: "var(--admin-color-2c2935)",
                                                                         fontSize: "15px",
                                                                         lineHeight: 1.3,
                                                                     }}
@@ -5978,7 +5921,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "5px",
-                                                                        color: "#777182",
+                                                                        color: "var(--admin-color-777182)",
                                                                         fontSize: "13px",
                                                                     }}
                                                                 >
@@ -5988,7 +5931,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "3px",
-                                                                        color: "#777182",
+                                                                        color: "var(--admin-color-777182)",
                                                                         fontSize: "13px",
                                                                     }}
                                                                 >
@@ -6016,7 +5959,7 @@ export default function AdminPage() {
                                                                         objectFit: "cover",
                                                                         borderRadius: "13px",
                                                                         flexShrink: 0,
-                                                                        background: "#f2effa",
+                                                                        background: "var(--admin-background-f2effa)",
                                                                     }}
                                                                 />
                                                             ) : (
@@ -6029,7 +5972,7 @@ export default function AdminPage() {
                                                                         display: "flex",
                                                                         alignItems: "center",
                                                                         justifyContent: "center",
-                                                                        background: "#f2effa",
+                                                                        background: "var(--admin-background-f2effa)",
                                                                         fontSize: "24px",
                                                                     }}
                                                                 >
@@ -6040,7 +5983,7 @@ export default function AdminPage() {
                                                                 <span
                                                                     style={{
                                                                         display: "block",
-                                                                        color: "#8a8298",
+                                                                        color: "var(--admin-color-8a8298)",
                                                                         fontSize: "11px",
                                                                         fontWeight: 800,
                                                                         textTransform: "uppercase",
@@ -6053,7 +5996,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "4px",
-                                                                        color: "#302c3a",
+                                                                        color: "var(--admin-color-302c3a)",
                                                                         fontSize: "14px",
                                                                     }}
                                                                 >
@@ -6063,7 +6006,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "3px",
-                                                                        color: "#777182",
+                                                                        color: "var(--admin-color-777182)",
                                                                         fontSize: "12px",
                                                                     }}
                                                                 >
@@ -6078,7 +6021,7 @@ export default function AdminPage() {
                                                             <span
                                                                 style={{
                                                                     display: "block",
-                                                                    color: "#8a8298",
+                                                                    color: "var(--admin-color-8a8298)",
                                                                     fontSize: "11px",
                                                                     fontWeight: 800,
                                                                     textTransform: "uppercase",
@@ -6090,13 +6033,13 @@ export default function AdminPage() {
                                                             <div
                                                                 style={{
                                                                     marginTop: "7px",
-                                                                    color: "#373241",
+                                                                    color: "var(--admin-color-373241)",
                                                                     fontSize: "13px",
                                                                     lineHeight: 1.45,
                                                                 }}
                                                             >
                                                                 <strong>{booking.pickup}</strong>
-                                                                <span style={{ color: "#7055e8", margin: "0 6px", fontWeight: 800 }}>→</span>
+                                                                <span style={{ color: "var(--admin-color-7055e8)", margin: "0 6px", fontWeight: 800 }}>→</span>
                                                                 <strong>{booking.destination}</strong>
                                                             </div>
                                                             <div
@@ -6105,13 +6048,13 @@ export default function AdminPage() {
                                                                     alignItems: "center",
                                                                     gap: "8px",
                                                                     marginTop: "9px",
-                                                                    color: "#777182",
+                                                                    color: "var(--admin-color-777182)",
                                                                     fontSize: "12px",
                                                                 }}
                                                             >
                                                                 <strong
                                                                     style={{
-                                                                        color: "#5f586c",
+                                                                        color: "var(--admin-color-5f586c)",
                                                                         fontWeight: 800,
                                                                     }}
                                                                 >
@@ -6128,13 +6071,13 @@ export default function AdminPage() {
                                                                         alignItems: "center",
                                                                         gap: "8px",
                                                                         marginTop: "5px",
-                                                                        color: "#777182",
+                                                                        color: "var(--admin-color-777182)",
                                                                         fontSize: "12px",
                                                                     }}
                                                                 >
                                                                     <strong
                                                                         style={{
-                                                                            color: "#5f586c",
+                                                                            color: "var(--admin-color-5f586c)",
                                                                             fontWeight: 800,
                                                                         }}
                                                                     >
@@ -6163,16 +6106,16 @@ export default function AdminPage() {
                                                                     borderRadius: "999px",
                                                                     background:
                                                                         bookingStatus === "confirmed"
-                                                                            ? "#eaf8f0"
+                                                                            ? "var(--admin-background-eaf8f0)"
                                                                             : bookingStatus === "pending"
-                                                                                ? "#fff7e6"
-                                                                                : "#fef0f0",
+                                                                                ? "var(--admin-background-fff7e6)"
+                                                                                : "var(--admin-background-fef0f0)",
                                                                     color:
                                                                         bookingStatus === "confirmed"
-                                                                            ? "#16804a"
+                                                                            ? "var(--admin-color-16804a)"
                                                                             : bookingStatus === "pending"
-                                                                                ? "#b77900"
-                                                                                : "#dc2626",
+                                                                                ? "var(--admin-color-b77900)"
+                                                                                : "var(--admin-color-dc2626)",
                                                                     fontSize: "11px",
                                                                     fontWeight: 800,
                                                                     marginBottom: "10px",
@@ -6185,10 +6128,10 @@ export default function AdminPage() {
                                                                         borderRadius: "50%",
                                                                         background:
                                                                             bookingStatus === "confirmed"
-                                                                                ? "#22a05a"
+                                                                                ? "var(--admin-background-22a05a)"
                                                                                 : bookingStatus === "pending"
-                                                                                    ? "#f59e0b"
-                                                                                    : "#ef4444",
+                                                                                    ? "var(--admin-background-f59e0b)"
+                                                                                    : "var(--admin-misc-ef4444)",
                                                                     }}
                                                                 />
                                                                 {bookingStatus}
@@ -6196,7 +6139,7 @@ export default function AdminPage() {
                                                             <strong
                                                                 style={{
                                                                     display: "block",
-                                                                    color: "#654fe0",
+                                                                    color: "var(--admin-color-654fe0)",
                                                                     fontSize: "23px",
                                                                     lineHeight: 1,
                                                                 }}
@@ -6207,7 +6150,7 @@ export default function AdminPage() {
                                                                 style={{
                                                                     display: "block",
                                                                     marginTop: "5px",
-                                                                    color: "#8a8298",
+                                                                    color: "var(--admin-color-8a8298)",
                                                                     fontSize: "11px",
                                                                 }}
                                                             >
@@ -6220,7 +6163,7 @@ export default function AdminPage() {
                                                         style={{
                                                             marginTop: "17px",
                                                             paddingTop: "13px",
-                                                            borderTop: "1px solid #f0ecf6",
+                                                            borderTop: "1px solid var(--admin-misc-f0ecf6)",
                                                             display: "flex",
                                                             alignItems: "center",
                                                             justifyContent: "space-between",
@@ -6230,7 +6173,7 @@ export default function AdminPage() {
                                                     >
                                                         <span
                                                             style={{
-                                                                color: "#938da0",
+                                                                color: "var(--admin-color-938da0)",
                                                                 fontSize: "11px",
                                                             }}
                                                         >
@@ -6305,9 +6248,9 @@ export default function AdminPage() {
                                 style={{
                                     padding: "28px",
                                     borderRadius: "24px",
-                                    background: "rgba(255,255,255,0.94)",
-                                    border: "1px solid #e7e0f5",
-                                    boxShadow: "0 16px 40px rgba(75, 55, 125, 0.07)",
+                                    background: "var(--admin-background-rgba-255-255-255-0-94)",
+                                    border: "1px solid var(--admin-border-e7e0f5)",
+                                    boxShadow: "0 16px 40px var(--admin-boxshadow-rgba-75-55-125-0-07)",
                                 }}
                             >
                                 <div
@@ -6315,7 +6258,7 @@ export default function AdminPage() {
                                     style={{
                                         marginBottom: "22px",
                                         paddingBottom: "20px",
-                                        borderBottom: "1px solid #eee9f6",
+                                        borderBottom: "1px solid var(--admin-boxshadow-eee9f6)",
                                     }}
                                 >
                                     <div>
@@ -6335,7 +6278,7 @@ export default function AdminPage() {
                                                         display: "inline-flex",
                                                         alignItems: "center",
                                                         justifyContent: "center",
-                                                        background: "#f0ebff",
+                                                        background: "var(--admin-background-f0ebff)",
                                                         fontSize: "21px",
                                                     }}
                                                 >
@@ -6355,8 +6298,8 @@ export default function AdminPage() {
                                         marginBottom: "18px",
                                         padding: "16px",
                                         borderRadius: "18px",
-                                        border: "1px solid #ebe5f5",
-                                        background: "#fbf9ff",
+                                        border: "1px solid var(--admin-border-ebe5f5)",
+                                        background: "var(--admin-background-fbf9ff)",
                                         display: "grid",
                                         gridTemplateColumns: "minmax(260px, 1.7fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(170px, 0.9fr) auto",
                                         gap: "12px",
@@ -6371,7 +6314,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             Search bookings
@@ -6396,7 +6339,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             User
@@ -6430,7 +6373,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             Status
@@ -6457,7 +6400,7 @@ export default function AdminPage() {
                                                 marginBottom: "7px",
                                                 fontSize: "12px",
                                                 fontWeight: 800,
-                                                color: "#5f596d",
+                                                color: "var(--admin-color-5f596d)",
                                             }}
                                         >
                                             Sort by
@@ -6506,20 +6449,20 @@ export default function AdminPage() {
                                         gap: "12px",
                                         marginBottom: "14px",
                                         padding: "0 3px",
-                                        color: "#777182",
+                                        color: "var(--admin-color-777182)",
                                         fontSize: "13px",
                                     }}
                                 >
                                         <span>
-                                            Showing <strong style={{ color: "#302c3a" }}>{filteredBookings.length}</strong> of{" "}
-                                            <strong style={{ color: "#302c3a" }}>{allBookings.length}</strong> bookings
+                                            Showing <strong style={{ color: "var(--admin-color-302c3a)" }}>{filteredBookings.length}</strong> of{" "}
+                                            <strong style={{ color: "var(--admin-color-302c3a)" }}>{allBookings.length}</strong> bookings
                                         </span>
                                     <span
                                         style={{
                                             padding: "6px 10px",
                                             borderRadius: "999px",
-                                            background: "#f3efff",
-                                            color: "#6552d7",
+                                            background: "var(--admin-background-f3efff)",
+                                            color: "var(--admin-color-6552d7)",
                                             fontWeight: 800,
                                             fontSize: "11px",
                                         }}
@@ -6573,10 +6516,10 @@ export default function AdminPage() {
                                                         gap: "18px",
                                                         alignItems: "center",
                                                         padding: "18px",
-                                                        border: "1px solid #ece7f5",
+                                                        border: "1px solid var(--admin-border-ece7f5)",
                                                         borderRadius: "18px",
-                                                        background: "#ffffff",
-                                                        boxShadow: "0 6px 18px rgba(73, 55, 116, 0.04)",
+                                                        background: "var(--admin-background-ffffff)",
+                                                        boxShadow: "0 6px 18px var(--admin-boxshadow-rgba-73-55-116-0-04)",
                                                     }}
                                                 >
                                                     {/* PROPERTY */}
@@ -6598,7 +6541,7 @@ export default function AdminPage() {
                                                                     objectFit: "cover",
                                                                     borderRadius: "13px",
                                                                     flexShrink: 0,
-                                                                    background: "#f2effa",
+                                                                    background: "var(--admin-background-f2effa)",
                                                                 }}
                                                             />
                                                         ) : (
@@ -6611,7 +6554,7 @@ export default function AdminPage() {
                                                                     display: "flex",
                                                                     alignItems: "center",
                                                                     justifyContent: "center",
-                                                                    background: "#f2effa",
+                                                                    background: "var(--admin-background-f2effa)",
                                                                     fontSize: "25px",
                                                                 }}
                                                             >
@@ -6622,7 +6565,7 @@ export default function AdminPage() {
                                                                 <span
                                                                     style={{
                                                                         display: "block",
-                                                                        color: "#8a8298",
+                                                                        color: "var(--admin-color-8a8298)",
                                                                         fontSize: "10px",
                                                                         fontWeight: 800,
                                                                         textTransform: "uppercase",
@@ -6635,7 +6578,7 @@ export default function AdminPage() {
                                                             <strong
                                                                 style={{
                                                                     display: "block",
-                                                                    color: "#302c3a",
+                                                                    color: "var(--admin-color-302c3a)",
                                                                     fontSize: "15px",
                                                                     lineHeight: 1.3,
                                                                     overflow: "hidden",
@@ -6650,7 +6593,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "5px",
-                                                                        color: "#f2b94b",
+                                                                        color: "var(--admin-color-f2b94b)",
                                                                         fontSize: "12px",
                                                                         letterSpacing: "1px",
                                                                     }}
@@ -6666,7 +6609,7 @@ export default function AdminPage() {
                                                             <span
                                                                 style={{
                                                                     display: "block",
-                                                                    color: "#8a8298",
+                                                                    color: "var(--admin-color-8a8298)",
                                                                     fontSize: "10px",
                                                                     fontWeight: 800,
                                                                     textTransform: "uppercase",
@@ -6692,8 +6635,8 @@ export default function AdminPage() {
                                                                         display: "inline-flex",
                                                                         alignItems: "center",
                                                                         justifyContent: "center",
-                                                                        background: "#f0ebff",
-                                                                        color: "#6954db",
+                                                                        background: "var(--admin-background-f0ebff)",
+                                                                        color: "var(--admin-color-6954db)",
                                                                         fontSize: "12px",
                                                                         fontWeight: 900,
                                                                         flexShrink: 0,
@@ -6705,7 +6648,7 @@ export default function AdminPage() {
                                                                 <strong
                                                                     style={{
                                                                         display: "block",
-                                                                        color: "#3b3645",
+                                                                        color: "var(--admin-color-3b3645)",
                                                                         fontSize: "13px",
                                                                         overflow: "hidden",
                                                                         textOverflow: "ellipsis",
@@ -6720,7 +6663,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "2px",
-                                                                        color: "#8a8298",
+                                                                        color: "var(--admin-color-8a8298)",
                                                                         fontSize: "11px",
                                                                         overflow: "hidden",
                                                                         textOverflow: "ellipsis",
@@ -6733,7 +6676,7 @@ export default function AdminPage() {
                                                                     style={{
                                                                         display: "block",
                                                                         marginTop: "2px",
-                                                                        color: "#8a8298",
+                                                                        color: "var(--admin-color-8a8298)",
                                                                         fontSize: "11px",
                                                                         overflow: "hidden",
                                                                         textOverflow: "ellipsis",
@@ -6751,7 +6694,7 @@ export default function AdminPage() {
                                                             <span
                                                                 style={{
                                                                     display: "block",
-                                                                    color: "#8a8298",
+                                                                    color: "var(--admin-color-8a8298)",
                                                                     fontSize: "10px",
                                                                     fontWeight: 800,
                                                                     textTransform: "uppercase",
@@ -6764,7 +6707,7 @@ export default function AdminPage() {
                                                         <strong
                                                             style={{
                                                                 display: "block",
-                                                                color: "#3b3645",
+                                                                color: "var(--admin-color-3b3645)",
                                                                 fontSize: "13px",
                                                             }}
                                                         >
@@ -6789,16 +6732,16 @@ export default function AdminPage() {
                                                                     borderRadius: "999px",
                                                                     color:
                                                                         isConfirmed
-                                                                            ? "#16804a"
+                                                                            ? "var(--admin-color-16804a)"
                                                                             : isPending
-                                                                                ? "#b77900"
-                                                                                : "#dc2626",
+                                                                                ? "var(--admin-color-b77900)"
+                                                                                : "var(--admin-color-dc2626)",
                                                                     background:
                                                                         isConfirmed
-                                                                            ? "#eaf8f0"
+                                                                            ? "var(--admin-background-eaf8f0)"
                                                                             : isPending
-                                                                                ? "#fff7e6"
-                                                                                : "#fef0f0",
+                                                                                ? "var(--admin-background-fff7e6)"
+                                                                                : "var(--admin-background-fef0f0)",
                                                                     fontSize: "10px",
                                                                     fontWeight: 800,
                                                                     textTransform: "capitalize",
@@ -6812,10 +6755,10 @@ export default function AdminPage() {
                                                                         borderRadius: "50%",
                                                                         background:
                                                                             isConfirmed
-                                                                                ? "#22a05a"
+                                                                                ? "var(--admin-background-22a05a)"
                                                                                 : isPending
-                                                                                    ? "#f59e0b"
-                                                                                    : "#ef4444",
+                                                                                    ? "var(--admin-background-f59e0b)"
+                                                                                    : "var(--admin-background-ef4444)",
                                                                     }}
                                                                 />
                                                                 {booking.status}
@@ -6823,7 +6766,7 @@ export default function AdminPage() {
                                                         <strong
                                                             style={{
                                                                 display: "block",
-                                                                color: "#654fe0",
+                                                                color: "var(--admin-color-654fe0)",
                                                                 fontSize: "20px",
                                                                 lineHeight: 1.1,
                                                             }}
@@ -6885,99 +6828,100 @@ export default function AdminPage() {
                         </>
                     )}
 
-                </div>
-            </section>
+                    {selectedScheduleDriverId && (
+                        <div
+                            className="driver-schedule-overlay"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="driver-schedule-title"
+                            onClick={(event) => {
+                                if (event.target === event.currentTarget) {
+                                    setSelectedScheduleDriverId(null);
+                                }
+                            }}
+                            style={{
+                                position: "fixed",
+                                inset: 0,
+                                zIndex: 1000,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: "24px",
+                                background: "var(--admin-background-rgba-39-32-57-0-42)",
+                                backdropFilter: "blur(7px)",
+                            }}
+                        >
+                            {(() => {
+                                const scheduleDriver =
+                                    allTransferDrivers.find(
+                                        (driver) =>
+                                            driver.id ===
+                                            selectedScheduleDriverId
+                                    );
 
-            {selectedScheduleDriverId && (
-                <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="driver-schedule-title"
-                    onClick={(event) => {
-                        if (event.target === event.currentTarget) {
-                            setSelectedScheduleDriverId(null);
-                        }
-                    }}
-                    style={{
-                        position: "fixed",
-                        inset: 0,
-                        zIndex: 1000,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: "24px",
-                        background: "rgba(39, 32, 57, 0.42)",
-                        backdropFilter: "blur(7px)",
-                    }}
-                >
-                    {(() => {
-                        const scheduleDriver =
-                            allTransferDrivers.find(
-                                (driver) =>
-                                    driver.id ===
-                                    selectedScheduleDriverId
-                            );
+                                if (!scheduleDriver) {
+                                    return null;
+                                }
 
-                        if (!scheduleDriver) {
-                            return null;
-                        }
+                                const assignedVehicle =
+                                    allTransferVehicles.find(
+                                        (vehicle) =>
+                                            vehicle.driverId ===
+                                            scheduleDriver.id
+                                    );
 
-                        const assignedVehicle =
-                            allTransferVehicles.find(
-                                (vehicle) =>
-                                    vehicle.driverId ===
-                                    scheduleDriver.id
-                            );
+                                const scheduleBookings =
+                                    getScheduleBookings(
+                                        scheduleDriver.id
+                                    );
 
-                        const scheduleBookings =
-                            getScheduleBookings(
-                                scheduleDriver.id
-                            );
-
-                        return (
-                            <div
-                                style={{
-                                    width: "min(720px, 100%)",
-                                    maxHeight: "min(720px, 90vh)",
-                                    overflowY: "auto",
-                                    borderRadius: "24px",
-                                    background: "#ffffff",
-                                    border: "1px solid #e8e2f2",
-                                    boxShadow:
-                                        "0 30px 90px rgba(43, 32, 72, 0.24)",
-                                }}
-                            >
-                                {/* Header */}
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent:
-                                            "space-between",
-                                        gap: "20px",
-                                        padding: "22px 24px 20px",
-                                        borderBottom:
-                                            "1px solid #eee9f6",
-                                        background:
-                                            "linear-gradient(135deg, #ffffff 0%, #faf8ff 100%)",
-                                    }}
-                                >
+                                return (
                                     <div
+                                        className="driver-schedule-modal"
                                         style={{
-                                            minWidth: 0,
+                                            width: "min(720px, 100%)",
+                                            maxHeight: "min(720px, 90vh)",
+                                            overflowY: "auto",
+                                            borderRadius: "24px",
+                                            background: "var(--admin-background-ffffff)",
+                                            border: "1px solid var(--admin-border-e8e2f2)",
+                                            boxShadow:
+                                                "0 30px 90px var(--admin-boxshadow-rgba-43-32-72-0-24)",
                                         }}
                                     >
+                                        {/* Header */}
                                         <div
+                                            className="driver-schedule-header"
                                             style={{
                                                 display: "flex",
                                                 alignItems: "center",
-                                                flexWrap: "wrap",
-                                                gap: "10px",
+                                                justifyContent:
+                                                    "space-between",
+                                                gap: "20px",
+                                                padding: "22px 24px 20px",
+                                                borderBottom:
+                                                    "1px solid var(--admin-misc-eee9f6)",
+                                                background:
+                                                    "linear-gradient(135deg, var(--admin-background-ffffff) 0%, var(--admin-background-faf8ff) 100%)",
                                             }}
                                         >
-                                            <span
+                                            <div
                                                 style={{
-                                                    color: "#7055e8",
+                                                    minWidth: 0,
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        flexWrap: "wrap",
+                                                        gap: "10px",
+                                                    }}
+                                                >
+                                            <span
+                                                className="driver-schedule-eyebrow"
+                                                style={{
+                                                    color: "var(--admin-color-7055e8)",
                                                     fontSize: "10px",
                                                     fontWeight: 900,
                                                     letterSpacing:
@@ -6987,256 +6931,244 @@ export default function AdminPage() {
                                                 DRIVER SCHEDULE
                                             </span>
 
-                                            <span
-                                                style={{
-                                                    padding:
-                                                        "4px 8px",
-                                                    borderRadius:
-                                                        "999px",
-                                                    background:
-                                                        scheduleDriver.status ===
-                                                        "inactive"
-                                                            ? "#fff0f0"
-                                                            : scheduleDriver.status ===
-                                                            "busy"
-                                                                ? "#fff7e6"
-                                                                : "#eaf8f0",
-                                                    color:
-                                                        scheduleDriver.status ===
-                                                        "inactive"
-                                                            ? "#c73535"
-                                                            : scheduleDriver.status ===
-                                                            "busy"
-                                                                ? "#b77900"
-                                                                : "#16804a",
-                                                    fontSize: "9px",
-                                                    fontWeight: 800,
-                                                    textTransform:
-                                                        "uppercase",
-                                                }}
-                                            >
+                                                    <span
+                                                        style={{
+                                                            padding:
+                                                                "4px 8px",
+                                                            borderRadius:
+                                                                "999px",
+                                                            background:
+                                                                scheduleDriver.status ===
+                                                                "inactive"
+                                                                    ? "var(--admin-background-fff0f0)"
+                                                                    : scheduleDriver.status ===
+                                                                    "busy"
+                                                                        ? "var(--admin-background-fff7e6)"
+                                                                        : "var(--admin-misc-eaf8f0)",
+                                                            color:
+                                                                scheduleDriver.status ===
+                                                                "inactive"
+                                                                    ? "var(--admin-color-c73535)"
+                                                                    : scheduleDriver.status ===
+                                                                    "busy"
+                                                                        ? "var(--admin-color-b77900)"
+                                                                        : "var(--admin-misc-16804a)",
+                                                            fontSize: "9px",
+                                                            fontWeight: 800,
+                                                            textTransform:
+                                                                "uppercase",
+                                                        }}
+                                                    >
                                                 {scheduleDriver.status}
                                             </span>
-                                        </div>
+                                                </div>
 
-                                        <h2
-                                            id="driver-schedule-title"
-                                            style={{
-                                                margin: "7px 0 0",
-                                                color: "#292532",
-                                                fontSize: "25px",
-                                                lineHeight: 1.15,
-                                                fontWeight: 800,
-                                            }}
-                                        >
-                                            {scheduleDriver.name}
-                                        </h2>
+                                                <h2
+                                                    id="driver-schedule-title"
+                                                    style={{
+                                                        margin: "7px 0 0",
+                                                        color: "var(--admin-color-292532)",
+                                                        fontSize: "25px",
+                                                        lineHeight: 1.15,
+                                                        fontWeight: 800,
+                                                    }}
+                                                >
+                                                    {scheduleDriver.name}
+                                                </h2>
 
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                flexWrap: "wrap",
-                                                gap: "7px",
-                                                marginTop: "7px",
-                                                color: "#777182",
-                                                fontSize: "11px",
-                                            }}
-                                        >
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        flexWrap: "wrap",
+                                                        gap: "7px",
+                                                        marginTop: "7px",
+                                                        color: "var(--admin-color-777182)",
+                                                        fontSize: "11px",
+                                                    }}
+                                                >
                                             <span>
                                                 {scheduleDriver.phone}
                                             </span>
-                                            <span>·</span>
-                                            <span>
+                                                    <span>·</span>
+                                                    <span>
                                                 {scheduleDriver.city}
                                             </span>
 
-                                            {assignedVehicle && (
-                                                <>
-                                                    <span>·</span>
-                                                    <span>
+                                                    {assignedVehicle && (
+                                                        <>
+                                                            <span>·</span>
+                                                            <span>
                                                         🚘{" "}
-                                                        {
-                                                            assignedVehicle.name
-                                                        }
-                                                        {" · "}
-                                                        {
-                                                            assignedVehicle.licensePlate
-                                                        }
+                                                                {
+                                                                    assignedVehicle.name
+                                                                }
+                                                                {" · "}
+                                                                {
+                                                                    assignedVehicle.licensePlate
+                                                                }
                                                     </span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                    <button
-                                        type="button"
-                                        aria-label="Close schedule"
-                                        onClick={() =>
-                                            setSelectedScheduleDriverId(
-                                                null
-                                            )
-                                        }
-                                        style={{
-                                            width: "36px",
-                                            height: "36px",
-                                            flexShrink: 0,
-                                            borderRadius: "11px",
-                                            border:
-                                                "1px solid #e9e4f3",
-                                            background: "#ffffff",
-                                            color: "#665f72",
-                                            fontSize: "19px",
-                                            lineHeight: 1,
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-
-                                {/* Schedule content */}
-                                <div
-                                    style={{
-                                        padding: "20px 24px 24px",
-                                    }}
-                                >
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "flex-end",
-                                            justifyContent:
-                                                "space-between",
-                                            gap: "12px",
-                                            marginBottom: "13px",
-                                        }}
-                                    >
-                                        <div>
-                                            <strong
+                                            <button
+                                                className="driver-schedule-close"
+                                                type="button"
+                                                aria-label="Close schedule"
+                                                onClick={() =>
+                                                    setSelectedScheduleDriverId(
+                                                        null
+                                                    )
+                                                }
                                                 style={{
-                                                    display: "block",
-                                                    color: "#302c3a",
-                                                    fontSize: "15px",
+                                                    width: "36px",
+                                                    height: "36px",
+                                                    flexShrink: 0,
+                                                    borderRadius: "11px",
+                                                    border:
+                                                        "1px solid var(--admin-border-e9e4f3)",
+                                                    background: "var(--admin-background-ffffff)",
+                                                    color: "var(--admin-color-665f72)",
+                                                    fontSize: "19px",
+                                                    lineHeight: 1,
+                                                    cursor: "pointer",
                                                 }}
                                             >
-                                                Upcoming transfers
-                                            </strong>
-
-                                            <span
-                                                style={{
-                                                    display: "block",
-                                                    marginTop: "3px",
-                                                    color: "#91899d",
-                                                    fontSize: "11px",
-                                                }}
-                                            >
-                                                {scheduleBookings.length}{" "}
-                                                {scheduleBookings.length ===
-                                                1
-                                                    ? "scheduled transfer"
-                                                    : "scheduled transfers"}
-                                            </span>
+                                                ×
+                                            </button>
                                         </div>
-                                    </div>
 
-                                    {scheduleBookings.length === 0 ? (
+                                        {/* Schedule content */}
                                         <div
+                                            className="driver-schedule-content"
                                             style={{
-                                                padding: "34px 22px",
-                                                borderRadius: "16px",
-                                                background: "#faf8ff",
-                                                border: "1px solid #eee9f7",
-                                                textAlign: "center",
+                                                padding: "20px 24px 24px",
                                             }}
                                         >
                                             <div
                                                 style={{
-                                                    marginBottom:
-                                                        "8px",
-                                                    fontSize: "27px",
+                                                    display: "flex",
+                                                    alignItems: "flex-end",
+                                                    justifyContent:
+                                                        "space-between",
+                                                    gap: "12px",
+                                                    marginBottom: "13px",
                                                 }}
                                             >
-                                                📅
+                                                <div>
+                                                    <strong
+                                                        style={{
+                                                            display: "block",
+                                                            color: "var(--admin-color-302c3a)",
+                                                            fontSize: "15px",
+                                                        }}
+                                                    >
+                                                        Upcoming transfers
+                                                    </strong>
+
+                                                    <span
+                                                        style={{
+                                                            display: "block",
+                                                            marginTop: "3px",
+                                                            color: "var(--admin-color-91899d)",
+                                                            fontSize: "11px",
+                                                        }}
+                                                    >
+                                                {scheduleBookings.length}{" "}
+                                                        {scheduleBookings.length ===
+                                                        1
+                                                            ? "scheduled transfer"
+                                                            : "scheduled transfers"}
+                                            </span>
+                                                </div>
                                             </div>
 
-                                            <strong
-                                                style={{
-                                                    display: "block",
-                                                    color: "#302c3a",
-                                                    fontSize: "14px",
-                                                }}
-                                            >
-                                                No upcoming transfers
-                                            </strong>
+                                            {scheduleBookings.length === 0 ? (
+                                                <div
+                                                    className="driver-schedule-empty"
+                                                    style={{
+                                                        padding: "34px 22px",
+                                                        borderRadius: "16px",
+                                                        background: "var(--admin-background-faf8ff)",
+                                                        border: "1px solid var(--admin-border-eee9f7)",
+                                                        textAlign: "center",
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            marginBottom:
+                                                                "8px",
+                                                            fontSize: "27px",
+                                                        }}
+                                                    >
+                                                        📅
+                                                    </div>
 
-                                            <span
-                                                style={{
-                                                    display: "block",
-                                                    marginTop: "4px",
-                                                    color: "#91899d",
-                                                    fontSize: "11px",
-                                                }}
-                                            >
+                                                    <strong
+                                                        style={{
+                                                            display: "block",
+                                                            color: "var(--admin-color-302c3a)",
+                                                            fontSize: "14px",
+                                                        }}
+                                                    >
+                                                        No upcoming transfers
+                                                    </strong>
+
+                                                    <span
+                                                        style={{
+                                                            display: "block",
+                                                            marginTop: "4px",
+                                                            color: "var(--admin-color-91899d)",
+                                                            fontSize: "11px",
+                                                        }}
+                                                    >
                                                 This driver currently has
                                                 no active scheduled bookings.
                                             </span>
-                                        </div>
-                                    ) : (
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: "10px",
-                                            }}
-                                        >
-                                            {scheduleBookings.map(
-                                                (booking) => {
-                                                    const bookingStatus =
-                                                        booking.status ??
-                                                        "confirmed";
-                                                    const duration =
-                                                        getBookingDuration(
-                                                            booking
-                                                        );
-                                                    const isReturn =
-                                                        booking.transferType ===
-                                                        "return";
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        gap: "10px",
+                                                    }}
+                                                >
+                                                    {scheduleBookings.map(
+                                                        (booking) => {
+                                                            const bookingStatus =
+                                                                booking.status ??
+                                                                "confirmed";
+                                                            const duration =
+                                                                getBookingDuration(
+                                                                    booking
+                                                                );
+                                                            const isReturn =
+                                                                booking.transferType ===
+                                                                "return";
 
-                                                    return (
-                                                        <div
-                                                            key={booking.id}
-                                                            style={{
-                                                                borderRadius:
-                                                                    "16px",
-                                                                border:
-                                                                    "1px solid #e9e4f3",
-                                                                overflow:
-                                                                    "hidden",
-                                                                background:
-                                                                    "#ffffff",
-                                                            }}
-                                                        >
-                                                            {/* Main transfer */}
-                                                            <div
-                                                                style={{
-                                                                    padding:
-                                                                        "15px 17px 16px",
-                                                                }}
-                                                            >
+                                                            return (
                                                                 <div
+                                                                    key={booking.id}
+                                                                    className="driver-schedule-booking"
                                                                     style={{
-                                                                        display:
-                                                                            "flex",
-                                                                        alignItems:
-                                                                            "flex-start",
-                                                                        justifyContent:
-                                                                            "space-between",
-                                                                        gap: "15px",
+                                                                        borderRadius:
+                                                                            "16px",
+                                                                        border:
+                                                                            "1px solid var(--admin-border-e9e4f3)",
+                                                                        overflow:
+                                                                            "hidden",
+                                                                        background:
+                                                                            "var(--admin-background-ffffff)",
                                                                     }}
                                                                 >
+                                                                    {/* Main transfer */}
                                                                     <div
                                                                         style={{
-                                                                            minWidth: 0,
+                                                                            padding:
+                                                                                "15px 17px 16px",
                                                                         }}
                                                                     >
                                                                         <div
@@ -7244,116 +7176,132 @@ export default function AdminPage() {
                                                                                 display:
                                                                                     "flex",
                                                                                 alignItems:
-                                                                                    "center",
-                                                                                flexWrap:
-                                                                                    "wrap",
-                                                                                gap: "8px",
+                                                                                    "flex-start",
+                                                                                justifyContent:
+                                                                                    "space-between",
+                                                                                gap: "15px",
                                                                             }}
                                                                         >
-                                                                            <strong
+                                                                            <div
                                                                                 style={{
-                                                                                    color:
-                                                                                        "#302c3a",
-                                                                                    fontSize:
-                                                                                        "15px",
+                                                                                    minWidth: 0,
                                                                                 }}
                                                                             >
-                                                                                {formatScheduleDate(
-                                                                                    booking.date
-                                                                                )}
-                                                                            </strong>
+                                                                                <div
+                                                                                    style={{
+                                                                                        display:
+                                                                                            "flex",
+                                                                                        alignItems:
+                                                                                            "center",
+                                                                                        flexWrap:
+                                                                                            "wrap",
+                                                                                        gap: "8px",
+                                                                                    }}
+                                                                                >
+                                                                                    <strong
+                                                                                        style={{
+                                                                                            color:
+                                                                                                "var(--admin-color-302c3a)",
+                                                                                            fontSize:
+                                                                                                "15px",
+                                                                                        }}
+                                                                                    >
+                                                                                        {formatScheduleDate(
+                                                                                            booking.date
+                                                                                        )}
+                                                                                    </strong>
 
-                                                                            <span
-                                                                                style={{
-                                                                                    padding:
-                                                                                        "4px 8px",
-                                                                                    borderRadius:
-                                                                                        "999px",
-                                                                                    background:
-                                                                                        bookingStatus ===
-                                                                                        "confirmed"
-                                                                                            ? "#eaf8f0"
-                                                                                            : bookingStatus ===
-                                                                                            "cancelled"
-                                                                                                ? "#fff0f0"
-                                                                                                : "#fff7e6",
-                                                                                    color:
-                                                                                        bookingStatus ===
-                                                                                        "confirmed"
-                                                                                            ? "#16804a"
-                                                                                            : bookingStatus ===
-                                                                                            "cancelled"
-                                                                                                ? "#c73535"
-                                                                                                : "#b77900",
-                                                                                    fontSize:
-                                                                                        "9px",
-                                                                                    fontWeight:
-                                                                                        800,
-                                                                                    textTransform:
-                                                                                        "uppercase",
-                                                                                }}
-                                                                            >
+                                                                                    <span
+                                                                                        style={{
+                                                                                            padding:
+                                                                                                "4px 8px",
+                                                                                            borderRadius:
+                                                                                                "999px",
+                                                                                            background:
+                                                                                                bookingStatus ===
+                                                                                                "confirmed"
+                                                                                                    ? "var(--admin-background-eaf8f0)"
+                                                                                                    : bookingStatus ===
+                                                                                                    "cancelled"
+                                                                                                        ? "var(--admin-misc-fff0f0)"
+                                                                                                        : "var(--admin-misc-fff7e6)",
+                                                                                            color:
+                                                                                                bookingStatus ===
+                                                                                                "confirmed"
+                                                                                                    ? "var(--admin-color-16804a)"
+                                                                                                    : bookingStatus ===
+                                                                                                    "cancelled"
+                                                                                                        ? "var(--admin-misc-c73535)"
+                                                                                                        : "var(--admin-misc-b77900)",
+                                                                                            fontSize:
+                                                                                                "9px",
+                                                                                            fontWeight:
+                                                                                                800,
+                                                                                            textTransform:
+                                                                                                "uppercase",
+                                                                                        }}
+                                                                                    >
                                                                                 {
                                                                                     bookingStatus
                                                                                 }
                                                                             </span>
-                                                                        </div>
+                                                                                </div>
 
-                                                                        <div
-                                                                            style={{
-                                                                                display:
-                                                                                    "flex",
-                                                                                alignItems:
-                                                                                    "center",
-                                                                                flexWrap:
-                                                                                    "wrap",
-                                                                                gap: "8px",
-                                                                                marginTop:
-                                                                                    "5px",
-                                                                                color:
-                                                                                    "#6d6678",
-                                                                                fontSize:
-                                                                                    "11px",
-                                                                                fontWeight:
-                                                                                    700,
-                                                                            }}
-                                                                        >
+                                                                                <div
+                                                                                    style={{
+                                                                                        display:
+                                                                                            "flex",
+                                                                                        alignItems:
+                                                                                            "center",
+                                                                                        flexWrap:
+                                                                                            "wrap",
+                                                                                        gap: "8px",
+                                                                                        marginTop:
+                                                                                            "5px",
+                                                                                        color:
+                                                                                            "var(--admin-color-6d6678)",
+                                                                                        fontSize:
+                                                                                            "11px",
+                                                                                        fontWeight:
+                                                                                            700,
+                                                                                    }}
+                                                                                >
                                                                             <span>
                                                                                 🕐{" "}
                                                                                 {
                                                                                     booking.time
                                                                                 }
                                                                             </span>
-                                                                            <span>
+                                                                                    <span>
                                                                                 ·{" "}
-                                                                                {
-                                                                                    duration
-                                                                                }{" "}
-                                                                                min
+                                                                                        {
+                                                                                            duration
+                                                                                        }{" "}
+                                                                                        min
                                                                             </span>
-                                                                            <span>
+                                                                                    <span>
                                                                                 ·{" "}
-                                                                                {isReturn
-                                                                                    ? "Return"
-                                                                                    : "One-way"}
+                                                                                        {isReturn
+                                                                                            ? "Return"
+                                                                                            : "One-way"}
                                                                             </span>
-                                                                        </div>
-                                                                    </div>
+                                                                                </div>
+                                                                            </div>
 
-                                                                    <div
-                                                                        style={{
-                                                                            flexShrink:
-                                                                                0,
-                                                                            textAlign:
-                                                                                "right",
-                                                                        }}
-                                                                    >
+                                                                            <div
+                                                                                style={{
+                                                                                    flexShrink:
+                                                                                        0,
+                                                                                    textAlign:
+                                                                                        "right",
+                                                                                }}
+                                                                            >
                                                                         <span
                                                                             style={{
                                                                                 display:
                                                                                     "block",
                                                                                 color:
-                                                                                    "#9a93a5",
+                                                                                    "var(--admin-color-9a93a5)",
                                                                                 fontSize:
                                                                                     "9px",
                                                                                 fontWeight:
@@ -7367,56 +7315,56 @@ export default function AdminPage() {
                                                                             Passenger
                                                                         </span>
 
-                                                                        <strong
+                                                                                <strong
+                                                                                    style={{
+                                                                                        display:
+                                                                                            "block",
+                                                                                        marginTop:
+                                                                                            "3px",
+                                                                                        color:
+                                                                                            "var(--admin-color-403b4a)",
+                                                                                        fontSize:
+                                                                                            "11px",
+                                                                                    }}
+                                                                                >
+                                                                                    {
+                                                                                        booking.firstName
+                                                                                    }{" "}
+                                                                                    {
+                                                                                        booking.lastName
+                                                                                    }
+                                                                                </strong>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
                                                                             style={{
                                                                                 display:
-                                                                                    "block",
+                                                                                    "grid",
+                                                                                gridTemplateColumns:
+                                                                                    "1fr 28px 1fr",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                gap: "10px",
                                                                                 marginTop:
-                                                                                    "3px",
-                                                                                color:
-                                                                                    "#403b4a",
-                                                                                fontSize:
-                                                                                    "11px",
+                                                                                    "14px",
+                                                                                paddingTop:
+                                                                                    "12px",
+                                                                                borderTop:
+                                                                                    "1px solid var(--admin-misc-f1edf6)",
                                                                             }}
                                                                         >
-                                                                            {
-                                                                                booking.firstName
-                                                                            }{" "}
-                                                                            {
-                                                                                booking.lastName
-                                                                            }
-                                                                        </strong>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div
-                                                                    style={{
-                                                                        display:
-                                                                            "grid",
-                                                                        gridTemplateColumns:
-                                                                            "1fr 28px 1fr",
-                                                                        alignItems:
-                                                                            "center",
-                                                                        gap: "10px",
-                                                                        marginTop:
-                                                                            "14px",
-                                                                        paddingTop:
-                                                                            "12px",
-                                                                        borderTop:
-                                                                            "1px solid #f1edf6",
-                                                                    }}
-                                                                >
-                                                                    <div
-                                                                        style={{
-                                                                            minWidth: 0,
-                                                                        }}
-                                                                    >
+                                                                            <div
+                                                                                style={{
+                                                                                    minWidth: 0,
+                                                                                }}
+                                                                            >
                                                                         <span
                                                                             style={{
                                                                                 display:
                                                                                     "block",
                                                                                 color:
-                                                                                    "#9a93a5",
+                                                                                    "var(--admin-color-9a93a5)",
                                                                                 fontSize:
                                                                                     "9px",
                                                                                 fontWeight:
@@ -7430,54 +7378,54 @@ export default function AdminPage() {
                                                                             Pick-up
                                                                         </span>
 
-                                                                        <strong
-                                                                            style={{
-                                                                                display:
-                                                                                    "block",
-                                                                                marginTop:
-                                                                                    "4px",
-                                                                                color:
-                                                                                    "#403b4a",
-                                                                                fontSize:
-                                                                                    "11px",
-                                                                                lineHeight:
-                                                                                    1.35,
-                                                                            }}
-                                                                        >
-                                                                            {
-                                                                                booking.pickup
-                                                                            }
-                                                                        </strong>
-                                                                    </div>
+                                                                                <strong
+                                                                                    style={{
+                                                                                        display:
+                                                                                            "block",
+                                                                                        marginTop:
+                                                                                            "4px",
+                                                                                        color:
+                                                                                            "var(--admin-color-403b4a)",
+                                                                                        fontSize:
+                                                                                            "11px",
+                                                                                        lineHeight:
+                                                                                            1.35,
+                                                                                    }}
+                                                                                >
+                                                                                    {
+                                                                                        booking.pickup
+                                                                                    }
+                                                                                </strong>
+                                                                            </div>
 
-                                                                    <span
-                                                                        style={{
-                                                                            display:
-                                                                                "flex",
-                                                                            alignItems:
-                                                                                "center",
-                                                                            justifyContent:
-                                                                                "center",
-                                                                            color:
-                                                                                "#7055e8",
-                                                                            fontSize:
-                                                                                "17px",
-                                                                        }}
-                                                                    >
+                                                                            <span
+                                                                                style={{
+                                                                                    display:
+                                                                                        "flex",
+                                                                                    alignItems:
+                                                                                        "center",
+                                                                                    justifyContent:
+                                                                                        "center",
+                                                                                    color:
+                                                                                        "var(--admin-color-7055e8)",
+                                                                                    fontSize:
+                                                                                        "17px",
+                                                                                }}
+                                                                            >
                                                                         →
                                                                     </span>
 
-                                                                    <div
-                                                                        style={{
-                                                                            minWidth: 0,
-                                                                        }}
-                                                                    >
+                                                                            <div
+                                                                                style={{
+                                                                                    minWidth: 0,
+                                                                                }}
+                                                                            >
                                                                         <span
                                                                             style={{
                                                                                 display:
                                                                                     "block",
                                                                                 color:
-                                                                                    "#9a93a5",
+                                                                                    "var(--admin-color-9a93a5)",
                                                                                 fontSize:
                                                                                     "9px",
                                                                                 fontWeight:
@@ -7491,44 +7439,44 @@ export default function AdminPage() {
                                                                             Destination
                                                                         </span>
 
-                                                                        <strong
+                                                                                <strong
+                                                                                    style={{
+                                                                                        display:
+                                                                                            "block",
+                                                                                        marginTop:
+                                                                                            "4px",
+                                                                                        color:
+                                                                                            "var(--admin-color-403b4a)",
+                                                                                        fontSize:
+                                                                                            "11px",
+                                                                                        lineHeight:
+                                                                                            1.35,
+                                                                                    }}
+                                                                                >
+                                                                                    {
+                                                                                        booking.destination
+                                                                                    }
+                                                                                </strong>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div
                                                                             style={{
                                                                                 display:
-                                                                                    "block",
+                                                                                    "flex",
+                                                                                alignItems:
+                                                                                    "center",
+                                                                                flexWrap:
+                                                                                    "wrap",
+                                                                                gap: "8px",
                                                                                 marginTop:
-                                                                                    "4px",
-                                                                                color:
-                                                                                    "#403b4a",
-                                                                                fontSize:
                                                                                     "11px",
-                                                                                lineHeight:
-                                                                                    1.35,
+                                                                                color:
+                                                                                    "var(--admin-color-91899d)",
+                                                                                fontSize:
+                                                                                    "10px",
                                                                             }}
                                                                         >
-                                                                            {
-                                                                                booking.destination
-                                                                            }
-                                                                        </strong>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div
-                                                                    style={{
-                                                                        display:
-                                                                            "flex",
-                                                                        alignItems:
-                                                                            "center",
-                                                                        flexWrap:
-                                                                            "wrap",
-                                                                        gap: "8px",
-                                                                        marginTop:
-                                                                            "11px",
-                                                                        color:
-                                                                            "#91899d",
-                                                                        fontSize:
-                                                                            "10px",
-                                                                    }}
-                                                                >
                                                                     <span>
                                                                         👤{" "}
                                                                         {
@@ -7541,52 +7489,54 @@ export default function AdminPage() {
                                                                             : "s"}
                                                                     </span>
 
-                                                                    <span>
+                                                                            <span>
                                                                         ·
                                                                     </span>
 
-                                                                    <span>
+                                                                            <span>
                                                                         {
                                                                             booking.email
                                                                         }
                                                                     </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* Return journey */}
-                                                            {isReturn &&
-                                                                booking.returnDate &&
-                                                                booking.returnTime && (
-                                                                    <div
-                                                                        style={{
-                                                                            display:
-                                                                                "flex",
-                                                                            alignItems:
-                                                                                "center",
-                                                                            justifyContent:
-                                                                                "space-between",
-                                                                            gap: "16px",
-                                                                            padding:
-                                                                                "11px 17px 12px",
-                                                                            borderTop:
-                                                                                "1px solid #eee9f6",
-                                                                            background:
-                                                                                "#faf8ff",
-                                                                        }}
-                                                                    >
-                                                                        <div
-                                                                            style={{
-                                                                                display:
-                                                                                    "flex",
-                                                                                alignItems:
-                                                                                    "center",
-                                                                                gap: "10px",
-                                                                            }}
-                                                                        >
+                                                                    {/* Return journey */}
+                                                                    {isReturn &&
+                                                                        booking.returnDate &&
+                                                                        booking.returnTime && (
+                                                                            <div
+                                                                                className="driver-schedule-return"
+                                                                                style={{
+                                                                                    display:
+                                                                                        "flex",
+                                                                                    alignItems:
+                                                                                        "center",
+                                                                                    justifyContent:
+                                                                                        "space-between",
+                                                                                    gap: "16px",
+                                                                                    padding:
+                                                                                        "11px 17px 12px",
+                                                                                    borderTop:
+                                                                                        "1px solid var(--admin-misc-eee9f6)",
+                                                                                    background:
+                                                                                        "var(--admin-background-faf8ff)",
+                                                                                }}
+                                                                            >
+                                                                                <div
+                                                                                    style={{
+                                                                                        display:
+                                                                                            "flex",
+                                                                                        alignItems:
+                                                                                            "center",
+                                                                                        gap: "10px",
+                                                                                    }}
+                                                                                >
                                                                             <span
+                                                                                className="driver-schedule-return-label"
                                                                                 style={{
                                                                                     color:
-                                                                                        "#7055e8",
+                                                                                        "var(--admin-color-7055e8)",
                                                                                     fontSize:
                                                                                         "10px",
                                                                                     fontWeight:
@@ -7600,68 +7550,71 @@ export default function AdminPage() {
                                                                                 Return
                                                                             </span>
 
-                                                                            <span
-                                                                                style={{
-                                                                                    color:
-                                                                                        "#d5cfdf",
-                                                                                }}
-                                                                            >
+                                                                                    <span
+                                                                                        style={{
+                                                                                            color:
+                                                                                                "var(--admin-color-d5cfdf)",
+                                                                                        }}
+                                                                                    >
                                                                                 |
                                                                             </span>
 
-                                                                            <strong
-                                                                                style={{
-                                                                                    color:
-                                                                                        "#4a4453",
-                                                                                    fontSize:
-                                                                                        "11px",
-                                                                                }}
-                                                                            >
-                                                                                📅{" "}
-                                                                                {formatScheduleDate(
-                                                                                    booking.returnDate
-                                                                                )}
-                                                                            </strong>
+                                                                                    <strong
+                                                                                        style={{
+                                                                                            color:
+                                                                                                "var(--admin-color-4a4453)",
+                                                                                            fontSize:
+                                                                                                "11px",
+                                                                                        }}
+                                                                                    >
+                                                                                        📅{" "}
+                                                                                        {formatScheduleDate(
+                                                                                            booking.returnDate
+                                                                                        )}
+                                                                                    </strong>
 
-                                                                            <strong
-                                                                                style={{
-                                                                                    color:
-                                                                                        "#4a4453",
-                                                                                    fontSize:
-                                                                                        "11px",
-                                                                                }}
-                                                                            >
-                                                                                🕐{" "}
-                                                                                {
-                                                                                    booking.returnTime
-                                                                                }
-                                                                            </strong>
-                                                                        </div>
+                                                                                    <strong
+                                                                                        style={{
+                                                                                            color:
+                                                                                                "var(--admin-color-4a4453)",
+                                                                                            fontSize:
+                                                                                                "11px",
+                                                                                        }}
+                                                                                    >
+                                                                                        🕐{" "}
+                                                                                        {
+                                                                                            booking.returnTime
+                                                                                        }
+                                                                                    </strong>
+                                                                                </div>
 
-                                                                        <span
-                                                                            style={{
-                                                                                color:
-                                                                                    "#91899d",
-                                                                                fontSize:
-                                                                                    "10px",
-                                                                            }}
-                                                                        >
+                                                                                <span
+                                                                                    style={{
+                                                                                        color:
+                                                                                            "var(--admin-color-91899d)",
+                                                                                        fontSize:
+                                                                                            "10px",
+                                                                                    }}
+                                                                                >
                                                                             Same driver
                                                                         </span>
-                                                                    </div>
-                                                                )}
-                                                        </div>
-                                                    );
-                                                }
+                                                                            </div>
+                                                                        )}
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })()}
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                    )}
+
                 </div>
-            )}
+            </section>
 
         </main>
     );

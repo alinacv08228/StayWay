@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import ErrorPage from "../components/ErrorPage";
 
 export default function GlobalError({
                                         error,
@@ -15,31 +14,45 @@ export default function GlobalError({
     }, [error]);
 
     return (
-        <main>
-            <section className="section">
-                <div className="container">
-                    <div className="no-stays">
-                        <p className="admin-label">
-                            ERROR 500
-                        </p>
+        <main className="error-page error-page-ready">
+            <section className="error-section">
 
-                        <h1 className="page-title">
-                            Something went wrong
-                        </h1>
+                <div className="error-card">
 
-                        <p className="admin-description">
-                            An unexpected error occurred.
-                        </p>
+                    <div className="error-icon">
+                        ✦
+                    </div>
 
+                    <p className="error-code">
+                        ERROR 500
+                    </p>
+
+                    <h1
+                        style={{
+                            fontWeight: 800,
+                            letterSpacing: "-0.02em",
+                        }}
+                    >
+                        Something went wrong
+                    </h1>
+
+                    <p className="error-message">
+                        An unexpected error occurred.
+                        Please try again.
+                    </p>
+
+                    <div className="error-actions">
                         <button
                             type="button"
-                            className="reset-filters-button"
+                            className="error-reset-button"
                             onClick={() => reset()}
                         >
                             Try again
                         </button>
                     </div>
+
                 </div>
+
             </section>
         </main>
     );
