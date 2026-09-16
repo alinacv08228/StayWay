@@ -90,13 +90,1266 @@ const bookingPageTranslations: Record<string, Record<string, string>> = {
     "Lietuvių": {"title": "Užsakymai", "searchAdmin": "Ieškoti pagal viešbutį, naudotoją arba datą...", "searchUser": "Ieškoti pagal viešbutį, kambarį arba datą...", "searchBookings": "Ieškoti užsakymų", "filterUser": "Filtruoti pagal naudotoją", "allUsers": "Visi naudotojai", "filterStatus": "Filtruoti pagal būseną", "allStatuses": "Visos būsenos", "confirmed": "Patvirtinta", "cancelled": "Atšaukta", "pending": "Laukiama patvirtinimo", "sortBookings": "Rikiuoti užsakymus", "newest": "Atvykimas: naujausi", "oldest": "Atvykimas: seniausi", "totalHigh": "Iš viso: nuo didžiausio iki mažiausio", "totalLow": "Iš viso: nuo mažiausio iki didžiausio", "clear": "Išvalyti", "clearSearch": "Išvalyti paiešką", "showing": "Rodoma", "of": "iš", "bookings": "užsakymų", "noFound": "Užsakymų nerasta", "tryFilters": "Pabandykite kitą paieškos terminą arba pakeiskite filtrus.", "property": "Apgyvendinimo vieta", "room": "Kambarys", "user": "Naudotojas", "unknownUser": "Nežinomas naudotojas", "checkIn": "Atvykimas", "checkOut": "Išvykimas", "guests": "Svečiai", "total": "Iš viso", "status": "Būsena", "viewProperty": "Peržiūrėti apgyvendinimo vietą", "cancelBooking": "Atšaukti užsakymą", "roomNotSpecified": "Kambarys nenurodytas", "adult": "suaugusysis", "adults": "suaugusieji", "child": "vaikas", "children": "vaikai", "infant": "kūdikis", "infants": "kūdikiai", "loading": "Įkeliama rezervacija...", "backProperty": "← Grįžti į apgyvendinimo vietą", "backStays": "← Grįžti į apgyvendinimo vietas", "confirmBooking": "Patvirtinti rezervaciją", "night": "naktis", "nights": "naktys", "roomCapacity": "Kambario talpa", "guest": "svečias", "guestsWord": "svečiai", "totalLabel": "Iš viso", "errorDates": "Pasirinkite atvykimo ir išvykimo datas.", "errorCheckInPast": "Atvykimo data negali būti praeityje.", "errorCheckOutPast": "Išvykimo data negali būti praeityje.", "errorOrder": "Išvykimo data turi būti vėlesnė už atvykimo datą.", "errorAdult": "Reikalingas bent vienas suaugusysis.", "errorCapacity": "Šiame kambaryje gali apsistoti iki {count} suaugusiųjų ir vaikų.", "errorLogin": "Norėdami atlikti rezervaciją turite prisijungti.", "errorProperty": "Apgyvendinimo vieta nerasta.", "adultYears": "13+ metų", "childYears": "2–12 metų", "infantYears": "Iki 2 metų", "propertyNotFound": "Apgyvendinimo vieta nerasta."}
 };
 
+
+
+/* =========================================================
+   BOOKINGS PAGE — EXTRA UI TRANSLATIONS
+   Text only. No booking/filter/storage logic is changed.
+   ========================================================= */
+
+const bookingPageExtraTranslations: Record<
+    string,
+    Record<string, string>
+> = {
+    English: {
+        email: "Email",
+        phone: "Phone",
+        bookingPending: "Booking pending",
+        pendingMessage: "Your reservation is waiting for confirmation from StayWay.",
+        transferSearchPlaceholder: "Search by route, vehicle or driver...",
+        clearTransferSearch: "Clear transfer search",
+        filterTransferType: "Filter by transfer type",
+        allTransferTypes: "All types",
+        filterTransferDate: "Filter by transfer date",
+        allDates: "All dates",
+        upcoming: "Upcoming",
+        past: "Past",
+        filterVehicle: "Filter by vehicle",
+        allVehicles: "All vehicles",
+        filterPassengers: "Filter by passengers",
+        anyPassengers: "Any passengers",
+        sortTransfers: "Sort transfers",
+        transfersLower: "transfers",
+        newestFirst: "Newest first",
+        oldestFirst: "Oldest first",
+        priceHigh: "Price: high",
+        priceLow: "Price: low",
+        driver: "Driver",
+        noTransfersFound: "No transfer bookings found",
+        noTransfersHint: "Try changing the filters or book a new transfer.",
+        findTransfers: "Find transfers",
+        basicRoom: "Basic",
+    },
+
+    "Română": {
+        email: "Email",
+        phone: "Telefon",
+        bookingPending: "Rezervare în așteptare",
+        pendingMessage: "Rezervarea ta așteaptă confirmarea StayWay.",
+        transferSearchPlaceholder: "Caută după rută, vehicul sau șofer...",
+        clearTransferSearch: "Șterge căutarea transferurilor",
+        filterTransferType: "Filtrează după tipul transferului",
+        allTransferTypes: "Toate tipurile",
+        filterTransferDate: "Filtrează după data transferului",
+        allDates: "Toate datele",
+        upcoming: "Viitoare",
+        past: "Trecute",
+        filterVehicle: "Filtrează după vehicul",
+        allVehicles: "Toate vehiculele",
+        filterPassengers: "Filtrează după pasageri",
+        anyPassengers: "Orice număr de pasageri",
+        sortTransfers: "Sortează transferurile",
+        transfersLower: "transferuri",
+        newestFirst: "Cele mai noi",
+        oldestFirst: "Cele mai vechi",
+        priceHigh: "Preț: descrescător",
+        priceLow: "Preț: crescător",
+        driver: "Șofer",
+        noTransfersFound: "Nu au fost găsite rezervări de transfer",
+        noTransfersHint: "Schimbă filtrele sau rezervă un transfer nou.",
+        findTransfers: "Caută transferuri",
+        basicRoom: "Basică",
+    },
+
+    "Русский": {
+        email: "Email",
+        phone: "Телефон",
+        bookingPending: "Бронирование ожидает подтверждения",
+        pendingMessage: "Ваше бронирование ожидает подтверждения от StayWay.",
+        transferSearchPlaceholder: "Поиск по маршруту, автомобилю или водителю...",
+        clearTransferSearch: "Очистить поиск трансферов",
+        filterTransferType: "Фильтр по типу трансфера",
+        allTransferTypes: "Все типы",
+        filterTransferDate: "Фильтр по дате трансфера",
+        allDates: "Все даты",
+        upcoming: "Предстоящие",
+        past: "Прошедшие",
+        filterVehicle: "Фильтр по автомобилю",
+        allVehicles: "Все автомобили",
+        filterPassengers: "Фильтр по пассажирам",
+        anyPassengers: "Любое число пассажиров",
+        sortTransfers: "Сортировать трансферы",
+        transfersLower: "трансферов",
+        newestFirst: "Сначала новые",
+        oldestFirst: "Сначала старые",
+        priceHigh: "Цена: по убыванию",
+        priceLow: "Цена: по возрастанию",
+        driver: "Водитель",
+        noTransfersFound: "Бронирования трансферов не найдены",
+        noTransfersHint: "Измените фильтры или забронируйте новый трансфер.",
+        findTransfers: "Найти трансфер",
+        basicRoom: "Базовый",
+    },
+
+    "Українська": {
+        email: "Email",
+        phone: "Телефон",
+        bookingPending: "Бронювання очікує підтвердження",
+        pendingMessage: "Ваше бронювання очікує підтвердження від StayWay.",
+        transferSearchPlaceholder: "Пошук за маршрутом, автомобілем або водієм...",
+        clearTransferSearch: "Очистити пошук трансферів",
+        filterTransferType: "Фільтр за типом трансферу",
+        allTransferTypes: "Усі типи",
+        filterTransferDate: "Фільтр за датою трансферу",
+        allDates: "Усі дати",
+        upcoming: "Майбутні",
+        past: "Минулі",
+        filterVehicle: "Фільтр за автомобілем",
+        allVehicles: "Усі автомобілі",
+        filterPassengers: "Фільтр за пасажирами",
+        anyPassengers: "Будь-яка кількість пасажирів",
+        sortTransfers: "Сортувати трансфери",
+        transfersLower: "трансферів",
+        newestFirst: "Спочатку нові",
+        oldestFirst: "Спочатку старі",
+        priceHigh: "Ціна: за спаданням",
+        priceLow: "Ціна: за зростанням",
+        driver: "Водій",
+        noTransfersFound: "Бронювань трансферів не знайдено",
+        noTransfersHint: "Змініть фільтри або забронюйте новий трансфер.",
+        findTransfers: "Знайти трансфер",
+        basicRoom: "Базовий",
+    },
+
+    "Français": {
+        email: "E-mail",
+        phone: "Téléphone",
+        bookingPending: "Réservation en attente",
+        pendingMessage: "Votre réservation attend la confirmation de StayWay.",
+        transferSearchPlaceholder: "Rechercher par trajet, véhicule ou chauffeur...",
+        clearTransferSearch: "Effacer la recherche de transferts",
+        filterTransferType: "Filtrer par type de transfert",
+        allTransferTypes: "Tous les types",
+        filterTransferDate: "Filtrer par date de transfert",
+        allDates: "Toutes les dates",
+        upcoming: "À venir",
+        past: "Passés",
+        filterVehicle: "Filtrer par véhicule",
+        allVehicles: "Tous les véhicules",
+        filterPassengers: "Filtrer par passagers",
+        anyPassengers: "Tous nombres de passagers",
+        sortTransfers: "Trier les transferts",
+        transfersLower: "transferts",
+        newestFirst: "Plus récents d’abord",
+        oldestFirst: "Plus anciens d’abord",
+        priceHigh: "Prix : décroissant",
+        priceLow: "Prix : croissant",
+        driver: "Chauffeur",
+        noTransfersFound: "Aucune réservation de transfert trouvée",
+        noTransfersHint: "Modifiez les filtres ou réservez un nouveau transfert.",
+        findTransfers: "Trouver un transfert",
+        basicRoom: "Basique",
+    },
+
+    "Español": {
+        email: "Correo electrónico",
+        phone: "Teléfono",
+        bookingPending: "Reserva pendiente",
+        pendingMessage: "Tu reserva está esperando la confirmación de StayWay.",
+        transferSearchPlaceholder: "Buscar por ruta, vehículo o conductor...",
+        clearTransferSearch: "Limpiar búsqueda de traslados",
+        filterTransferType: "Filtrar por tipo de traslado",
+        allTransferTypes: "Todos los tipos",
+        filterTransferDate: "Filtrar por fecha del traslado",
+        allDates: "Todas las fechas",
+        upcoming: "Próximos",
+        past: "Pasados",
+        filterVehicle: "Filtrar por vehículo",
+        allVehicles: "Todos los vehículos",
+        filterPassengers: "Filtrar por pasajeros",
+        anyPassengers: "Cualquier número de pasajeros",
+        sortTransfers: "Ordenar traslados",
+        transfersLower: "traslados",
+        newestFirst: "Más recientes primero",
+        oldestFirst: "Más antiguos primero",
+        priceHigh: "Precio: de mayor a menor",
+        priceLow: "Precio: de menor a mayor",
+        driver: "Conductor",
+        noTransfersFound: "No se encontraron reservas de traslado",
+        noTransfersHint: "Cambia los filtros o reserva un nuevo traslado.",
+        findTransfers: "Buscar traslados",
+        basicRoom: "Básica",
+    },
+
+    "Deutsch": {
+        email: "E-Mail",
+        phone: "Telefon",
+        bookingPending: "Buchung ausstehend",
+        pendingMessage: "Ihre Buchung wartet auf die Bestätigung durch StayWay.",
+        transferSearchPlaceholder: "Nach Route, Fahrzeug oder Fahrer suchen...",
+        clearTransferSearch: "Transfersuche löschen",
+        filterTransferType: "Nach Transfertyp filtern",
+        allTransferTypes: "Alle Typen",
+        filterTransferDate: "Nach Transferdatum filtern",
+        allDates: "Alle Daten",
+        upcoming: "Bevorstehend",
+        past: "Vergangen",
+        filterVehicle: "Nach Fahrzeug filtern",
+        allVehicles: "Alle Fahrzeuge",
+        filterPassengers: "Nach Passagieren filtern",
+        anyPassengers: "Beliebige Passagierzahl",
+        sortTransfers: "Transfers sortieren",
+        transfersLower: "Transfers",
+        newestFirst: "Neueste zuerst",
+        oldestFirst: "Älteste zuerst",
+        priceHigh: "Preis: absteigend",
+        priceLow: "Preis: aufsteigend",
+        driver: "Fahrer",
+        noTransfersFound: "Keine Transferbuchungen gefunden",
+        noTransfersHint: "Ändern Sie die Filter oder buchen Sie einen neuen Transfer.",
+        findTransfers: "Transfer finden",
+        basicRoom: "Basis",
+    },
+
+    "Italiano": {
+        email: "Email",
+        phone: "Telefono",
+        bookingPending: "Prenotazione in attesa",
+        pendingMessage: "La tua prenotazione è in attesa della conferma di StayWay.",
+        transferSearchPlaceholder: "Cerca per percorso, veicolo o autista...",
+        clearTransferSearch: "Cancella ricerca transfer",
+        filterTransferType: "Filtra per tipo di transfer",
+        allTransferTypes: "Tutti i tipi",
+        filterTransferDate: "Filtra per data del transfer",
+        allDates: "Tutte le date",
+        upcoming: "Prossimi",
+        past: "Passati",
+        filterVehicle: "Filtra per veicolo",
+        allVehicles: "Tutti i veicoli",
+        filterPassengers: "Filtra per passeggeri",
+        anyPassengers: "Qualsiasi numero di passeggeri",
+        sortTransfers: "Ordina transfer",
+        transfersLower: "transfer",
+        newestFirst: "Più recenti prima",
+        oldestFirst: "Più vecchi prima",
+        priceHigh: "Prezzo: decrescente",
+        priceLow: "Prezzo: crescente",
+        driver: "Autista",
+        noTransfersFound: "Nessuna prenotazione transfer trovata",
+        noTransfersHint: "Modifica i filtri o prenota un nuovo transfer.",
+        findTransfers: "Trova transfer",
+        basicRoom: "Base",
+    },
+
+    "Português": {
+        email: "E-mail",
+        phone: "Telefone",
+        bookingPending: "Reserva pendente",
+        pendingMessage: "A sua reserva está à espera da confirmação da StayWay.",
+        transferSearchPlaceholder: "Pesquisar por rota, veículo ou motorista...",
+        clearTransferSearch: "Limpar pesquisa de transfers",
+        filterTransferType: "Filtrar por tipo de transfer",
+        allTransferTypes: "Todos os tipos",
+        filterTransferDate: "Filtrar por data do transfer",
+        allDates: "Todas as datas",
+        upcoming: "Próximos",
+        past: "Passados",
+        filterVehicle: "Filtrar por veículo",
+        allVehicles: "Todos os veículos",
+        filterPassengers: "Filtrar por passageiros",
+        anyPassengers: "Qualquer número de passageiros",
+        sortTransfers: "Ordenar transfers",
+        transfersLower: "transfers",
+        newestFirst: "Mais recentes primeiro",
+        oldestFirst: "Mais antigos primeiro",
+        priceHigh: "Preço: do maior para o menor",
+        priceLow: "Preço: do menor para o maior",
+        driver: "Motorista",
+        noTransfersFound: "Nenhuma reserva de transfer encontrada",
+        noTransfersHint: "Altere os filtros ou reserve um novo transfer.",
+        findTransfers: "Encontrar transfer",
+        basicRoom: "Básico",
+    },
+
+    "Nederlands": {
+        email: "E-mail",
+        phone: "Telefoon",
+        bookingPending: "Boeking in afwachting",
+        pendingMessage: "Je boeking wacht op bevestiging van StayWay.",
+        transferSearchPlaceholder: "Zoeken op route, voertuig of chauffeur...",
+        clearTransferSearch: "Transferzoekopdracht wissen",
+        filterTransferType: "Filteren op transfertype",
+        allTransferTypes: "Alle typen",
+        filterTransferDate: "Filteren op transferdatum",
+        allDates: "Alle datums",
+        upcoming: "Aankomend",
+        past: "Voorbij",
+        filterVehicle: "Filteren op voertuig",
+        allVehicles: "Alle voertuigen",
+        filterPassengers: "Filteren op passagiers",
+        anyPassengers: "Elk aantal passagiers",
+        sortTransfers: "Transfers sorteren",
+        transfersLower: "transfers",
+        newestFirst: "Nieuwste eerst",
+        oldestFirst: "Oudste eerst",
+        priceHigh: "Prijs: hoog naar laag",
+        priceLow: "Prijs: laag naar hoog",
+        driver: "Chauffeur",
+        noTransfersFound: "Geen transferboekingen gevonden",
+        noTransfersHint: "Pas de filters aan of boek een nieuwe transfer.",
+        findTransfers: "Transfer zoeken",
+        basicRoom: "Basis",
+    },
+
+    "Norsk": {
+        email: "E-post",
+        phone: "Telefon",
+        bookingPending: "Bestilling venter",
+        pendingMessage: "Bestillingen din venter på bekreftelse fra StayWay.",
+        transferSearchPlaceholder: "Søk etter rute, kjøretøy eller sjåfør...",
+        clearTransferSearch: "Tøm transfersøk",
+        filterTransferType: "Filtrer etter transfertype",
+        allTransferTypes: "Alle typer",
+        filterTransferDate: "Filtrer etter transferdato",
+        allDates: "Alle datoer",
+        upcoming: "Kommende",
+        past: "Tidligere",
+        filterVehicle: "Filtrer etter kjøretøy",
+        allVehicles: "Alle kjøretøy",
+        filterPassengers: "Filtrer etter passasjerer",
+        anyPassengers: "Valgfritt antall passasjerer",
+        sortTransfers: "Sorter transfer",
+        transfersLower: "transfer",
+        newestFirst: "Nyeste først",
+        oldestFirst: "Eldste først",
+        priceHigh: "Pris: høy til lav",
+        priceLow: "Pris: lav til høy",
+        driver: "Sjåfør",
+        noTransfersFound: "Ingen transferbestillinger funnet",
+        noTransfersHint: "Endre filtrene eller bestill en ny transfer.",
+        findTransfers: "Finn transfer",
+        basicRoom: "Basis",
+    },
+
+    "Svenska": {
+        email: "E-post",
+        phone: "Telefon",
+        bookingPending: "Bokning väntar",
+        pendingMessage: "Din bokning väntar på bekräftelse från StayWay.",
+        transferSearchPlaceholder: "Sök efter rutt, fordon eller förare...",
+        clearTransferSearch: "Rensa transfersökning",
+        filterTransferType: "Filtrera efter transfertyp",
+        allTransferTypes: "Alla typer",
+        filterTransferDate: "Filtrera efter transferdatum",
+        allDates: "Alla datum",
+        upcoming: "Kommande",
+        past: "Tidigare",
+        filterVehicle: "Filtrera efter fordon",
+        allVehicles: "Alla fordon",
+        filterPassengers: "Filtrera efter passagerare",
+        anyPassengers: "Valfritt antal passagerare",
+        sortTransfers: "Sortera transfer",
+        transfersLower: "transfer",
+        newestFirst: "Nyaste först",
+        oldestFirst: "Äldsta först",
+        priceHigh: "Pris: högst till lägst",
+        priceLow: "Pris: lägst till högst",
+        driver: "Förare",
+        noTransfersFound: "Inga transferbokningar hittades",
+        noTransfersHint: "Ändra filtren eller boka en ny transfer.",
+        findTransfers: "Hitta transfer",
+        basicRoom: "Bas",
+    },
+
+    "Dansk": {
+        email: "E-mail",
+        phone: "Telefon",
+        bookingPending: "Reservation afventer",
+        pendingMessage: "Din reservation afventer bekræftelse fra StayWay.",
+        transferSearchPlaceholder: "Søg efter rute, køretøj eller chauffør...",
+        clearTransferSearch: "Ryd transfersøgning",
+        filterTransferType: "Filtrer efter transfertype",
+        allTransferTypes: "Alle typer",
+        filterTransferDate: "Filtrer efter transferdato",
+        allDates: "Alle datoer",
+        upcoming: "Kommende",
+        past: "Tidligere",
+        filterVehicle: "Filtrer efter køretøj",
+        allVehicles: "Alle køretøjer",
+        filterPassengers: "Filtrer efter passagerer",
+        anyPassengers: "Ethvert antal passagerer",
+        sortTransfers: "Sorter transfers",
+        transfersLower: "transfers",
+        newestFirst: "Nyeste først",
+        oldestFirst: "Ældste først",
+        priceHigh: "Pris: høj til lav",
+        priceLow: "Pris: lav til høj",
+        driver: "Chauffør",
+        noTransfersFound: "Ingen transferreservationer fundet",
+        noTransfersHint: "Skift filtrene eller book en ny transfer.",
+        findTransfers: "Find transfer",
+        basicRoom: "Basis",
+    },
+
+    "Suomi": {
+        email: "Sähköposti",
+        phone: "Puhelin",
+        bookingPending: "Varaus odottaa",
+        pendingMessage: "Varauksesi odottaa StayWayn vahvistusta.",
+        transferSearchPlaceholder: "Hae reitin, ajoneuvon tai kuljettajan mukaan...",
+        clearTransferSearch: "Tyhjennä kuljetushaku",
+        filterTransferType: "Suodata kuljetustyypin mukaan",
+        allTransferTypes: "Kaikki tyypit",
+        filterTransferDate: "Suodata kuljetuspäivän mukaan",
+        allDates: "Kaikki päivät",
+        upcoming: "Tulevat",
+        past: "Menneet",
+        filterVehicle: "Suodata ajoneuvon mukaan",
+        allVehicles: "Kaikki ajoneuvot",
+        filterPassengers: "Suodata matkustajien mukaan",
+        anyPassengers: "Mikä tahansa matkustajamäärä",
+        sortTransfers: "Lajittele kuljetukset",
+        transfersLower: "kuljetusta",
+        newestFirst: "Uusimmat ensin",
+        oldestFirst: "Vanhimmat ensin",
+        priceHigh: "Hinta: korkein ensin",
+        priceLow: "Hinta: matalin ensin",
+        driver: "Kuljettaja",
+        noTransfersFound: "Kuljetusvarauksia ei löytynyt",
+        noTransfersHint: "Muuta suodattimia tai varaa uusi kuljetus.",
+        findTransfers: "Etsi kuljetus",
+        basicRoom: "Perus",
+    },
+
+    "Polski": {
+        email: "E-mail",
+        phone: "Telefon",
+        bookingPending: "Rezerwacja oczekuje",
+        pendingMessage: "Twoja rezerwacja oczekuje na potwierdzenie przez StayWay.",
+        transferSearchPlaceholder: "Szukaj według trasy, pojazdu lub kierowcy...",
+        clearTransferSearch: "Wyczyść wyszukiwanie transferów",
+        filterTransferType: "Filtruj według typu transferu",
+        allTransferTypes: "Wszystkie typy",
+        filterTransferDate: "Filtruj według daty transferu",
+        allDates: "Wszystkie daty",
+        upcoming: "Nadchodzące",
+        past: "Minione",
+        filterVehicle: "Filtruj według pojazdu",
+        allVehicles: "Wszystkie pojazdy",
+        filterPassengers: "Filtruj według pasażerów",
+        anyPassengers: "Dowolna liczba pasażerów",
+        sortTransfers: "Sortuj transfery",
+        transfersLower: "transferów",
+        newestFirst: "Najnowsze najpierw",
+        oldestFirst: "Najstarsze najpierw",
+        priceHigh: "Cena: malejąco",
+        priceLow: "Cena: rosnąco",
+        driver: "Kierowca",
+        noTransfersFound: "Nie znaleziono rezerwacji transferów",
+        noTransfersHint: "Zmień filtry lub zarezerwuj nowy transfer.",
+        findTransfers: "Znajdź transfer",
+        basicRoom: "Podstawowy",
+    },
+
+    "Čeština": {
+        email: "E-mail",
+        phone: "Telefon",
+        bookingPending: "Rezervace čeká",
+        pendingMessage: "Vaše rezervace čeká na potvrzení StayWay.",
+        transferSearchPlaceholder: "Hledat podle trasy, vozidla nebo řidiče...",
+        clearTransferSearch: "Vymazat hledání transferů",
+        filterTransferType: "Filtrovat podle typu transferu",
+        allTransferTypes: "Všechny typy",
+        filterTransferDate: "Filtrovat podle data transferu",
+        allDates: "Všechna data",
+        upcoming: "Nadcházející",
+        past: "Minulé",
+        filterVehicle: "Filtrovat podle vozidla",
+        allVehicles: "Všechna vozidla",
+        filterPassengers: "Filtrovat podle cestujících",
+        anyPassengers: "Libovolný počet cestujících",
+        sortTransfers: "Seřadit transfery",
+        transfersLower: "transferů",
+        newestFirst: "Nejnovější první",
+        oldestFirst: "Nejstarší první",
+        priceHigh: "Cena: od nejvyšší",
+        priceLow: "Cena: od nejnižší",
+        driver: "Řidič",
+        noTransfersFound: "Nebyly nalezeny rezervace transferů",
+        noTransfersHint: "Změňte filtry nebo si rezervujte nový transfer.",
+        findTransfers: "Najít transfer",
+        basicRoom: "Základní",
+    },
+
+    "Slovenčina": {
+        email: "E-mail",
+        phone: "Telefón",
+        bookingPending: "Rezervácia čaká",
+        pendingMessage: "Vaša rezervácia čaká na potvrdenie StayWay.",
+        transferSearchPlaceholder: "Hľadať podľa trasy, vozidla alebo vodiča...",
+        clearTransferSearch: "Vymazať vyhľadávanie transferov",
+        filterTransferType: "Filtrovať podľa typu transferu",
+        allTransferTypes: "Všetky typy",
+        filterTransferDate: "Filtrovať podľa dátumu transferu",
+        allDates: "Všetky dátumy",
+        upcoming: "Nadchádzajúce",
+        past: "Minulé",
+        filterVehicle: "Filtrovať podľa vozidla",
+        allVehicles: "Všetky vozidlá",
+        filterPassengers: "Filtrovať podľa cestujúcich",
+        anyPassengers: "Ľubovoľný počet cestujúcich",
+        sortTransfers: "Zoradiť transfery",
+        transfersLower: "transferov",
+        newestFirst: "Najnovšie prvé",
+        oldestFirst: "Najstaršie prvé",
+        priceHigh: "Cena: od najvyššej",
+        priceLow: "Cena: od najnižšej",
+        driver: "Vodič",
+        noTransfersFound: "Nenašli sa rezervácie transferov",
+        noTransfersHint: "Zmeňte filtre alebo si rezervujte nový transfer.",
+        findTransfers: "Nájsť transfer",
+        basicRoom: "Základná",
+    },
+
+    "Magyar": {
+        email: "E-mail",
+        phone: "Telefon",
+        bookingPending: "Foglalás függőben",
+        pendingMessage: "A foglalása a StayWay megerősítésére vár.",
+        transferSearchPlaceholder: "Keresés útvonal, jármű vagy sofőr alapján...",
+        clearTransferSearch: "Transzferkeresés törlése",
+        filterTransferType: "Szűrés transzfertípus szerint",
+        allTransferTypes: "Minden típus",
+        filterTransferDate: "Szűrés transzferdátum szerint",
+        allDates: "Minden dátum",
+        upcoming: "Közelgő",
+        past: "Korábbi",
+        filterVehicle: "Szűrés jármű szerint",
+        allVehicles: "Minden jármű",
+        filterPassengers: "Szűrés utasok szerint",
+        anyPassengers: "Bármennyi utas",
+        sortTransfers: "Transzferek rendezése",
+        transfersLower: "transzfer",
+        newestFirst: "Legújabb elöl",
+        oldestFirst: "Legrégebbi elöl",
+        priceHigh: "Ár: csökkenő",
+        priceLow: "Ár: növekvő",
+        driver: "Sofőr",
+        noTransfersFound: "Nem találhatók transzferfoglalások",
+        noTransfersHint: "Módosítsa a szűrőket vagy foglaljon új transzfert.",
+        findTransfers: "Transzfer keresése",
+        basicRoom: "Alap",
+    },
+
+    "Български": {
+        email: "Имейл",
+        phone: "Телефон",
+        bookingPending: "Резервацията изчаква",
+        pendingMessage: "Вашата резервация очаква потвърждение от StayWay.",
+        transferSearchPlaceholder: "Търсене по маршрут, автомобил или шофьор...",
+        clearTransferSearch: "Изчисти търсенето на трансфери",
+        filterTransferType: "Филтрирай по тип трансфер",
+        allTransferTypes: "Всички типове",
+        filterTransferDate: "Филтрирай по дата на трансфера",
+        allDates: "Всички дати",
+        upcoming: "Предстоящи",
+        past: "Минали",
+        filterVehicle: "Филтрирай по автомобил",
+        allVehicles: "Всички автомобили",
+        filterPassengers: "Филтрирай по пътници",
+        anyPassengers: "Произволен брой пътници",
+        sortTransfers: "Сортирай трансферите",
+        transfersLower: "трансфера",
+        newestFirst: "Най-нови първо",
+        oldestFirst: "Най-стари първо",
+        priceHigh: "Цена: от висока към ниска",
+        priceLow: "Цена: от ниска към висока",
+        driver: "Шофьор",
+        noTransfersFound: "Не са намерени резервации за трансфер",
+        noTransfersHint: "Променете филтрите или резервирайте нов трансфер.",
+        findTransfers: "Намери трансфер",
+        basicRoom: "Основна",
+    },
+
+    "Hrvatski": {
+        email: "E-pošta",
+        phone: "Telefon",
+        bookingPending: "Rezervacija na čekanju",
+        pendingMessage: "Vaša rezervacija čeka potvrdu StayWaya.",
+        transferSearchPlaceholder: "Pretraži prema ruti, vozilu ili vozaču...",
+        clearTransferSearch: "Očisti pretragu transfera",
+        filterTransferType: "Filtriraj prema vrsti transfera",
+        allTransferTypes: "Sve vrste",
+        filterTransferDate: "Filtriraj prema datumu transfera",
+        allDates: "Svi datumi",
+        upcoming: "Nadolazeći",
+        past: "Prošli",
+        filterVehicle: "Filtriraj prema vozilu",
+        allVehicles: "Sva vozila",
+        filterPassengers: "Filtriraj prema putnicima",
+        anyPassengers: "Bilo koji broj putnika",
+        sortTransfers: "Sortiraj transfere",
+        transfersLower: "transfera",
+        newestFirst: "Najnoviji prvo",
+        oldestFirst: "Najstariji prvo",
+        priceHigh: "Cijena: od više prema nižoj",
+        priceLow: "Cijena: od niže prema višoj",
+        driver: "Vozač",
+        noTransfersFound: "Nisu pronađene rezervacije transfera",
+        noTransfersHint: "Promijenite filtre ili rezervirajte novi transfer.",
+        findTransfers: "Pronađi transfer",
+        basicRoom: "Osnovna",
+    },
+
+    "Slovenščina": {
+        email: "E-pošta",
+        phone: "Telefon",
+        bookingPending: "Rezervacija čaka",
+        pendingMessage: "Vaša rezervacija čaka na potrditev StayWaya.",
+        transferSearchPlaceholder: "Išči po poti, vozilu ali vozniku...",
+        clearTransferSearch: "Počisti iskanje prevozov",
+        filterTransferType: "Filtriraj po vrsti prevoza",
+        allTransferTypes: "Vse vrste",
+        filterTransferDate: "Filtriraj po datumu prevoza",
+        allDates: "Vsi datumi",
+        upcoming: "Prihajajoči",
+        past: "Pretekli",
+        filterVehicle: "Filtriraj po vozilu",
+        allVehicles: "Vsa vozila",
+        filterPassengers: "Filtriraj po potnikih",
+        anyPassengers: "Poljubno število potnikov",
+        sortTransfers: "Razvrsti prevoze",
+        transfersLower: "prevozov",
+        newestFirst: "Najnovejši najprej",
+        oldestFirst: "Najstarejši najprej",
+        priceHigh: "Cena: od najvišje",
+        priceLow: "Cena: od najnižje",
+        driver: "Voznik",
+        noTransfersFound: "Rezervacij prevozov ni bilo mogoče najti",
+        noTransfersHint: "Spremenite filtre ali rezervirajte nov prevoz.",
+        findTransfers: "Poišči prevoz",
+        basicRoom: "Osnovna",
+    },
+
+    "Srpski": {
+        email: "E-pošta",
+        phone: "Telefon",
+        bookingPending: "Rezervacija na čekanju",
+        pendingMessage: "Vaša rezervacija čeka potvrdu StayWaya.",
+        transferSearchPlaceholder: "Pretraži po ruti, vozilu ili vozaču...",
+        clearTransferSearch: "Obriši pretragu transfera",
+        filterTransferType: "Filtriraj po vrsti transfera",
+        allTransferTypes: "Sve vrste",
+        filterTransferDate: "Filtriraj po datumu transfera",
+        allDates: "Svi datumi",
+        upcoming: "Predstojeći",
+        past: "Prošli",
+        filterVehicle: "Filtriraj po vozilu",
+        allVehicles: "Sva vozila",
+        filterPassengers: "Filtriraj po putnicima",
+        anyPassengers: "Bilo koji broj putnika",
+        sortTransfers: "Sortiraj transfere",
+        transfersLower: "transfera",
+        newestFirst: "Najnoviji prvo",
+        oldestFirst: "Najstariji prvo",
+        priceHigh: "Cena: od više ka nižoj",
+        priceLow: "Cena: od niže ka višoj",
+        driver: "Vozač",
+        noTransfersFound: "Nisu pronađene rezervacije transfera",
+        noTransfersHint: "Promenite filtere ili rezervišite novi transfer.",
+        findTransfers: "Pronađi transfer",
+        basicRoom: "Osnovna",
+    },
+
+    "Bosanski": {
+        email: "E-mail",
+        phone: "Telefon",
+        bookingPending: "Rezervacija na čekanju",
+        pendingMessage: "Vaša rezervacija čeka potvrdu StayWaya.",
+        transferSearchPlaceholder: "Pretraži prema ruti, vozilu ili vozaču...",
+        clearTransferSearch: "Očisti pretragu transfera",
+        filterTransferType: "Filtriraj prema vrsti transfera",
+        allTransferTypes: "Sve vrste",
+        filterTransferDate: "Filtriraj prema datumu transfera",
+        allDates: "Svi datumi",
+        upcoming: "Predstojeći",
+        past: "Prošli",
+        filterVehicle: "Filtriraj prema vozilu",
+        allVehicles: "Sva vozila",
+        filterPassengers: "Filtriraj prema putnicima",
+        anyPassengers: "Bilo koji broj putnika",
+        sortTransfers: "Sortiraj transfere",
+        transfersLower: "transfera",
+        newestFirst: "Najnoviji prvo",
+        oldestFirst: "Najstariji prvo",
+        priceHigh: "Cijena: od više prema nižoj",
+        priceLow: "Cijena: od niže prema višoj",
+        driver: "Vozač",
+        noTransfersFound: "Nisu pronađene rezervacije transfera",
+        noTransfersHint: "Promijenite filtere ili rezervišite novi transfer.",
+        findTransfers: "Pronađi transfer",
+        basicRoom: "Osnovna",
+    },
+
+    "Ελληνικά": {
+        email: "Email",
+        phone: "Τηλέφωνο",
+        bookingPending: "Κράτηση σε αναμονή",
+        pendingMessage: "Η κράτησή σας περιμένει επιβεβαίωση από το StayWay.",
+        transferSearchPlaceholder: "Αναζήτηση ανά διαδρομή, όχημα ή οδηγό...",
+        clearTransferSearch: "Εκκαθάριση αναζήτησης μεταφορών",
+        filterTransferType: "Φιλτράρισμα ανά τύπο μεταφοράς",
+        allTransferTypes: "Όλοι οι τύποι",
+        filterTransferDate: "Φιλτράρισμα ανά ημερομηνία μεταφοράς",
+        allDates: "Όλες οι ημερομηνίες",
+        upcoming: "Επερχόμενες",
+        past: "Προηγούμενες",
+        filterVehicle: "Φιλτράρισμα ανά όχημα",
+        allVehicles: "Όλα τα οχήματα",
+        filterPassengers: "Φιλτράρισμα ανά επιβάτες",
+        anyPassengers: "Οποιοσδήποτε αριθμός επιβατών",
+        sortTransfers: "Ταξινόμηση μεταφορών",
+        transfersLower: "μεταφορές",
+        newestFirst: "Νεότερα πρώτα",
+        oldestFirst: "Παλαιότερα πρώτα",
+        priceHigh: "Τιμή: φθίνουσα",
+        priceLow: "Τιμή: αύξουσα",
+        driver: "Οδηγός",
+        noTransfersFound: "Δεν βρέθηκαν κρατήσεις μεταφοράς",
+        noTransfersHint: "Αλλάξτε τα φίλτρα ή κλείστε νέα μεταφορά.",
+        findTransfers: "Βρείτε μεταφορά",
+        basicRoom: "Βασικό",
+    },
+
+    "Türkçe": {
+        email: "E-posta",
+        phone: "Telefon",
+        bookingPending: "Rezervasyon beklemede",
+        pendingMessage: "Rezervasyonunuz StayWay onayını bekliyor.",
+        transferSearchPlaceholder: "Rota, araç veya sürücüye göre ara...",
+        clearTransferSearch: "Transfer aramasını temizle",
+        filterTransferType: "Transfer türüne göre filtrele",
+        allTransferTypes: "Tüm türler",
+        filterTransferDate: "Transfer tarihine göre filtrele",
+        allDates: "Tüm tarihler",
+        upcoming: "Yaklaşan",
+        past: "Geçmiş",
+        filterVehicle: "Araca göre filtrele",
+        allVehicles: "Tüm araçlar",
+        filterPassengers: "Yolcuya göre filtrele",
+        anyPassengers: "Herhangi bir yolcu sayısı",
+        sortTransfers: "Transferleri sırala",
+        transfersLower: "transfer",
+        newestFirst: "En yeni önce",
+        oldestFirst: "En eski önce",
+        priceHigh: "Fiyat: yüksekten düşüğe",
+        priceLow: "Fiyat: düşükten yükseğe",
+        driver: "Sürücü",
+        noTransfersFound: "Transfer rezervasyonu bulunamadı",
+        noTransfersHint: "Filtreleri değiştirin veya yeni bir transfer rezervasyonu yapın.",
+        findTransfers: "Transfer bul",
+        basicRoom: "Temel",
+    },
+
+    "العربية": {
+        email: "البريد الإلكتروني",
+        phone: "الهاتف",
+        bookingPending: "الحجز قيد الانتظار",
+        pendingMessage: "حجزك ينتظر تأكيد StayWay.",
+        transferSearchPlaceholder: "البحث حسب المسار أو المركبة أو السائق...",
+        clearTransferSearch: "مسح بحث النقل",
+        filterTransferType: "التصفية حسب نوع النقل",
+        allTransferTypes: "جميع الأنواع",
+        filterTransferDate: "التصفية حسب تاريخ النقل",
+        allDates: "جميع التواريخ",
+        upcoming: "القادمة",
+        past: "السابقة",
+        filterVehicle: "التصفية حسب المركبة",
+        allVehicles: "جميع المركبات",
+        filterPassengers: "التصفية حسب الركاب",
+        anyPassengers: "أي عدد من الركاب",
+        sortTransfers: "ترتيب خدمات النقل",
+        transfersLower: "خدمات نقل",
+        newestFirst: "الأحدث أولاً",
+        oldestFirst: "الأقدم أولاً",
+        priceHigh: "السعر: من الأعلى إلى الأقل",
+        priceLow: "السعر: من الأقل إلى الأعلى",
+        driver: "السائق",
+        noTransfersFound: "لم يتم العثور على حجوزات نقل",
+        noTransfersHint: "غيّر عوامل التصفية أو احجز خدمة نقل جديدة.",
+        findTransfers: "البحث عن نقل",
+        basicRoom: "أساسية",
+    },
+
+    "עברית": {
+        email: "אימייל",
+        phone: "טלפון",
+        bookingPending: "ההזמנה ממתינה",
+        pendingMessage: "ההזמנה שלך ממתינה לאישור של StayWay.",
+        transferSearchPlaceholder: "חיפוש לפי מסלול, רכב או נהג...",
+        clearTransferSearch: "נקה חיפוש הסעות",
+        filterTransferType: "סינון לפי סוג הסעה",
+        allTransferTypes: "כל הסוגים",
+        filterTransferDate: "סינון לפי תאריך הסעה",
+        allDates: "כל התאריכים",
+        upcoming: "עתידיות",
+        past: "קודמות",
+        filterVehicle: "סינון לפי רכב",
+        allVehicles: "כל הרכבים",
+        filterPassengers: "סינון לפי נוסעים",
+        anyPassengers: "כל מספר נוסעים",
+        sortTransfers: "מיון הסעות",
+        transfersLower: "הסעות",
+        newestFirst: "החדשות ביותר תחילה",
+        oldestFirst: "הישנות ביותר תחילה",
+        priceHigh: "מחיר: מהגבוה לנמוך",
+        priceLow: "מחיר: מהנמוך לגבוה",
+        driver: "נהג",
+        noTransfersFound: "לא נמצאו הזמנות הסעה",
+        noTransfersHint: "שנה את המסננים או הזמן הסעה חדשה.",
+        findTransfers: "מצא הסעה",
+        basicRoom: "בסיסי",
+    },
+
+    "हिन्दी": {
+        email: "ईमेल",
+        phone: "फ़ोन",
+        bookingPending: "बुकिंग लंबित है",
+        pendingMessage: "आपकी बुकिंग StayWay की पुष्टि की प्रतीक्षा कर रही है।",
+        transferSearchPlaceholder: "रूट, वाहन या ड्राइवर से खोजें...",
+        clearTransferSearch: "ट्रांसफर खोज साफ़ करें",
+        filterTransferType: "ट्रांसफर प्रकार से फ़िल्टर करें",
+        allTransferTypes: "सभी प्रकार",
+        filterTransferDate: "ट्रांसफर तारीख से फ़िल्टर करें",
+        allDates: "सभी तारीखें",
+        upcoming: "आगामी",
+        past: "पिछली",
+        filterVehicle: "वाहन से फ़िल्टर करें",
+        allVehicles: "सभी वाहन",
+        filterPassengers: "यात्रियों से फ़िल्टर करें",
+        anyPassengers: "यात्रियों की कोई भी संख्या",
+        sortTransfers: "ट्रांसफर क्रमबद्ध करें",
+        transfersLower: "ट्रांसफर",
+        newestFirst: "नए पहले",
+        oldestFirst: "पुराने पहले",
+        priceHigh: "कीमत: अधिक से कम",
+        priceLow: "कीमत: कम से अधिक",
+        driver: "ड्राइवर",
+        noTransfersFound: "कोई ट्रांसफर बुकिंग नहीं मिली",
+        noTransfersHint: "फ़िल्टर बदलें या नया ट्रांसफर बुक करें।",
+        findTransfers: "ट्रांसफर खोजें",
+        basicRoom: "बेसिक",
+    },
+
+    "ไทย": {
+        email: "อีเมล",
+        phone: "โทรศัพท์",
+        bookingPending: "การจองกำลังรอการยืนยัน",
+        pendingMessage: "การจองของคุณกำลังรอการยืนยันจาก StayWay",
+        transferSearchPlaceholder: "ค้นหาตามเส้นทาง รถ หรือคนขับ...",
+        clearTransferSearch: "ล้างการค้นหาบริการรับส่ง",
+        filterTransferType: "กรองตามประเภทบริการรับส่ง",
+        allTransferTypes: "ทุกประเภท",
+        filterTransferDate: "กรองตามวันที่บริการรับส่ง",
+        allDates: "ทุกวันที่",
+        upcoming: "กำลังจะมาถึง",
+        past: "ที่ผ่านมา",
+        filterVehicle: "กรองตามรถ",
+        allVehicles: "รถทั้งหมด",
+        filterPassengers: "กรองตามผู้โดยสาร",
+        anyPassengers: "จำนวนผู้โดยสารใดก็ได้",
+        sortTransfers: "เรียงบริการรับส่ง",
+        transfersLower: "บริการรับส่ง",
+        newestFirst: "ใหม่ล่าสุดก่อน",
+        oldestFirst: "เก่าที่สุดก่อน",
+        priceHigh: "ราคา: สูงไปต่ำ",
+        priceLow: "ราคา: ต่ำไปสูง",
+        driver: "คนขับ",
+        noTransfersFound: "ไม่พบการจองบริการรับส่ง",
+        noTransfersHint: "เปลี่ยนตัวกรองหรือจองบริการรับส่งใหม่",
+        findTransfers: "ค้นหาบริการรับส่ง",
+        basicRoom: "พื้นฐาน",
+    },
+
+    "Bahasa Indonesia": {
+        email: "Email",
+        phone: "Telepon",
+        bookingPending: "Pemesanan menunggu",
+        pendingMessage: "Pemesanan Anda menunggu konfirmasi dari StayWay.",
+        transferSearchPlaceholder: "Cari berdasarkan rute, kendaraan, atau pengemudi...",
+        clearTransferSearch: "Hapus pencarian transfer",
+        filterTransferType: "Filter berdasarkan jenis transfer",
+        allTransferTypes: "Semua jenis",
+        filterTransferDate: "Filter berdasarkan tanggal transfer",
+        allDates: "Semua tanggal",
+        upcoming: "Mendatang",
+        past: "Lampau",
+        filterVehicle: "Filter berdasarkan kendaraan",
+        allVehicles: "Semua kendaraan",
+        filterPassengers: "Filter berdasarkan penumpang",
+        anyPassengers: "Jumlah penumpang apa pun",
+        sortTransfers: "Urutkan transfer",
+        transfersLower: "transfer",
+        newestFirst: "Terbaru dahulu",
+        oldestFirst: "Terlama dahulu",
+        priceHigh: "Harga: tinggi ke rendah",
+        priceLow: "Harga: rendah ke tinggi",
+        driver: "Pengemudi",
+        noTransfersFound: "Pemesanan transfer tidak ditemukan",
+        noTransfersHint: "Ubah filter atau pesan transfer baru.",
+        findTransfers: "Cari transfer",
+        basicRoom: "Dasar",
+    },
+
+    "Tiếng Việt": {
+        email: "Email",
+        phone: "Điện thoại",
+        bookingPending: "Đặt chỗ đang chờ",
+        pendingMessage: "Đặt chỗ của bạn đang chờ StayWay xác nhận.",
+        transferSearchPlaceholder: "Tìm theo tuyến đường, xe hoặc tài xế...",
+        clearTransferSearch: "Xóa tìm kiếm đưa đón",
+        filterTransferType: "Lọc theo loại đưa đón",
+        allTransferTypes: "Tất cả loại",
+        filterTransferDate: "Lọc theo ngày đưa đón",
+        allDates: "Tất cả ngày",
+        upcoming: "Sắp tới",
+        past: "Đã qua",
+        filterVehicle: "Lọc theo xe",
+        allVehicles: "Tất cả xe",
+        filterPassengers: "Lọc theo hành khách",
+        anyPassengers: "Bất kỳ số hành khách",
+        sortTransfers: "Sắp xếp đưa đón",
+        transfersLower: "lượt đưa đón",
+        newestFirst: "Mới nhất trước",
+        oldestFirst: "Cũ nhất trước",
+        priceHigh: "Giá: cao xuống thấp",
+        priceLow: "Giá: thấp lên cao",
+        driver: "Tài xế",
+        noTransfersFound: "Không tìm thấy đặt chỗ đưa đón",
+        noTransfersHint: "Thay đổi bộ lọc hoặc đặt chuyến đưa đón mới.",
+        findTransfers: "Tìm chuyến đưa đón",
+        basicRoom: "Cơ bản",
+    },
+
+    "한국어": {
+        email: "이메일",
+        phone: "전화",
+        bookingPending: "예약 대기 중",
+        pendingMessage: "예약이 StayWay의 확인을 기다리고 있습니다.",
+        transferSearchPlaceholder: "경로, 차량 또는 기사로 검색...",
+        clearTransferSearch: "이동 서비스 검색 지우기",
+        filterTransferType: "이동 유형별 필터",
+        allTransferTypes: "모든 유형",
+        filterTransferDate: "이동 날짜별 필터",
+        allDates: "모든 날짜",
+        upcoming: "예정",
+        past: "지난 일정",
+        filterVehicle: "차량별 필터",
+        allVehicles: "모든 차량",
+        filterPassengers: "승객 수별 필터",
+        anyPassengers: "모든 승객 수",
+        sortTransfers: "이동 서비스 정렬",
+        transfersLower: "이동 서비스",
+        newestFirst: "최신순",
+        oldestFirst: "오래된순",
+        priceHigh: "가격: 높은순",
+        priceLow: "가격: 낮은순",
+        driver: "기사",
+        noTransfersFound: "이동 서비스 예약을 찾을 수 없습니다",
+        noTransfersHint: "필터를 변경하거나 새 이동 서비스를 예약하세요.",
+        findTransfers: "이동 서비스 찾기",
+        basicRoom: "기본",
+    },
+
+    "日本語": {
+        email: "メール",
+        phone: "電話",
+        bookingPending: "予約保留中",
+        pendingMessage: "予約はStayWayの確認を待っています。",
+        transferSearchPlaceholder: "ルート、車両、ドライバーで検索...",
+        clearTransferSearch: "送迎検索をクリア",
+        filterTransferType: "送迎タイプで絞り込む",
+        allTransferTypes: "すべてのタイプ",
+        filterTransferDate: "送迎日で絞り込む",
+        allDates: "すべての日付",
+        upcoming: "今後",
+        past: "過去",
+        filterVehicle: "車両で絞り込む",
+        allVehicles: "すべての車両",
+        filterPassengers: "乗客数で絞り込む",
+        anyPassengers: "任意の乗客数",
+        sortTransfers: "送迎を並べ替え",
+        transfersLower: "件の送迎",
+        newestFirst: "新しい順",
+        oldestFirst: "古い順",
+        priceHigh: "価格：高い順",
+        priceLow: "価格：安い順",
+        driver: "ドライバー",
+        noTransfersFound: "送迎予約が見つかりません",
+        noTransfersHint: "フィルターを変更するか、新しい送迎を予約してください。",
+        findTransfers: "送迎を探す",
+        basicRoom: "ベーシック",
+    },
+
+    "中文": {
+        email: "电子邮箱",
+        phone: "电话",
+        bookingPending: "预订待确认",
+        pendingMessage: "您的预订正在等待 StayWay 确认。",
+        transferSearchPlaceholder: "按路线、车辆或司机搜索...",
+        clearTransferSearch: "清除接送搜索",
+        filterTransferType: "按接送类型筛选",
+        allTransferTypes: "所有类型",
+        filterTransferDate: "按接送日期筛选",
+        allDates: "所有日期",
+        upcoming: "即将到来",
+        past: "已过去",
+        filterVehicle: "按车辆筛选",
+        allVehicles: "所有车辆",
+        filterPassengers: "按乘客筛选",
+        anyPassengers: "任意乘客人数",
+        sortTransfers: "接送排序",
+        transfersLower: "个接送",
+        newestFirst: "最新优先",
+        oldestFirst: "最早优先",
+        priceHigh: "价格：从高到低",
+        priceLow: "价格：从低到高",
+        driver: "司机",
+        noTransfersFound: "未找到接送预订",
+        noTransfersHint: "请更改筛选条件或预订新的接送服务。",
+        findTransfers: "查找接送",
+        basicRoom: "基础",
+    },
+
+    "繁體中文": {
+        email: "電子郵件",
+        phone: "電話",
+        bookingPending: "預訂待確認",
+        pendingMessage: "您的預訂正在等待 StayWay 確認。",
+        transferSearchPlaceholder: "依路線、車輛或司機搜尋...",
+        clearTransferSearch: "清除接送搜尋",
+        filterTransferType: "依接送類型篩選",
+        allTransferTypes: "所有類型",
+        filterTransferDate: "依接送日期篩選",
+        allDates: "所有日期",
+        upcoming: "即將到來",
+        past: "已過去",
+        filterVehicle: "依車輛篩選",
+        allVehicles: "所有車輛",
+        filterPassengers: "依乘客篩選",
+        anyPassengers: "任意乘客人數",
+        sortTransfers: "接送排序",
+        transfersLower: "筆接送",
+        newestFirst: "最新優先",
+        oldestFirst: "最早優先",
+        priceHigh: "價格：由高到低",
+        priceLow: "價格：由低到高",
+        driver: "司機",
+        noTransfersFound: "找不到接送預訂",
+        noTransfersHint: "請更改篩選條件或預訂新的接送服務。",
+        findTransfers: "尋找接送",
+        basicRoom: "基本",
+    },
+
+    "Català": {
+        email: "Correu electrònic",
+        phone: "Telèfon",
+        bookingPending: "Reserva pendent",
+        pendingMessage: "La teva reserva espera la confirmació de StayWay.",
+        transferSearchPlaceholder: "Cerca per ruta, vehicle o conductor...",
+        clearTransferSearch: "Neteja la cerca de trasllats",
+        filterTransferType: "Filtra per tipus de trasllat",
+        allTransferTypes: "Tots els tipus",
+        filterTransferDate: "Filtra per data del trasllat",
+        allDates: "Totes les dates",
+        upcoming: "Propers",
+        past: "Passats",
+        filterVehicle: "Filtra per vehicle",
+        allVehicles: "Tots els vehicles",
+        filterPassengers: "Filtra per passatgers",
+        anyPassengers: "Qualsevol nombre de passatgers",
+        sortTransfers: "Ordena els trasllats",
+        transfersLower: "trasllats",
+        newestFirst: "Més recents primer",
+        oldestFirst: "Més antics primer",
+        priceHigh: "Preu: de més alt a més baix",
+        priceLow: "Preu: de més baix a més alt",
+        driver: "Conductor",
+        noTransfersFound: "No s'han trobat reserves de trasllat",
+        noTransfersHint: "Canvia els filtres o reserva un nou trasllat.",
+        findTransfers: "Troba un trasllat",
+        basicRoom: "Bàsica",
+    },
+
+    "Eesti": {
+        email: "E-post",
+        phone: "Telefon",
+        bookingPending: "Broneering ootel",
+        pendingMessage: "Teie broneering ootab StayWay kinnitust.",
+        transferSearchPlaceholder: "Otsi marsruudi, sõiduki või juhi järgi...",
+        clearTransferSearch: "Tühjenda transfeeriotsing",
+        filterTransferType: "Filtreeri transfeeri tüübi järgi",
+        allTransferTypes: "Kõik tüübid",
+        filterTransferDate: "Filtreeri transfeeri kuupäeva järgi",
+        allDates: "Kõik kuupäevad",
+        upcoming: "Tulevased",
+        past: "Möödunud",
+        filterVehicle: "Filtreeri sõiduki järgi",
+        allVehicles: "Kõik sõidukid",
+        filterPassengers: "Filtreeri reisijate järgi",
+        anyPassengers: "Mis tahes reisijate arv",
+        sortTransfers: "Sorteeri transfeere",
+        transfersLower: "transfeeri",
+        newestFirst: "Uusimad enne",
+        oldestFirst: "Vanimad enne",
+        priceHigh: "Hind: kõrgemast madalamani",
+        priceLow: "Hind: madalamast kõrgemani",
+        driver: "Juht",
+        noTransfersFound: "Transfeeribroneeringuid ei leitud",
+        noTransfersHint: "Muutke filtreid või broneerige uus transfeer.",
+        findTransfers: "Leia transfeer",
+        basicRoom: "Põhituba",
+    },
+
+    "Latviešu": {
+        email: "E-pasts",
+        phone: "Tālrunis",
+        bookingPending: "Rezervācija gaida",
+        pendingMessage: "Jūsu rezervācija gaida StayWay apstiprinājumu.",
+        transferSearchPlaceholder: "Meklēt pēc maršruta, transportlīdzekļa vai vadītāja...",
+        clearTransferSearch: "Notīrīt transfēru meklēšanu",
+        filterTransferType: "Filtrēt pēc transfēra veida",
+        allTransferTypes: "Visi veidi",
+        filterTransferDate: "Filtrēt pēc transfēra datuma",
+        allDates: "Visi datumi",
+        upcoming: "Gaidāmie",
+        past: "Pagājušie",
+        filterVehicle: "Filtrēt pēc transportlīdzekļa",
+        allVehicles: "Visi transportlīdzekļi",
+        filterPassengers: "Filtrēt pēc pasažieriem",
+        anyPassengers: "Jebkurš pasažieru skaits",
+        sortTransfers: "Kārtot transfērus",
+        transfersLower: "transfēri",
+        newestFirst: "Jaunākie vispirms",
+        oldestFirst: "Vecākie vispirms",
+        priceHigh: "Cena: no augstākās uz zemāko",
+        priceLow: "Cena: no zemākās uz augstāko",
+        driver: "Vadītājs",
+        noTransfersFound: "Transfēru rezervācijas nav atrastas",
+        noTransfersHint: "Mainiet filtrus vai rezervējiet jaunu transfēru.",
+        findTransfers: "Atrast transfēru",
+        basicRoom: "Pamata",
+    },
+
+    "Lietuvių": {
+        email: "El. paštas",
+        phone: "Telefonas",
+        bookingPending: "Užsakymas laukia",
+        pendingMessage: "Jūsų užsakymas laukia StayWay patvirtinimo.",
+        transferSearchPlaceholder: "Ieškoti pagal maršrutą, transporto priemonę ar vairuotoją...",
+        clearTransferSearch: "Išvalyti pervežimų paiešką",
+        filterTransferType: "Filtruoti pagal pervežimo tipą",
+        allTransferTypes: "Visi tipai",
+        filterTransferDate: "Filtruoti pagal pervežimo datą",
+        allDates: "Visos datos",
+        upcoming: "Būsimi",
+        past: "Praėję",
+        filterVehicle: "Filtruoti pagal transporto priemonę",
+        allVehicles: "Visos transporto priemonės",
+        filterPassengers: "Filtruoti pagal keleivius",
+        anyPassengers: "Bet koks keleivių skaičius",
+        sortTransfers: "Rikiuoti pervežimus",
+        transfersLower: "pervežimų",
+        newestFirst: "Naujausi pirmiausia",
+        oldestFirst: "Seniausi pirmiausia",
+        priceHigh: "Kaina: nuo didžiausios",
+        priceLow: "Kaina: nuo mažiausios",
+        driver: "Vairuotojas",
+        noTransfersFound: "Pervežimų užsakymų nerasta",
+        noTransfersHint: "Pakeiskite filtrus arba užsisakykite naują pervežimą.",
+        findTransfers: "Rasti pervežimą",
+        basicRoom: "Pagrindinis",
+    },
+};
+
 function getBookingPageText(language: string, key: string): string {
     const languageName = language.split("|")[0];
+
     return (
+        bookingPageExtraTranslations[languageName]?.[key] ??
         bookingPageTranslations[languageName]?.[key] ??
+        bookingPageExtraTranslations.English[key] ??
         bookingPageTranslations.English[key] ??
         key
     );
+}
+
+const bookingSupportedLanguages = Object.keys(
+    bookingPageTranslations
+);
+
+function getLocalizedTransferBookingTitle(
+    title: string,
+    language: string
+): string {
+    const transferTitleKeys = [
+        "privateTransfer",
+        "comfortTransfer",
+        "familyTransfer",
+    ] as const;
+
+    const normalizedTitle =
+        title.trim().toLocaleLowerCase();
+
+    for (const supportedLanguage of bookingSupportedLanguages) {
+        for (const key of transferTitleKeys) {
+            const translatedTitle =
+                getTranslation(
+                    supportedLanguage,
+                    key
+                );
+
+            if (
+                translatedTitle
+                    .trim()
+                    .toLocaleLowerCase() ===
+                normalizedTitle
+            ) {
+                return getTranslation(
+                    language,
+                    key
+                );
+            }
+        }
+    }
+
+    return title;
+}
+
+function getLocalizedBookingRoomName(
+    roomName: string | undefined,
+    language: string
+): string {
+    if (!roomName) {
+        return getBookingPageText(
+            language,
+            "roomNotSpecified"
+        );
+    }
+
+    if (
+        roomName
+            .trim()
+            .toLocaleLowerCase() ===
+        "basic"
+    ) {
+        return getBookingPageText(
+            language,
+            "basicRoom"
+        );
+    }
+
+    return roomName;
 }
 
 type Booking = {
@@ -1067,7 +2320,7 @@ function BookingsContent() {
                                 margin: 0,
                             }}
                         >
-                            Bookings
+                            {getBookingPageText(language, "title")}
                         </h1>
                     </div>
 
@@ -1276,7 +2529,7 @@ function BookingsContent() {
                                             currentUser?.role ===
                                             "admin"
                                                 ? getBookingPageText(language, "searchAdmin")
-                                                : getBookingPageText(language, "backStays")
+                                                : getBookingPageText(language, "searchUser")
                                         }
                                         aria-label={getBookingPageText(language, "searchBookings")}
                                         style={{
@@ -1687,7 +2940,7 @@ function BookingsContent() {
                                         filteredBookings.length
                                     }
                                 </strong>{" "}
-                                of{" "}
+                                {getBookingPageText(language, "of")}{" "}
                                 <strong
                                     style={{
                                         color:
@@ -1698,7 +2951,7 @@ function BookingsContent() {
                                         userBookings.length
                                     }
                                 </strong>{" "}
-                                bookings
+                                {getBookingPageText(language, "bookings")}
                             </span>
                                     </div>
                                 )}
@@ -1747,7 +3000,7 @@ function BookingsContent() {
                                             color: "#302d3a",
                                         }}
                                     >
-                                        {getTranslation(language, "noBookings")}
+                                        {getBookingPageText(language, "noTransfersFound")}
                                     </h3>
 
                                     <Link
@@ -1940,10 +3193,9 @@ function BookingsContent() {
 
                                                                     <span>
                                                                 {
-                                                                    room?.name ??
-                                                                    getTranslation(
-                                                                        language,
-                                                                        "roomNotSpecified"
+                                                                    getLocalizedBookingRoomName(
+                                                                        room?.name,
+                                                                        language
                                                                     )
                                                                 }
                                                             </span>
@@ -1985,7 +3237,9 @@ function BookingsContent() {
                                                                 <Mail className="booking-info-icon" />
 
                                                                 <div>
-                                                                    <strong>Email</strong>
+                                                                    <strong>
+                                                                        {getBookingPageText(language, "email")}
+                                                                    </strong>
 
                                                                     <span>
                                                                         {
@@ -2002,7 +3256,9 @@ function BookingsContent() {
                                                                 <Phone className="booking-info-icon" />
 
                                                                 <div>
-                                                                    <strong>Phone</strong>
+                                                                    <strong>
+                                                                        {getBookingPageText(language, "phone")}
+                                                                    </strong>
 
                                                                     <span>
                                                                         {booking.phone ?? "—"}
@@ -2153,7 +3409,7 @@ function BookingsContent() {
                                                                     <strong>
                                                                         {booking.status ===
                                                                         "pending"
-                                                                            ? "Booking pending"
+                                                                            ? getBookingPageText(language, "bookingPending")
                                                                             : getTranslation(
                                                                                 language,
                                                                                 "status"
@@ -2185,7 +3441,7 @@ function BookingsContent() {
                                                                     >
                                                                         {booking.status ===
                                                                         "pending"
-                                                                            ? "Your reservation is waiting for confirmation from StayWay."
+                                                                            ? getBookingPageText(language, "pendingMessage")
                                                                             : getStatusText(
                                                                                 booking.status
                                                                             )}
@@ -2211,7 +3467,7 @@ function BookingsContent() {
                                                                                     700,
                                                                             }}
                                                                         >
-                                                                        Pending
+                                                                        {getBookingPageText(language, "pending")}
                                                                     </span>
                                                                     )}
                                                             </div>
@@ -2313,8 +3569,8 @@ function BookingsContent() {
                                         onChange={(event) =>
                                             setTransferSearch(event.target.value)
                                         }
-                                        placeholder="Search by route, vehicle or driver..."
-                                        aria-label="Search transfers"
+                                        placeholder={getBookingPageText(language, "transferSearchPlaceholder")}
+                                        aria-label={getTranslation(language, "searchTransfers")}
                                         style={{
                                             width: "100%",
                                             height: "56px",
@@ -2333,7 +3589,7 @@ function BookingsContent() {
                                         <button
                                             type="button"
                                             onClick={() => setTransferSearch("")}
-                                            aria-label="Clear transfer search"
+                                            aria-label={getBookingPageText(language, "clearTransferSearch")}
                                             style={{
                                                 border: "none",
                                                 background: "transparent",
@@ -2383,7 +3639,7 @@ function BookingsContent() {
                                                 event.target.value as typeof transferTypeFilter
                                             )
                                         }
-                                        aria-label="Filter by transfer type"
+                                        aria-label={getBookingPageText(language, "filterTransferType")}
                                         style={{
                                             width: "100%",
                                             height: "56px",
@@ -2397,9 +3653,15 @@ function BookingsContent() {
                                             minWidth: 0,
                                         }}
                                     >
-                                        <option value="all">All types</option>
-                                        <option value="one-way">One way</option>
-                                        <option value="return">Return</option>
+                                        <option value="all">
+                                            {getBookingPageText(language, "allTransferTypes")}
+                                        </option>
+                                        <option value="one-way">
+                                            {getTranslation(language, "oneWay")}
+                                        </option>
+                                        <option value="return">
+                                            {getTranslation(language, "return")}
+                                        </option>
                                     </select>
                                 </div>
 
@@ -2434,7 +3696,7 @@ function BookingsContent() {
                                                 event.target.value as typeof transferDateFilter
                                             )
                                         }
-                                        aria-label="Filter by transfer date"
+                                        aria-label={getBookingPageText(language, "filterTransferDate")}
                                         style={{
                                             width: "100%",
                                             height: "56px",
@@ -2448,9 +3710,15 @@ function BookingsContent() {
                                             minWidth: 0,
                                         }}
                                     >
-                                        <option value="all">All dates</option>
-                                        <option value="upcoming">Upcoming</option>
-                                        <option value="past">Past</option>
+                                        <option value="all">
+                                            {getBookingPageText(language, "allDates")}
+                                        </option>
+                                        <option value="upcoming">
+                                            {getBookingPageText(language, "upcoming")}
+                                        </option>
+                                        <option value="past">
+                                            {getBookingPageText(language, "past")}
+                                        </option>
                                     </select>
                                 </div>
 
@@ -2483,7 +3751,7 @@ function BookingsContent() {
                                         onChange={(event) =>
                                             setTransferVehicleFilter(event.target.value)
                                         }
-                                        aria-label="Filter by vehicle"
+                                        aria-label={getBookingPageText(language, "filterVehicle")}
                                         style={{
                                             width: "100%",
                                             height: "56px",
@@ -2497,7 +3765,9 @@ function BookingsContent() {
                                             minWidth: 0,
                                         }}
                                     >
-                                        <option value="all">All vehicles</option>
+                                        <option value="all">
+                                            {getBookingPageText(language, "allVehicles")}
+                                        </option>
                                         {transferVehicleOptions.map((vehicle) => (
                                             <option key={vehicle} value={vehicle}>
                                                 {vehicle}
@@ -2537,7 +3807,7 @@ function BookingsContent() {
                                                 event.target.value as typeof transferPassengersFilter
                                             )
                                         }
-                                        aria-label="Filter by passengers"
+                                        aria-label={getBookingPageText(language, "filterPassengers")}
                                         style={{
                                             width: "100%",
                                             height: "56px",
@@ -2551,7 +3821,9 @@ function BookingsContent() {
                                             minWidth: 0,
                                         }}
                                     >
-                                        <option value="all">Any passengers</option>
+                                        <option value="all">
+                                            {getBookingPageText(language, "anyPassengers")}
+                                        </option>
                                         <option value="1-3">1–3</option>
                                         <option value="4-5">4–5</option>
                                         <option value="6+">6+</option>
@@ -2571,7 +3843,7 @@ function BookingsContent() {
                                         transferPassengersFilter === "all" &&
                                         transferSortBy === "newest"
                                     }
-                                    aria-label="Clear transfer filters"
+                                    aria-label={getBookingPageText(language, "clear")}
                                     style={{
                                         minHeight: "58px",
                                         width: "160px",
@@ -2611,7 +3883,7 @@ function BookingsContent() {
                                             "0 8px 24px rgba(78, 64, 125, 0.06)",
                                     }}
                                 >
-                                    Clear
+                                    {getBookingPageText(language, "clear")}
                                 </button>
                             </div>
 
@@ -2628,15 +3900,15 @@ function BookingsContent() {
                                 }}
                             >
                                 <span>
-                                    Showing{" "}
+                                    {getBookingPageText(language, "showing")}{" "}
                                     <strong style={{ color: "#302d3a" }}>
                                         {filteredTransferBookings.length}
                                     </strong>{" "}
-                                    of{" "}
+                                    {getBookingPageText(language, "of")}{" "}
                                     <strong style={{ color: "#302d3a" }}>
                                         {transferBookings.length}
                                     </strong>{" "}
-                                    transfers
+                                    {getBookingPageText(language, "transfersLower")}
                                 </span>
 
 
@@ -2671,7 +3943,7 @@ function BookingsContent() {
                                                 event.target.value as typeof transferSortBy
                                             )
                                         }
-                                        aria-label="Sort transfers"
+                                        aria-label={getBookingPageText(language, "sortTransfers")}
                                         style={{
                                             width: "100%",
                                             height: "40px",
@@ -2685,10 +3957,18 @@ function BookingsContent() {
                                             minWidth: 0,
                                         }}
                                     >
-                                        <option value="newest">Newest first</option>
-                                        <option value="oldest">Oldest first</option>
-                                        <option value="priceHigh">Price: high</option>
-                                        <option value="priceLow">Price: low</option>
+                                        <option value="newest">
+                                            {getBookingPageText(language, "newestFirst")}
+                                        </option>
+                                        <option value="oldest">
+                                            {getBookingPageText(language, "oldestFirst")}
+                                        </option>
+                                        <option value="priceHigh">
+                                            {getBookingPageText(language, "priceHigh")}
+                                        </option>
+                                        <option value="priceLow">
+                                            {getBookingPageText(language, "priceLow")}
+                                        </option>
                                     </select>
                                 </div>                            </div>
 
@@ -2737,14 +4017,14 @@ function BookingsContent() {
                                             color: "#777184",
                                         }}
                                     >
-                                        {getTranslation(language, "searchTransfers")}
+                                        {getBookingPageText(language, "noTransfersHint")}
                                     </p>
 
                                     <Link
                                         href="/transfers"
                                         className="button"
                                     >
-                                        {getTranslation(language, "searchTransfers")}
+                                        {getBookingPageText(language, "findTransfers")}
                                     </Link>
                                 </div>
                             ) : (
@@ -2881,7 +4161,10 @@ function BookingsContent() {
                                                                             fontWeight: 850,
                                                                         }}
                                                                     >
-                                                                        {booking.optionTitle}
+                                                                        {getLocalizedTransferBookingTitle(
+                                                                            booking.optionTitle,
+                                                                            language
+                                                                        )}
                                                                     </h3>
                                                                     <span
                                                                         style={{
@@ -2940,7 +4223,9 @@ function BookingsContent() {
                                                                         >
                                                                             <User size={15} strokeWidth={2.4} />
                                                                         </span>
-                                                                        <span>Driver: {driverName}</span>
+                                                                        <span>
+                                                                            {getBookingPageText(language, "driver")}: {driverName}
+                                                                        </span>
                                                                         {transferDriver?.phone && (
                                                                             <>
                                                                                 <span style={{ color: "#c9c3d5" }}>•</span>
@@ -3230,5 +4515,3 @@ export default function BookingsPage() {
         </ProtectedRoute>
     );
 }
-
-

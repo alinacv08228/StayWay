@@ -21,6 +21,8 @@ import {
 
 import {
     getTranslation,
+    getHomeTranslation,
+    getLocalizedCountryName,
 } from "../data/translations";
 
 import {
@@ -49,6 +51,73 @@ export default function Home() {
     const selectedCurrency =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
+
+    const homeT = (
+        key: Parameters<typeof getHomeTranslation>[1]
+    ) =>
+        getHomeTranslation(
+            language,
+            key
+        );
+
+    /*
+     * Keep the Home hero visually balanced in every language.
+     * English keeps the original 88px title.
+     * Longer translated lines are automatically reduced so the
+     * explicit two-line composition stays intact.
+     */
+    const languageName =
+        language.split("|")[0];
+
+    const heroFirstLine =
+        homeT("findYour");
+
+    const heroSecondLine =
+        homeT("perfectStay");
+
+    const longestHeroLineLength =
+        Math.max(
+            Array.from(heroFirstLine).length,
+            Array.from(heroSecondLine).length
+        );
+
+    const heroTitleFontSize =
+        languageName === "English"
+            ? 88
+            : Math.max(
+                52,
+                Math.min(
+                    80,
+                    Math.floor(
+                        620 /
+                        Math.max(
+                            1,
+                            longestHeroLineLength * 0.58
+                        )
+                    )
+                )
+            );
+
+    const journeyBadgeLength =
+        Array.from(
+            homeT("journeyStartsHere")
+        ).length;
+
+    const heroBadgeFontSize =
+        languageName === "English"
+            ? 13
+            : journeyBadgeLength > 34
+                ? 10.5
+                : journeyBadgeLength > 27
+                    ? 11.5
+                    : 12.5;
+
+    const heroLanguageStyle = {
+        "--home-title-size":
+            `${heroTitleFontSize}px`,
+        "--home-badge-size":
+            `${heroBadgeFontSize}px`,
+    } as CSSProperties;
 
     // =========================================
     // HOME CAROUSEL
@@ -286,27 +355,30 @@ export default function Home() {
 
     if (isLoading) {
         return (
-            <main className="home-page page-enter home-animated">
+            <main className="home-page cherry-olive-home page-enter home-animated">
 
                 <section className="home-hero">
-                    <div className="container home-hero-inner">
+                    <div
+                        className="container home-hero-inner"
+                        style={heroLanguageStyle}
+                    >
 
                         <div className="hero-content">
 
                             <div className="hero-badge">
-                                ✦ YOUR JOURNEY STARTS HERE
+                                ✦ {homeT("journeyStartsHere")}
                             </div>
 
                             <h1>
-                                FIND YOUR
+                                {homeT("findYour")}
                                 <br />
                                 <span>
-                                    PERFECT STAY.
+                                    {homeT("perfectStay")}
                                 </span>
                             </h1>
 
                             <p className="hero-subtitle home-hero-subtitle-animated">
-                                Loading StayWay...
+                                {homeT("loadingStayWay")}
                             </p>
 
                         </div>
@@ -327,10 +399,13 @@ export default function Home() {
         availableProperties.length === 0
     ) {
         return (
-            <main className="home-page page-enter">
+            <main className="home-page cherry-olive-home page-enter">
 
                 <section className="home-hero">
-                    <div className="container home-hero-inner">
+                    <div
+                        className="container home-hero-inner"
+                        style={heroLanguageStyle}
+                    >
 
                         <div className="hero-content">
 
@@ -339,24 +414,18 @@ export default function Home() {
                             </div>
 
                             <h1>
-                                SOMETHING
-                                <br />
-                                <span>
-                                    WENT WRONG.
-                                </span>
+                                {homeT("somethingWentWrong")}
                             </h1>
 
                             <p className="hero-subtitle">
-                                We could not load
-                                the available
-                                stays.
+                                {homeT("couldNotLoadStays")}
                             </p>
 
                             <Link
                                 href="/500"
                                 className="home-cta-button"
                             >
-                                VIEW ERROR PAGE
+                                {homeT("viewErrorPage")}
                                 <span>↗</span>
                             </Link>
 
@@ -370,7 +439,7 @@ export default function Home() {
     }
 
     return (
-        <main className="home-page page-enter home-animated">
+        <main className="home-page cherry-olive-home page-enter home-animated">
 
 
             {/* =================================================
@@ -383,29 +452,29 @@ export default function Home() {
 
                 <div className="hero-glow hero-glow-two"></div>
 
-                <div className="container home-hero-inner">
+                <div
+                    className="container home-hero-inner"
+                    style={heroLanguageStyle}
+                >
 
                     {/* HERO CONTENT */}
 
                     <div className="hero-content">
 
                         <div className="hero-badge home-hero-item home-hero-item-1">
-                            ✦ YOUR JOURNEY STARTS HERE
+                            ✦ {homeT("journeyStartsHere")}
                         </div>
 
                         <h1 className="home-hero-item home-hero-item-2">
-                            FIND YOUR
+                            {homeT("findYour")}
                             <br />
                             <span>
-                    PERFECT STAY.
-                </span>
+                                {homeT("perfectStay")}
+                            </span>
                         </h1>
 
                         <p className="hero-subtitle home-hero-subtitle-animated">
-                            Discover beautiful places,
-                            unforgettable stays
-                            and destinations worth
-                            exploring.
+                            {homeT("heroDescription")}
                         </p>
 
                         <div className="hero-stats home-hero-item home-hero-item-4">
@@ -420,7 +489,7 @@ export default function Home() {
                                 </strong>
 
                                 <span>
-                        Unique stays
+                        {homeT("uniqueStays")}
                     </span>
                             </div>
 
@@ -434,7 +503,7 @@ export default function Home() {
                                 </strong>
 
                                 <span>
-                        Available countries
+                        {homeT("availableCountries")}
                     </span>
                             </div>
 
@@ -446,7 +515,7 @@ export default function Home() {
                                 </strong>
 
                                 <span>
-                        Guest rating
+                        {homeT("guestRating")}
                     </span>
                             </div>
 
@@ -624,25 +693,21 @@ export default function Home() {
                         <div>
 
                             <span className="home-eyebrow">
-                                DISCOVER
+                                {homeT("discover")}
                             </span>
 
                             <h2>
-                                EXPLORE
+                                {homeT("explore")}
                                 <br />
                                 <span>
-                                    THE WORLD.
+                                    {homeT("theWorld")}
                                 </span>
                             </h2>
 
                         </div>
 
                         <p>
-                            Explore countries with
-                            available StayWay
-                            properties and discover
-                            cities waiting for your
-                            next adventure.
+                            {homeT("exploreCountriesDescription")}
                         </p>
 
                     </div>
@@ -655,15 +720,11 @@ export default function Home() {
                         <div className="home-empty-state">
 
                             <h3>
-                                No destinations
-                                available
+                                {homeT("noDestinationsAvailable")}
                             </h3>
 
                             <p>
-                                New countries will
-                                appear here when an
-                                administrator adds a
-                                property there.
+                                {homeT("noDestinationsDescription")}
                             </p>
 
                         </div>
@@ -731,7 +792,10 @@ export default function Home() {
 
                                             <h3>
                                                 {
-                                                    destination.country
+                                                    getLocalizedCountryName(
+                                                        destination.country,
+                                                        language
+                                                    )
                                                 }
                                             </h3>
 
@@ -758,14 +822,14 @@ export default function Home() {
                     <div className="home-section-heading stays-heading">
                         <div>
                             <span className="home-eyebrow">
-                                HANDPICKED STAYS
+                                {homeT("handpickedStays")}
                             </span>
 
                             <h2>
-                                STAY SOMEWHERE
+                                {homeT("staySomewhere")}
                                 <br />
                                 <span>
-                                    SPECIAL.
+                                    {homeT("special")}
                                 </span>
                             </h2>
                         </div>
@@ -774,19 +838,18 @@ export default function Home() {
                             href="/stays"
                             className="home-outline-button"
                         >
-                            View all stays ↗
+                            {homeT("viewAllStays")} ↗
                         </Link>
                     </div>
 
                     {featuredProperties.length === 0 ? (
                         <div className="home-empty-state">
                             <h3>
-                                No stays available
+                                {homeT("noStaysAvailable")}
                             </h3>
 
                             <p>
-                                Properties added by the administrator
-                                will appear here.
+                                {homeT("noStaysDescription")}
                             </p>
                         </div>
                     ) : (
@@ -814,7 +877,7 @@ export default function Home() {
                                             </div>
 
                                             <div className="property-view">
-                                                VIEW STAY ↗
+                                                {homeT("viewStay")} ↗
                                             </div>
                                         </div>
 
@@ -839,7 +902,7 @@ export default function Home() {
 
                                                 <div className="home-property-price">
                                                     <small>
-                                                        FROM
+                                                        {homeT("from")}
                                                     </small>
 
                                                     <div>
@@ -922,7 +985,7 @@ export default function Home() {
                                     boxShadow: "0 0 0 6px rgba(255,255,255,0.10)",
                                 }}
                             />
-                            YOUR NEXT ADVENTURE
+                            {homeT("yourNextAdventure")}
                         </span>
 
                         <h2
@@ -935,14 +998,14 @@ export default function Home() {
                                 letterSpacing: "-0.045em",
                             }}
                         >
-                            READY TO
+                            {homeT("readyTo")}
                             <br />
                             <span
                                 style={{
                                     color: "#ffffff",
                                 }}
                             >
-                                GET AWAY?
+                                {homeT("getAway")}
                             </span>
                         </h2>
 
@@ -955,8 +1018,7 @@ export default function Home() {
                                 lineHeight: 1.6,
                             }}
                         >
-                            Find your next stay and turn your plans into
-                            something worth remembering.
+                            {homeT("ctaDescription")}
                         </p>
                     </div>
 
@@ -1000,7 +1062,7 @@ export default function Home() {
                                     letterSpacing: "0.12em",
                                 }}
                             >
-                                STAYS
+                                {homeT("staysLabel")}
                             </span>
                         </div>
 
@@ -1033,7 +1095,7 @@ export default function Home() {
                                     letterSpacing: "0.12em",
                                 }}
                             >
-                                COUNTRIES
+                                {homeT("countriesLabel")}
                             </span>
                         </div>
 
@@ -1067,7 +1129,7 @@ export default function Home() {
                                     letterSpacing: "0.12em",
                                 }}
                             >
-                                GUEST RATING
+                                {homeT("guestRating")}
                             </span>
                         </div>
                     </div>
@@ -1095,7 +1157,7 @@ export default function Home() {
                             transition: "transform 0.2s ease, box-shadow 0.2s ease",
                         }}
                     >
-                        <span>EXPLORE ALL STAYS</span>
+                        <span>{homeT("exploreAllStays")}</span>
                         <span
                             style={{
                                 width: "34px",
@@ -1763,4 +1825,3 @@ export default function Home() {
         </main>
     );
 }
-

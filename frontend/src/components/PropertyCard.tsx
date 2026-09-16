@@ -9,6 +9,7 @@ import { currencyInfo } from "../data/currency";
 
 import {
     getTranslation,
+    getHomeTranslation,
     getLocalizedRoomFeature,
     getLocalizedBedType,
 } from "../data/translations";
@@ -476,7 +477,10 @@ export default function PropertyCard({
                         <div className="property-price-box">
 
                             <span className="price-from">
-                                From
+                                {getHomeTranslation(
+                                    language,
+                                    "from"
+                                )}
                             </span>
 
                             <div className="price-row">

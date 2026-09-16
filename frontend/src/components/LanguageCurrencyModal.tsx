@@ -10,14 +10,6 @@ type LanguageCurrencyModalProps = {
 
 const languages = [
     ["English", "United States"],
-    ["English", "United Kingdom"],
-    ["English", "Australia"],
-    ["English", "Canada"],
-    ["English", "India"],
-    ["English", "Ireland"],
-    ["English", "New Zealand"],
-    ["English", "Singapore"],
-    ["English", "United Arab Emirates"],
     ["Română", "România"],
     ["Русский", "Россия"],
     ["Українська", "Україна"],
@@ -581,7 +573,6 @@ export default function LanguageCurrencyModal({
                         <div className="suggested-languages">
                             {[
                                 ["English", "United States"],
-                                ["English", "United Kingdom"],
                                 ["Русский", "Россия"],
                                 ["Română", "România"],
                             ].map(

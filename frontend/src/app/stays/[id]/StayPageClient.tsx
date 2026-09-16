@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -1223,7 +1222,7 @@ export default function StayPageClient({
 
                             </div>
 
-                        )} 
+                        )}
 
 
                         {/* REVIEWS */}
@@ -1250,4 +1249,3 @@ export default function StayPageClient({
         </main>
     );
 }
-
