@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "Paris",
+    "country": "France",
+    "image": "/Paris.jpg",
+    "countryImage": "/France.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Rome",
+    "country": "Italy",
+    "image": "/Rome.jpg",
+    "countryImage": "/Italy.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Barcelona",
+    "country": "Spain",
+    "image": "/Barcelona.jpg",
+    "countryImage": "/Spain.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Nice",
+    "country": "France",
+    "image": "/Paris.jpg",
+    "countryImage": "/Paris.jpg"
+  },
+  {
+    "id": 1788770149504,
+    "name": "Hamburg",
+    "country": "Germany",
+    "image": "/Paris.jpg",
+    "countryImage": "/Paris.jpg"
+  },
+  {
+    "id": 1788771598126,
+    "name": "Berlin",
+    "country": "Germany",
+    "image": "/Paris.jpg",
+    "countryImage": "/Paris.jpg"
+  },
+  {
+    "id": 1788799667033,
+    "name": "Athens",
+    "country": "Greece",
+    "image": "/Athens.jpg",
+    "countryImage": "/Greece.jpg"
+  },
+  {
+    "id": 1788867600382,
+    "name": "Lisbon",
+    "country": "Portugal",
+    "image": "/Lisbon.jpg",
+    "countryImage": "/Portugal.jpg"
+  },
+  {
+    "id": 1788898052375,
+    "name": "Munich",
+    "country": "Germany",
+    "image": "/Munich.jpg",
+    "countryImage": "/Germany.jpg"
+  },
+  {
+    "id": 1789380690713,
+    "name": "London",
+    "country": "United Kingdom",
+    "image": "/United-Kingdom.jpg",
+    "countryImage": "/London.jpg"
+  }
+]

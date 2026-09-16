@@ -1,3 +1,4 @@
+import api from "../lib/api";
 import { properties as mockProperties } from "../data/mockData";
 import { Property } from "../types/types";
 
@@ -11,6 +12,77 @@ function getInitialProperties(): Property[] {
             property.destinationId === 3
     );
 }
+
+/* =========================================================
+   BACKEND API
+   ========================================================= */
+
+export async function getPropertiesFromApi(): Promise<Property[]> {
+    const response =
+        await api.get<Property[]>(
+            "/api/Properties"
+        );
+
+    const properties =
+        response.data;
+
+    /*
+     * Keep a synchronized local copy while the rest of the
+     * StayWay pages are migrated to the backend.
+     */
+    saveProperties(properties);
+
+    return properties;
+}
+
+export async function createPropertyInApi(
+    property: Omit<Property, "id">
+): Promise<Property> {
+    const response =
+        await api.post<Property>(
+            "/api/Properties",
+            {
+                id: 0,
+                ...property,
+            }
+        );
+
+    await getPropertiesFromApi();
+
+    return response.data;
+}
+
+export async function updatePropertyInApi(
+    id: number,
+    updatedData: Omit<Property, "id">
+): Promise<Property> {
+    const response =
+        await api.put<Property>(
+            `/api/Properties/${id}`,
+            {
+                id,
+                ...updatedData,
+            }
+        );
+
+    await getPropertiesFromApi();
+
+    return response.data;
+}
+
+export async function deletePropertyInApi(
+    id: number
+): Promise<void> {
+    await api.delete(
+        `/api/Properties/${id}`
+    );
+
+    await getPropertiesFromApi();
+}
+
+/* =========================================================
+   LEGACY LOCAL FALLBACK
+   ========================================================= */
 
 export function getProperties(): Property[] {
     // Pe server nu există localStorage.

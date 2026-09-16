@@ -35,23 +35,26 @@ import {
 } from "../../types/types";
 
 import {
-    createProperty,
-    deleteProperty,
+    createPropertyInApi,
+    deletePropertyInApi,
     getProperties,
-    updateProperty,
+    getPropertiesFromApi,
+    updatePropertyInApi,
 } from "../../services/propertyService";
 
 import {
-    createRoom,
-    deleteRoom,
+    createRoomInApi,
+    deleteRoomInApi,
     getRooms,
-    updateRoom,
+    getRoomsFromApi,
+    updateRoomInApi,
 } from "../../services/roomService";
 
 import {
-    createDestination,
+    createDestinationInApi,
     getDestinations,
-    updateDestination,
+    getDestinationsFromApi,
+    updateDestinationInApi,
 } from "../../services/destinationService";
 
 import {
@@ -1522,13 +1525,66 @@ export default function AdminPage() {
             setAllBookings([]);
         }
 
-        setAllProperties(
-            getProperties()
-        );
+        const loadPropertiesFromBackend = async () => {
+            try {
+                const loadedProperties =
+                    await getPropertiesFromApi();
 
-        setAllDestinations(
-            getDestinations()
-        );
+                setAllProperties(
+                    loadedProperties
+                );
+            } catch {
+                /*
+                 * Fallback to the synchronized local copy only if
+                 * the API is temporarily unavailable.
+                 */
+                setAllProperties(
+                    getProperties()
+                );
+            }
+        };
+
+        const loadRoomsFromBackend = async () => {
+            try {
+                const loadedRooms =
+                    await getRoomsFromApi();
+
+                setAllRooms(
+                    loadedRooms
+                );
+            } catch {
+                /*
+                 * Fallback to the synchronized local copy only if
+                 * the API is temporarily unavailable.
+                 */
+                setAllRooms(
+                    getRooms()
+                );
+            }
+        };
+
+        const loadDestinationsFromBackend = async () => {
+            try {
+                const loadedDestinations =
+                    await getDestinationsFromApi();
+
+                setAllDestinations(
+                    loadedDestinations
+                );
+            } catch {
+                /*
+                 * Fallback to the synchronized local copy only if
+                 * the API is temporarily unavailable.
+                 */
+                setAllDestinations(
+                    getDestinations()
+                );
+            }
+        };
+
+        void loadPropertiesFromBackend();
+        void loadRoomsFromBackend();
+        void loadDestinationsFromBackend();
 
         setAllTransferBookings(
             getTransferBookings()
@@ -1634,12 +1690,18 @@ export default function AdminPage() {
         const handleWindowFocus = () => {
             loadRegisteredUsers();
             loadDashboardBookings();
+            void loadPropertiesFromBackend();
+            void loadRoomsFromBackend();
+            void loadDestinationsFromBackend();
         };
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
                 loadRegisteredUsers();
                 loadDashboardBookings();
+                void loadPropertiesFromBackend();
+                void loadRoomsFromBackend();
+                void loadDestinationsFromBackend();
             }
         };
 
@@ -1854,7 +1916,7 @@ export default function AdminPage() {
         // Oraș care există deja
         setPropertyDestinationId(value);
 
-        const destination = getDestinations().find(
+        const destination = allDestinations.find(
             (item) => item.id === numericValue
         );
 
@@ -1869,7 +1931,7 @@ export default function AdminPage() {
     // SUBMIT PROPERTY
     // =========================================
 
-    const handlePropertySubmit = (
+    const handlePropertySubmit = async (
         event: FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
@@ -1975,13 +2037,6 @@ export default function AdminPage() {
                 propertyDestinationId
             );
 
-        /*
-         * NEW CITY
-         */
-        /*
-  * SELECTED CITY
-  */
-
         if (
             Number.isNaN(
                 destinationId
@@ -1995,132 +2050,121 @@ export default function AdminPage() {
         }
 
         /*
-         * Oraș predefinit care încă
-         * nu există în destinations.
+         * Create/update destination first, then save the property.
+         * Both operations now go through the backend.
          */
-        if (destinationId < 0) {
-            const selectedCity =
-                adminAvailableCities.find(
-                    (city) =>
-                        city.id ===
-                        destinationId
-                );
+        try {
+            if (destinationId < 0) {
+                const selectedCity =
+                    adminAvailableCities.find(
+                        (city) =>
+                            city.id ===
+                            destinationId
+                    );
 
-            if (!selectedCity) {
-                setPropertyError(
-                    "Please select a valid city."
-                );
+                if (!selectedCity) {
+                    setPropertyError(
+                        "Please select a valid city."
+                    );
 
-                return;
-            }
+                    return;
+                }
 
-            const newDestination =
-                createDestination({
-                    id: Date.now(),
-                    name:
-                    selectedCity.name,
-                    country:
-                    propertyCountry,
+                const newDestination =
+                    await createDestinationInApi({
+                        id: 0,
+                        name:
+                        selectedCity.name,
+                        country:
+                        propertyCountry,
+                        image:
+                            cityImage.trim(),
+                        countryImage:
+                            countryImage.trim(),
+                    });
+
+                destinationId =
+                    newDestination.id;
+            } else {
+                const existingDestination =
+                    allDestinations.find(
+                        (destination) =>
+                            destination.id ===
+                            destinationId
+                    );
+
+                if (!existingDestination) {
+                    setPropertyError(
+                        "Please select a valid city."
+                    );
+
+                    return;
+                }
+
+                await updateDestinationInApi({
+                    ...existingDestination,
                     image:
-                        cityImage.trim(),
+                        cityImage.trim() ||
+                        existingDestination.image,
                     countryImage:
-                        countryImage.trim(),
+                        countryImage.trim() ||
+                        existingDestination.countryImage,
                 });
-
-            destinationId =
-                newDestination.id;
-        } else {
-            /*
-             * Oraș care există deja.
-             */
-            const existingDestination =
-                getDestinations().find(
-                    (destination) =>
-                        destination.id ===
-                        destinationId
-                );
-
-            if (!existingDestination) {
-                setPropertyError(
-                    "Please select a valid city."
-                );
-
-                return;
             }
 
             /*
-             * Actualizăm imaginile
-             * orașului și țării.
+             * PROPERTY DATA
              */
-            updateDestination({
-                ...existingDestination,
-                image:
-                    cityImage.trim() ||
-                    existingDestination.image,
-                countryImage:
-                    countryImage.trim() ||
-                    existingDestination.countryImage,
-            });
-        }
+            const propertyData = {
+                name: propertyName.trim(),
+                description: propertyDescription.trim(),
+                destinationId,
+                address: propertyAddress.trim(),
+                stars,
+                rating:
+                    editingPropertyId !== null
+                        ? allProperties.find(
+                        (property) =>
+                            property.id ===
+                            editingPropertyId
+                    )?.rating ?? 0
+                        : 0,
+                pricePerNight: price,
+                image: propertyImage.trim(),
+            };
 
-        /*
-         * PROPERTY DATA
-         */
+            if (
+                editingPropertyId !==
+                null
+            ) {
+                await updatePropertyInApi(
+                    editingPropertyId,
+                    propertyData
+                );
+            } else {
+                await createPropertyInApi(
+                    propertyData
+                );
+            }
 
-        const propertyData = {
-            name: propertyName.trim(),
-            description: propertyDescription.trim(),
-            destinationId,
-            address: propertyAddress.trim(),
-            stars,
-            rating:
-                editingPropertyId !== null
-                    ? allProperties.find(
-                    (property) =>
-                        property.id ===
-                        editingPropertyId
-                )?.rating ?? 0
-                    : 0,
-            pricePerNight: price,
-            image: propertyImage.trim(),
-        };
-
-        /*
-         * CREATE / UPDATE
-         */
-        if (
-            editingPropertyId !==
-            null
-        ) {
-            updateProperty(
-                editingPropertyId,
-                propertyData
+            setAllProperties(
+                await getPropertiesFromApi()
             );
-        } else {
-            createProperty(
-                propertyData
+
+            setAllDestinations(
+                await getDestinationsFromApi()
+            );
+
+            resetPropertyForm();
+
+            setIsPropertyFormOpen(
+                false
+            );
+        } catch {
+            setPropertyError(
+                "Could not save the property or destination. Please try again."
             );
         }
-
-        /*
-         * REFRESH
-         */
-        setAllProperties(
-            getProperties()
-        );
-
-        setAllDestinations(
-            getDestinations()
-        );
-
-        /*
-         * RESET
-         */
-        resetPropertyForm();
-
-        setIsPropertyFormOpen(
-            false
-        );
     };
 
     // =========================================
@@ -2201,7 +2245,7 @@ export default function AdminPage() {
     // DELETE
     // =========================================
 
-    const handleDeleteProperty = (
+    const handleDeleteProperty = async (
         property: Property
     ) => {
         const confirmed =
@@ -2213,13 +2257,19 @@ export default function AdminPage() {
             return;
         }
 
-        deleteProperty(
-            property.id
-        );
+        try {
+            await deletePropertyInApi(
+                property.id
+            );
 
-        setAllProperties(
-            getProperties()
-        );
+            setAllProperties(
+                await getPropertiesFromApi()
+            );
+        } catch {
+            window.alert(
+                "Could not delete the property. Please try again."
+            );
+        }
     };
 
     const handleAddRoom = () => {
@@ -4205,7 +4255,7 @@ export default function AdminPage() {
                                                 <button
                                                     type="button"
                                                     className="admin-room-save-button"
-                                                    onClick={() => {
+                                                    onClick={async () => {
 
                                                         if (!roomName.trim()) {
                                                             setRoomError(
@@ -4250,19 +4300,29 @@ export default function AdminPage() {
                                                             roomNoPrepayment,
                                                         };
 
-                                                        if (editingRoomId === null) {
-                                                            createRoom(roomData);
-                                                        } else {
-                                                            updateRoom(
-                                                                editingRoomId,
-                                                                roomData
+                                                        try {
+                                                            if (editingRoomId === null) {
+                                                                await createRoomInApi(
+                                                                    roomData
+                                                                );
+                                                            } else {
+                                                                await updateRoomInApi(
+                                                                    editingRoomId,
+                                                                    roomData
+                                                                );
+                                                            }
+
+                                                            setAllRooms(
+                                                                await getRoomsFromApi()
+                                                            );
+                                                            setIsRoomFormOpen(false);
+                                                            setEditingRoomId(null);
+                                                            setRoomError("");
+                                                        } catch {
+                                                            setRoomError(
+                                                                "Could not save the room. Please try again."
                                                             );
                                                         }
-
-                                                        setAllRooms(getRooms());
-                                                        setIsRoomFormOpen(false);
-                                                        setEditingRoomId(null);
-                                                        setRoomError("");
                                                     }}
                                                 >
                                                     {editingRoomId === null
@@ -4400,7 +4460,7 @@ export default function AdminPage() {
                                                         <button
                                                             type="button"
                                                             className="admin-delete-button"
-                                                            onClick={() => {
+                                                            onClick={async () => {
                                                                 const confirmed =
                                                                     window.confirm(
                                                                         `Delete "${room.name}"?`
@@ -4410,8 +4470,19 @@ export default function AdminPage() {
                                                                     return;
                                                                 }
 
-                                                                deleteRoom(room.id);
-                                                                setAllRooms(getRooms());
+                                                                try {
+                                                                    await deleteRoomInApi(
+                                                                        room.id
+                                                                    );
+
+                                                                    setAllRooms(
+                                                                        await getRoomsFromApi()
+                                                                    );
+                                                                } catch {
+                                                                    window.alert(
+                                                                        "Could not delete the room. Please try again."
+                                                                    );
+                                                                }
                                                             }}
                                                         >
                                                             Delete

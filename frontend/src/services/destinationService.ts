@@ -1,3 +1,5 @@
+import api from "../lib/api";
+
 import {
     destinations as mockDestinations,
 } from "../data/mockData";
@@ -8,6 +10,68 @@ import {
 
 const DESTINATIONS_KEY =
     "stayway_destinations";
+
+/* =========================================================
+   BACKEND API
+   ========================================================= */
+
+export async function getDestinationsFromApi(): Promise<Destination[]> {
+    const response =
+        await api.get<Destination[]>(
+            "/api/Destinations"
+        );
+
+    const destinations =
+        response.data;
+
+    saveDestinations(
+        destinations
+    );
+
+    return destinations;
+}
+
+export async function createDestinationInApi(
+    destination: Destination
+): Promise<Destination> {
+    const response =
+        await api.post<Destination>(
+            "/api/Destinations",
+            destination
+        );
+
+    await getDestinationsFromApi();
+
+    return response.data;
+}
+
+export async function updateDestinationInApi(
+    destination: Destination
+): Promise<Destination> {
+    const response =
+        await api.put<Destination>(
+            `/api/Destinations/${destination.id}`,
+            destination
+        );
+
+    await getDestinationsFromApi();
+
+    return response.data;
+}
+
+export async function deleteDestinationInApi(
+    destinationId: number
+): Promise<void> {
+    await api.delete(
+        `/api/Destinations/${destinationId}`
+    );
+
+    await getDestinationsFromApi();
+}
+
+/* =========================================================
+   LEGACY LOCAL FALLBACK
+   ========================================================= */
 
 function getNextDestinationId(
     destinations: Destination[]
@@ -84,6 +148,13 @@ export function getDestinations(): Destination[] {
 export function saveDestinations(
     destinations: Destination[]
 ): void {
+    if (
+        typeof window ===
+        "undefined"
+    ) {
+        return;
+    }
+
     localStorage.setItem(
         DESTINATIONS_KEY,
         JSON.stringify(

@@ -3,3 +3,10 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+.DS_Store
+.idea/
+**/bin/
+**/obj/
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local

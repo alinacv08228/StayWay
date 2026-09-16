@@ -29,6 +29,7 @@ import {
 
 import {
     getProperties,
+    getPropertiesFromApi,
 } from "../../services/propertyService";
 
 import {
@@ -514,49 +515,62 @@ export default function StaysPage() {
     }, []);
 
     // =========================================
-    // LOAD LOCAL STORAGE DATA
+    // LOAD PROPERTIES FROM BACKEND
     // =========================================
 
     useEffect(() => {
         let mounted = true;
 
-        try {
-            const loadedProperties =
-                getProperties();
+        const loadProperties = async () => {
+            setIsLoading(true);
 
-            const loadedDestinations =
-                getDestinations();
+            try {
+                const loadedProperties =
+                    await getPropertiesFromApi();
 
-            if (!mounted) {
-                return;
+                const loadedDestinations =
+                    getDestinations();
+
+                if (!mounted) {
+                    return;
+                }
+
+                setAllProperties(
+                    loadedProperties
+                );
+
+                setAvailableDestinations(
+                    loadedDestinations
+                );
+
+                setHasError(false);
+            } catch {
+                if (!mounted) {
+                    return;
+                }
+
+                /*
+                 * Keep the last local copy as a fallback so the page
+                 * remains usable if the API is temporarily unavailable.
+                 */
+                const fallbackProperties =
+                    getProperties();
+
+                setAllProperties(
+                    fallbackProperties.length > 0
+                        ? fallbackProperties
+                        : mockProperties
+                );
+
+                setHasError(false);
+            } finally {
+                if (mounted) {
+                    setIsLoading(false);
+                }
             }
+        };
 
-            setAllProperties(
-                loadedProperties.length > 0
-                    ? loadedProperties
-                    : mockProperties
-            );
-
-            setAvailableDestinations(
-                loadedDestinations
-            );
-
-            setHasError(false);
-        } catch {
-            if (!mounted) {
-                return;
-            }
-
-            setAllProperties(
-                mockProperties
-            );
-
-            setHasError(false);
-        } finally {
-            if (mounted) {
-                setIsLoading(false);
-            }
-        }
+        void loadProperties();
 
         return () => {
             mounted = false;
@@ -1387,4 +1401,3 @@ export default function StaysPage() {
         </main>
     );
 }
-
