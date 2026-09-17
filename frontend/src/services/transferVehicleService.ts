@@ -1,3 +1,5 @@
+import api from "../lib/api";
+
 import {
     transferVehicles as initialTransferVehicles,
     TransferVehicle,
@@ -11,17 +13,137 @@ import {
 
 const STORAGE_KEY = "stayway_transfer_vehicles";
 
+/* =========================================================
+   BACKEND API
+========================================================= */
+
+export async function getTransferVehiclesFromApi(): Promise<
+    TransferVehicle[]
+> {
+    const response =
+        await api.get<TransferVehicle[]>(
+            "/api/TransferVehicles"
+        );
+
+    const vehicles = response.data;
+
+    saveTransferVehicles(vehicles);
+
+    return vehicles;
+}
+
+export async function getTransferVehicleByIdFromApi(
+    vehicleId: string
+): Promise<TransferVehicle> {
+    const response =
+        await api.get<TransferVehicle>(
+            `/api/TransferVehicles/${vehicleId}`
+        );
+
+    return response.data;
+}
+
+export async function getTransferVehiclesByCityFromApi(
+    city: string
+): Promise<TransferVehicle[]> {
+    const response =
+        await api.get<TransferVehicle[]>(
+            `/api/TransferVehicles/city/${encodeURIComponent(
+                city
+            )}`
+        );
+
+    return response.data;
+}
+
+export async function createTransferVehicleInApi(
+    vehicle: TransferVehicle
+): Promise<TransferVehicle> {
+    const response =
+        await api.post<TransferVehicle>(
+            "/api/TransferVehicles",
+            vehicle
+        );
+
+    await getTransferVehiclesFromApi();
+
+    return response.data;
+}
+
+export async function updateTransferVehicleInApi(
+    vehicleId: string,
+    updates: Partial<TransferVehicle>
+): Promise<TransferVehicle> {
+    /*
+     * Backend PUT expects the complete vehicle,
+     * therefore we first obtain the current object
+     * and then apply the requested changes.
+     */
+    let currentVehicle: TransferVehicle;
+
+    try {
+        currentVehicle =
+            await getTransferVehicleByIdFromApi(
+                vehicleId
+            );
+    } catch {
+        const localVehicle =
+            getTransferVehicleById(vehicleId);
+
+        if (!localVehicle) {
+            throw new Error(
+                "Transfer vehicle not found."
+            );
+        }
+
+        currentVehicle = localVehicle;
+    }
+
+    const updatedVehicle: TransferVehicle = {
+        ...currentVehicle,
+        ...updates,
+        id: vehicleId,
+    };
+
+    const response =
+        await api.put<TransferVehicle>(
+            `/api/TransferVehicles/${vehicleId}`,
+            updatedVehicle
+        );
+
+    await getTransferVehiclesFromApi();
+
+    return response.data;
+}
+
+export async function deleteTransferVehicleInApi(
+    vehicleId: string
+): Promise<void> {
+    await api.delete(
+        `/api/TransferVehicles/${vehicleId}`
+    );
+
+    await getTransferVehiclesFromApi();
+}
+
+/* =========================================================
+   LOCAL STORAGE FALLBACK
+========================================================= */
+
 export function getTransferVehicles(): TransferVehicle[] {
     if (typeof window === "undefined") {
         return initialTransferVehicles;
     }
 
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored =
+        localStorage.getItem(STORAGE_KEY);
 
     if (!stored) {
         localStorage.setItem(
             STORAGE_KEY,
-            JSON.stringify(initialTransferVehicles)
+            JSON.stringify(
+                initialTransferVehicles
+            )
         );
 
         return initialTransferVehicles;
@@ -31,8 +153,11 @@ export function getTransferVehicles(): TransferVehicle[] {
         const storedVehicles: TransferVehicle[] =
             JSON.parse(stored);
 
-        // Keep existing saved data, but automatically add any
-        // initial vehicles that are missing from localStorage.
+        /*
+         * Keep existing saved data, but automatically
+         * add any initial vehicles that are missing
+         * from localStorage.
+         */
         const updatedVehicles =
             initialTransferVehicles.map(
                 (initialVehicle) => {
@@ -50,18 +175,27 @@ export function getTransferVehicles(): TransferVehicle[] {
                     return {
                         ...initialVehicle,
                         ...existingVehicle,
+
                         licensePlate:
-                            existingVehicle.licensePlate ||
-                            initialVehicle.licensePlate ||
+                            existingVehicle
+                                .licensePlate ||
+                            initialVehicle
+                                .licensePlate ||
                             "",
+
                         driverId:
-                            existingVehicle.driverId ||
-                            initialVehicle.driverId,
+                            existingVehicle
+                                .driverId ||
+                            initialVehicle
+                                .driverId,
                     };
                 }
             );
 
-        // Keep custom vehicles created from Admin as well.
+        /*
+         * Keep custom vehicles created from
+         * Admin as well.
+         */
         const customVehicles =
             storedVehicles.filter(
                 (vehicle) =>
@@ -111,10 +245,12 @@ export function saveTransferVehicles(
 export function createTransferVehicle(
     vehicle: TransferVehicle
 ): TransferVehicle {
-    const vehicles = getTransferVehicles();
+    const vehicles =
+        getTransferVehicles();
 
     const newVehicle = {
         ...vehicle,
+
         id:
             vehicle.id ||
             `vehicle-${Date.now()}`,
@@ -132,12 +268,14 @@ export function updateTransferVehicle(
     vehicleId: string,
     updates: Partial<TransferVehicle>
 ): TransferVehicle | null {
-    const vehicles = getTransferVehicles();
+    const vehicles =
+        getTransferVehicles();
 
-    const index = vehicles.findIndex(
-        (vehicle) =>
-            vehicle.id === vehicleId
-    );
+    const index =
+        vehicles.findIndex(
+            (vehicle) =>
+                vehicle.id === vehicleId
+        );
 
     if (index === -1) {
         return null;
@@ -148,9 +286,12 @@ export function updateTransferVehicle(
         ...updates,
     };
 
-    vehicles[index] = updatedVehicle;
+    vehicles[index] =
+        updatedVehicle;
 
-    saveTransferVehicles(vehicles);
+    saveTransferVehicles(
+        vehicles
+    );
 
     return updatedVehicle;
 }
@@ -158,7 +299,8 @@ export function updateTransferVehicle(
 export function deleteTransferVehicle(
     vehicleId: string
 ): boolean {
-    const vehicles = getTransferVehicles();
+    const vehicles =
+        getTransferVehicles();
 
     const filteredVehicles =
         vehicles.filter(
@@ -199,6 +341,10 @@ export function getTransferVehicleById(
     );
 }
 
+/* =========================================================
+   VEHICLE BOOKINGS
+========================================================= */
+
 /**
  * Returns only active bookings assigned to a
  * specific vehicle.
@@ -216,6 +362,8 @@ export function getTransferVehicleBookings(
     return getTransferBookings().filter(
         (booking) =>
             booking.vehicleId === vehicleId &&
-            isActiveTransferBooking(booking)
+            isActiveTransferBooking(
+                booking
+            )
     );
 }

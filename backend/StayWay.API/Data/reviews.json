@@ -1,0 +1,432 @@
+[
+  {
+    "id": 1,
+    "propertyId": 4,
+    "userId": null,
+    "userName": "Sophie",
+    "rating": 5,
+    "comment": "Excellent location and very comfortable room. Perfect for exploring Rome.",
+    "createdAt": "2026-08-18",
+    "isMock": true
+  },
+  {
+    "id": 2,
+    "propertyId": 4,
+    "userId": null,
+    "userName": "Daniel",
+    "rating": 4,
+    "comment": "Beautiful hotel with friendly staff and excellent service.",
+    "createdAt": "2026-08-21",
+    "isMock": true
+  },
+  {
+    "id": 3,
+    "propertyId": 4,
+    "userId": null,
+    "userName": "Emma",
+    "rating": 4,
+    "comment": "Very clean and comfortable. Great location in Rome.",
+    "createdAt": "2026-08-14",
+    "isMock": true
+  },
+  {
+    "id": 4,
+    "propertyId": 1,
+    "userId": null,
+    "userName": "Daniel",
+    "rating": 5,
+    "comment": "Wonderful stay at H\u00F4tel Balzac. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-21",
+    "isMock": true
+  },
+  {
+    "id": 5,
+    "propertyId": 1,
+    "userId": null,
+    "userName": "Emma",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at H\u00F4tel Balzac. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-24",
+    "isMock": true
+  },
+  {
+    "id": 6,
+    "propertyId": 1,
+    "userId": null,
+    "userName": "Olivia",
+    "rating": 5,
+    "comment": "Excellent experience at H\u00F4tel Balzac. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-18",
+    "isMock": true
+  },
+  {
+    "id": 7,
+    "propertyId": 2,
+    "userId": null,
+    "userName": "Emma",
+    "rating": 5,
+    "comment": "Wonderful stay at Hyatt Paris Madeleine. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-30",
+    "isMock": true
+  },
+  {
+    "id": 8,
+    "propertyId": 2,
+    "userId": null,
+    "userName": "Olivia",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Hyatt Paris Madeleine. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-09-01",
+    "isMock": true
+  },
+  {
+    "id": 9,
+    "propertyId": 2,
+    "userId": null,
+    "userName": "Lucas",
+    "rating": 5,
+    "comment": "Excellent experience at Hyatt Paris Madeleine. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-27",
+    "isMock": true
+  },
+  {
+    "id": 10,
+    "propertyId": 3,
+    "userId": null,
+    "userName": "Olivia",
+    "rating": 5,
+    "comment": "Wonderful stay at Pullman Paris Tour Eiffel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-08",
+    "isMock": true
+  },
+  {
+    "id": 11,
+    "propertyId": 3,
+    "userId": null,
+    "userName": "Lucas",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Pullman Paris Tour Eiffel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-11",
+    "isMock": true
+  },
+  {
+    "id": 12,
+    "propertyId": 3,
+    "userId": null,
+    "userName": "Amelia",
+    "rating": 5,
+    "comment": "Excellent experience at Pullman Paris Tour Eiffel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-09-03",
+    "isMock": true
+  },
+  {
+    "id": 13,
+    "propertyId": 5,
+    "userId": null,
+    "userName": "Amelia",
+    "rating": 5,
+    "comment": "Wonderful stay at Rome Marriott Grand Hotel Flora. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-27",
+    "isMock": true
+  },
+  {
+    "id": 14,
+    "propertyId": 5,
+    "userId": null,
+    "userName": "Noah",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Rome Marriott Grand Hotel Flora. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-30",
+    "isMock": true
+  },
+  {
+    "id": 15,
+    "propertyId": 5,
+    "userId": null,
+    "userName": "Charlotte",
+    "rating": 5,
+    "comment": "Excellent experience at Rome Marriott Grand Hotel Flora. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-24",
+    "isMock": true
+  },
+  {
+    "id": 16,
+    "propertyId": 6,
+    "userId": null,
+    "userName": "Noah",
+    "rating": 5,
+    "comment": "Wonderful stay at Palazzo Manfredi. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-09-03",
+    "isMock": true
+  },
+  {
+    "id": 17,
+    "propertyId": 6,
+    "userId": null,
+    "userName": "Charlotte",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Palazzo Manfredi. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-08",
+    "isMock": true
+  },
+  {
+    "id": 18,
+    "propertyId": 6,
+    "userId": null,
+    "userName": "James",
+    "rating": 5,
+    "comment": "Excellent experience at Palazzo Manfredi. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-09-01",
+    "isMock": true
+  },
+  {
+    "id": 19,
+    "propertyId": 7,
+    "userId": null,
+    "userName": "Charlotte",
+    "rating": 5,
+    "comment": "Wonderful stay at Hotel Arts Barcelona. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-14",
+    "isMock": true
+  },
+  {
+    "id": 20,
+    "propertyId": 7,
+    "userId": null,
+    "userName": "James",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Hotel Arts Barcelona. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-18",
+    "isMock": true
+  },
+  {
+    "id": 21,
+    "propertyId": 7,
+    "userId": null,
+    "userName": "Mia",
+    "rating": 5,
+    "comment": "Excellent experience at Hotel Arts Barcelona. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-11",
+    "isMock": true
+  },
+  {
+    "id": 22,
+    "propertyId": 8,
+    "userId": null,
+    "userName": "James",
+    "rating": 5,
+    "comment": "Wonderful stay at W Barcelona. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-24",
+    "isMock": true
+  },
+  {
+    "id": 23,
+    "propertyId": 8,
+    "userId": null,
+    "userName": "Mia",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at W Barcelona. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-27",
+    "isMock": true
+  },
+  {
+    "id": 24,
+    "propertyId": 8,
+    "userId": null,
+    "userName": "Sophie",
+    "rating": 5,
+    "comment": "Excellent experience at W Barcelona. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-21",
+    "isMock": true
+  },
+  {
+    "id": 25,
+    "propertyId": 9,
+    "userId": null,
+    "userName": "Mia",
+    "rating": 5,
+    "comment": "Wonderful stay at Majestic Hotel \u0026 Spa Barcelona. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-09-01",
+    "isMock": true
+  },
+  {
+    "id": 26,
+    "propertyId": 9,
+    "userId": null,
+    "userName": "Sophie",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Majestic Hotel \u0026 Spa Barcelona. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-09-03",
+    "isMock": true
+  },
+  {
+    "id": 27,
+    "propertyId": 9,
+    "userId": null,
+    "userName": "Daniel",
+    "rating": 5,
+    "comment": "Excellent experience at Majestic Hotel \u0026 Spa Barcelona. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-30",
+    "isMock": true
+  },
+  {
+    "id": 28,
+    "propertyId": 10,
+    "userId": null,
+    "userName": "Sophie",
+    "rating": 5,
+    "comment": "Wonderful stay at Stayway Nice Hotel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-11",
+    "isMock": true
+  },
+  {
+    "id": 29,
+    "propertyId": 10,
+    "userId": null,
+    "userName": "Daniel",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Stayway Nice Hotel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-14",
+    "isMock": true
+  },
+  {
+    "id": 30,
+    "propertyId": 10,
+    "userId": null,
+    "userName": "Emma",
+    "rating": 5,
+    "comment": "Excellent experience at Stayway Nice Hotel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-08",
+    "isMock": true
+  },
+  {
+    "id": 31,
+    "propertyId": 11,
+    "userId": "1110",
+    "userName": "Daniel",
+    "rating": 5,
+    "comment": "Wonderful stay at Hotel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-18",
+    "isMock": true
+  },
+  {
+    "id": 32,
+    "propertyId": 11,
+    "userId": "1111",
+    "userName": "Emma",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at Hotel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-21",
+    "isMock": true
+  },
+  {
+    "id": 33,
+    "propertyId": 11,
+    "userId": "1112",
+    "userName": "Olivia",
+    "rating": 5,
+    "comment": "Excellent experience at Hotel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-24",
+    "isMock": true
+  },
+  {
+    "id": 35,
+    "propertyId": 1,
+    "userId": "1",
+    "userName": "Alina",
+    "rating": 5,
+    "comment": "Nice!!!!!!!!!!!!!!!!!!!!!",
+    "createdAt": "2026-09-07T12:48:04.743Z",
+    "isMock": false
+  },
+  {
+    "id": 36,
+    "propertyId": 5,
+    "userId": "1",
+    "userName": "Alina",
+    "rating": 5,
+    "comment": "Wow! The best hotel I have never been.",
+    "createdAt": "2026-09-07T17:35:50.009Z",
+    "isMock": false
+  },
+  {
+    "id": 37,
+    "propertyId": 5,
+    "userId": "1",
+    "userName": "Alina",
+    "rating": 5,
+    "comment": "Can I leave multiple reviews?",
+    "createdAt": "2026-09-07T17:36:15.073Z",
+    "isMock": false
+  },
+  {
+    "id": 38,
+    "propertyId": 5,
+    "userId": "1",
+    "userName": "Alina",
+    "rating": 5,
+    "comment": "Apparently, yes. But is it right?",
+    "createdAt": "2026-09-07T17:36:41.573Z",
+    "isMock": false
+  },
+  {
+    "id": 39,
+    "propertyId": 12,
+    "userId": "1120",
+    "userName": "Emma",
+    "rating": 5,
+    "comment": "Wonderful stay at AMERON M\u00FCnchen Motorworld. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-08-27",
+    "isMock": true
+  },
+  {
+    "id": 40,
+    "propertyId": 12,
+    "userId": "1121",
+    "userName": "Olivia",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at AMERON M\u00FCnchen Motorworld. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-30",
+    "isMock": true
+  },
+  {
+    "id": 41,
+    "propertyId": 12,
+    "userId": "1122",
+    "userName": "Lucas",
+    "rating": 5,
+    "comment": "Excellent experience at AMERON M\u00FCnchen Motorworld. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-09-01",
+    "isMock": true
+  },
+  {
+    "id": 42,
+    "propertyId": 13,
+    "userId": "1130",
+    "userName": "Olivia",
+    "rating": 5,
+    "comment": "Wonderful stay at The Londoner. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "createdAt": "2026-09-03",
+    "isMock": true
+  },
+  {
+    "id": 43,
+    "propertyId": 13,
+    "userId": "1131",
+    "userName": "Lucas",
+    "rating": 4,
+    "comment": "We really enjoyed our stay at The Londoner. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "createdAt": "2026-08-08",
+    "isMock": true
+  },
+  {
+    "id": 44,
+    "propertyId": 13,
+    "userId": "1132",
+    "userName": "Amelia",
+    "rating": 5,
+    "comment": "Excellent experience at The Londoner. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "createdAt": "2026-08-11",
+    "isMock": true
+  }
+]

@@ -1,3 +1,5 @@
+import api from "../lib/api";
+
 import {
     reviews as mockReviews,
     properties as mockProperties,
@@ -10,6 +12,203 @@ import {
 
 const REVIEWS_KEY = "stayway_reviews";
 const PROPERTIES_KEY = "stayway_properties";
+
+
+/* =========================================================
+   BACKEND API TYPES
+   ========================================================= */
+
+type ReviewApiDto = {
+    id: number;
+    propertyId: number;
+    userId: string | null;
+    userName: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    isMock: boolean;
+};
+
+export type ReviewApiInput = {
+    propertyId: number;
+    userId: string | number;
+    userName: string;
+    rating: number;
+    comment: string;
+};
+
+/* =========================================================
+   BACKEND API HELPERS
+   ========================================================= */
+
+function mapApiReview(
+    review: ReviewApiDto
+): Review {
+    return {
+        id: review.id,
+        propertyId: review.propertyId,
+
+        /*
+         * The backend stores userId as string because
+         * registered users may also have IDs such as
+         * "user-...".
+         *
+         * Review["userId"] is kept for compatibility
+         * with the existing frontend type.
+         */
+        userId:
+            review.userId as unknown as
+                Review["userId"],
+
+        userName: review.userName,
+        rating: review.rating,
+        comment: review.comment,
+        createdAt: review.createdAt,
+        isMock: review.isMock,
+    };
+}
+
+/* =========================================================
+   GET ALL REVIEWS FROM BACKEND
+   ========================================================= */
+
+export async function getReviewsFromApi():
+    Promise<Review[]> {
+    const response =
+        await api.get<ReviewApiDto[]>(
+            "/api/Reviews"
+        );
+
+    const reviews =
+        response.data.map(
+            mapApiReview
+        );
+
+    /*
+     * Keep localStorage synchronized temporarily so any
+     * old frontend code that still reads getReviews()
+     * continues to work while we migrate the UI.
+     */
+    saveReviews(reviews);
+
+    return reviews;
+}
+
+/* =========================================================
+   GET REVIEW BY ID FROM BACKEND
+   ========================================================= */
+
+export async function getReviewByIdFromApi(
+    reviewId: number
+): Promise<Review> {
+    const response =
+        await api.get<ReviewApiDto>(
+            `/api/Reviews/${reviewId}`
+        );
+
+    return mapApiReview(
+        response.data
+    );
+}
+
+/* =========================================================
+   GET REVIEWS BY PROPERTY FROM BACKEND
+   ========================================================= */
+
+export async function getReviewsByPropertyIdFromApi(
+    propertyId: number
+): Promise<Review[]> {
+    const response =
+        await api.get<ReviewApiDto[]>(
+            `/api/Reviews/property/${propertyId}`
+        );
+
+    return response.data.map(
+        mapApiReview
+    );
+}
+
+/* =========================================================
+   GET AVERAGE RATING FROM BACKEND
+   ========================================================= */
+
+export async function getAverageRatingFromApi(
+    propertyId: number
+): Promise<number> {
+    const response =
+        await api.get<number>(
+            `/api/Reviews/property/${propertyId}/average`
+        );
+
+    return response.data;
+}
+
+/* =========================================================
+   CREATE REVIEW IN BACKEND
+   ========================================================= */
+
+export async function createReviewInApi(
+    reviewData: ReviewApiInput
+): Promise<Review> {
+    const response =
+        await api.post<ReviewApiDto>(
+            "/api/Reviews",
+            {
+                id: 0,
+                propertyId:
+                reviewData.propertyId,
+                userId:
+                    String(
+                        reviewData.userId
+                    ),
+                userName:
+                reviewData.userName,
+                rating:
+                reviewData.rating,
+                comment:
+                reviewData.comment,
+                createdAt: "",
+                isMock: false,
+            }
+        );
+
+    const createdReview =
+        mapApiReview(
+            response.data
+        );
+
+    /*
+     * Synchronize the temporary local fallback after
+     * a successful backend write.
+     */
+    await getReviewsFromApi();
+
+    return createdReview;
+}
+
+/* =========================================================
+   DELETE REVIEW IN BACKEND
+   ========================================================= */
+
+export async function deleteReviewInApi(
+    reviewId: number,
+    userId: string | number
+): Promise<void> {
+    await api.delete(
+        `/api/Reviews/${reviewId}`,
+        {
+            params: {
+                userId:
+                    String(userId),
+            },
+        }
+    );
+
+    /*
+     * Refresh the temporary local fallback after delete.
+     */
+    await getReviewsFromApi();
+}
 
 /* =========================================================
    MOCK REVIEW DATA
@@ -237,7 +436,7 @@ function normalizeReviews(
             ) {
                 normalizedReview.rating = 4;
             }
-            
+
             return normalizedReview;
         }
     );

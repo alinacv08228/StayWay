@@ -20,6 +20,8 @@ import { useUser } from "../../context/UserContext";
 
 import { useSettings } from "../../context/SettingsContext";
 
+import api from "../../lib/api";
+
 import {
     getDestinationUiTranslation,
     getLocalizedCountryName,
@@ -32,6 +34,7 @@ import {
     Property,
     Destination,
     Room,
+    User,
 } from "../../types/types";
 
 import {
@@ -59,9 +62,13 @@ import {
 
 import {
     createTransferVehicle,
+    createTransferVehicleInApi,
     deleteTransferVehicle,
+    deleteTransferVehicleInApi,
     getTransferVehicles,
+    getTransferVehiclesFromApi,
     updateTransferVehicle,
+    updateTransferVehicleInApi,
 } from "../../services/transferVehicleService";
 
 import {
@@ -143,7 +150,7 @@ export default function AdminPage() {
         useState<TransferBooking[]>(getTransferBookings());
 
     const [adminUsers, setAdminUsers] =
-        useState<typeof users>(users);
+        useState<User[]>(users);
 
     const [selectedTransferCity, setSelectedTransferCity] =
         useState("Athens");
@@ -273,66 +280,108 @@ export default function AdminPage() {
             : 35;
     };
 
-    const handleTransferVehicleSubmit = (event: FormEvent) => {
+    const handleTransferVehicleSubmit = async (
+        event: FormEvent
+    ) => {
         event.preventDefault();
 
         setVehicleError("");
 
         if (!vehicleName.trim()) {
-            setVehicleError("Enter vehicle name.");
+            setVehicleError(
+                "Enter vehicle name."
+            );
+            return;
+        }
+
+        if (!vehicleLicensePlate.trim()) {
+            setVehicleError(
+                "Enter license plate."
+            );
             return;
         }
 
         const vehicleData: TransferVehicle = {
-            id: editingVehicleId || `vehicle-${Date.now()}`,
+            id: editingVehicleId ?? "",
             city: vehicleCity,
             name: vehicleName.trim(),
-            licensePlate: vehicleLicensePlate.trim(),
+            licensePlate:
+                vehicleLicensePlate.trim(),
             category: vehicleCategory,
-            passengers: Number(vehiclePassengers),
-            luggage: Number(vehicleLuggage),
-            image: getTransferImagePath(vehicleImage),
-            driverId: editingVehicleId
-                ? allTransferVehicles.find(
-                    (vehicle) => vehicle.id === editingVehicleId
-                )?.driverId
-                : undefined,
+            passengers:
+                Number(vehiclePassengers),
+            luggage:
+                Number(vehicleLuggage),
+            image:
+                getTransferImagePath(
+                    vehicleImage
+                ),
+            driverId:
+                editingVehicleId
+                    ? allTransferVehicles.find(
+                        (vehicle) =>
+                            vehicle.id ===
+                            editingVehicleId
+                    )?.driverId
+                    : undefined,
         };
 
-        if (editingVehicleId) {
-            const updatedVehicle = updateTransferVehicle(
-                editingVehicleId,
-                vehicleData
+        try {
+            if (editingVehicleId) {
+                await updateTransferVehicleInApi(
+                    editingVehicleId,
+                    vehicleData
+                );
+            } else {
+                await createTransferVehicleInApi(
+                    vehicleData
+                );
+            }
+
+            setAllTransferVehicles(
+                await getTransferVehiclesFromApi()
             );
 
-            if (updatedVehicle) {
-                setAllTransferVehicles(getTransferVehicles());
-            }
-        } else {
-            createTransferVehicle(vehicleData);
-            setAllTransferVehicles(getTransferVehicles());
+            setVehicleName("");
+            setVehicleLicensePlate("");
+            setVehicleCategory("Private");
+            setVehiclePassengers("3");
+            setVehicleLuggage("2");
+            setVehicleImage("");
+            setVehicleCity(
+                selectedTransferCity
+            );
+            setEditingVehicleId(null);
+            setIsVehicleFormOpen(false);
+        } catch {
+            setVehicleError(
+                "Could not save the vehicle. Please try again."
+            );
         }
-
-        setVehicleName("");
-        setVehicleLicensePlate("");
-        setVehicleCategory("Private");
-        setVehiclePassengers("3");
-        setVehicleLuggage("2");
-        setVehicleImage("");
-        setVehicleCity(selectedTransferCity);
-        setEditingVehicleId(null);
-        setIsVehicleFormOpen(false);
     };
 
-    const handleDeleteTransferVehicle = (vehicleId: string) => {
+    const handleDeleteTransferVehicle = async (
+        vehicleId: string
+    ) => {
         const confirmed = window.confirm(
             "Are you sure you want to delete this vehicle?"
         );
 
         if (!confirmed) return;
 
-        deleteTransferVehicle(vehicleId);
-        setAllTransferVehicles(getTransferVehicles());
+        try {
+            await deleteTransferVehicleInApi(
+                vehicleId
+            );
+
+            setAllTransferVehicles(
+                await getTransferVehiclesFromApi()
+            );
+        } catch {
+            window.alert(
+                "Could not delete the vehicle. Please try again."
+            );
+        }
     };
 
     const handleEditTransferVehicle = (vehicle: TransferVehicle) => {
@@ -624,7 +673,7 @@ export default function AdminPage() {
 
         allBookings.forEach((booking) => {
             const customer = booking as AdminBooking;
-            const fallbackUser = users.find(
+            const fallbackUser = adminUsers.find(
                 (user) => user.id === booking.userId
             );
 
@@ -664,7 +713,7 @@ export default function AdminPage() {
         return Array.from(customers.values()).sort((a, b) =>
             a.name.localeCompare(b.name)
         );
-    }, [allBookings]);
+    }, [allBookings, adminUsers]);
 
     const [transferBookingStatusFilter, setTransferBookingStatusFilter] =
         useState("All");
@@ -922,7 +971,7 @@ export default function AdminPage() {
 
             const customer = booking as AdminBooking;
 
-            const user = users.find(
+            const user = adminUsers.find(
                 (item) => item.id === booking.userId
             );
 
@@ -1027,7 +1076,7 @@ export default function AdminPage() {
     }, [
         allBookings,
         allProperties,
-        users,
+        adminUsers,
         currentUser,
         bookingSearch,
         bookingStatusFilter,
@@ -1582,9 +1631,25 @@ export default function AdminPage() {
             }
         };
 
+        const loadTransferVehiclesFromBackend = async () => {
+            try {
+                const loadedVehicles =
+                    await getTransferVehiclesFromApi();
+
+                setAllTransferVehicles(
+                    loadedVehicles
+                );
+            } catch {
+                setAllTransferVehicles(
+                    getTransferVehicles()
+                );
+            }
+        };
+
         void loadPropertiesFromBackend();
         void loadRoomsFromBackend();
         void loadDestinationsFromBackend();
+        void loadTransferVehiclesFromBackend();
 
         setAllTransferBookings(
             getTransferBookings()
@@ -1617,69 +1682,25 @@ export default function AdminPage() {
             );
         };
 
-        const loadRegisteredUsers = () => {
-            const storedUsers =
-                localStorage.getItem(
-                    "stayway_registered_users"
-                );
+        const loadRegisteredUsers = async () => {
+            try {
+                const response =
+                    await api.get<User[]>("/api/Users");
 
-            let registeredUsers: typeof users = [];
-
-            if (storedUsers) {
-                try {
-                    const parsedUsers = JSON.parse(
-                        storedUsers
-                    );
-
-                    if (Array.isArray(parsedUsers)) {
-                        registeredUsers =
-                            parsedUsers as typeof users;
-                    }
-                } catch {
-                    registeredUsers = [];
-                }
+                setAdminUsers(response.data);
+            } catch {
+                /*
+                 * Keep the original demo users as a fallback only when
+                 * the backend is temporarily unavailable.
+                 */
+                setAdminUsers(users);
             }
-
-            /*
-             * Build the Admin Users list from:
-             * 1. the existing mock users
-             * 2. users created through Sign Up
-             *
-             * Email is the unique key. This prevents duplicates even
-             * when the same registered user is stored more than once.
-             *
-             * Mock users stay as the original records when an identical
-             * email already exists in the mock data.
-             */
-            const usersByEmail = new Map<string, (typeof users)[number]>();
-
-            users.forEach((user) => {
-                const email = user.email.trim().toLowerCase();
-
-                if (email) {
-                    usersByEmail.set(email, user);
-                }
-            });
-
-            registeredUsers.forEach((registeredUser) => {
-                const email = registeredUser.email
-                    .trim()
-                    .toLowerCase();
-
-                if (!email || usersByEmail.has(email)) {
-                    return;
-                }
-
-                usersByEmail.set(email, registeredUser);
-            });
-
-            setAdminUsers(Array.from(usersByEmail.values()));
         };
 
-        loadRegisteredUsers();
+        void loadRegisteredUsers();
 
         const handleRegisteredUsersChange = () => {
-            loadRegisteredUsers();
+            void loadRegisteredUsers();
             loadDashboardBookings();
         };
 
@@ -1688,20 +1709,22 @@ export default function AdminPage() {
         };
 
         const handleWindowFocus = () => {
-            loadRegisteredUsers();
+            void loadRegisteredUsers();
             loadDashboardBookings();
             void loadPropertiesFromBackend();
             void loadRoomsFromBackend();
             void loadDestinationsFromBackend();
+            void loadTransferVehiclesFromBackend();
         };
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                loadRegisteredUsers();
+                void loadRegisteredUsers();
                 loadDashboardBookings();
                 void loadPropertiesFromBackend();
                 void loadRoomsFromBackend();
                 void loadDestinationsFromBackend();
+                void loadTransferVehiclesFromBackend();
             }
         };
 
@@ -6569,7 +6592,7 @@ export default function AdminPage() {
                                     >
                                         {filteredBookings.map((booking) => {
                                             const customer = booking as AdminBooking;
-                                            const user = users.find(
+                                            const user = adminUsers.find(
                                                 (item) => item.id === booking.userId
                                             );
                                             const property = allProperties.find(
@@ -7690,3 +7713,4 @@ export default function AdminPage() {
         </main>
     );
 }
+

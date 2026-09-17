@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useUser } from "../context/UserContext";
 import { useSettings } from "../context/SettingsContext";
 
 import {
-    createReview,
-    deleteReview,
-    getAverageRating,
-    getReviewsByPropertyId,
+    createReviewInApi,
+    deleteReviewInApi,
+    getAverageRatingFromApi,
+    getReviewsByPropertyIdFromApi,
 } from "../services/reviewService";
 
 import { Review } from "../types/types";
@@ -2167,6 +2167,9 @@ export default function ReviewSection({
     const [propertyReviews, setPropertyReviews] =
         useState<Review[]>([]);
 
+    const [averageRating, setAverageRating] =
+        useState(propertyRating);
+
     const [selectedRating, setSelectedRating] =
         useState(0);
 
@@ -2186,62 +2189,91 @@ export default function ReviewSection({
         useState<number | null>(null);
 
 
-    const loadReviews = () => {
+    const loadReviews = async () => {
+        const [
+            loadedReviews,
+            loadedAverage,
+        ] = await Promise.all([
+            getReviewsByPropertyIdFromApi(
+                propertyId
+            ),
+            getAverageRatingFromApi(
+                propertyId
+            ),
+        ]);
+
         setPropertyReviews(
-            getReviewsByPropertyId(propertyId)
+            loadedReviews
+        );
+
+        setAverageRating(
+            loadedAverage > 0
+                ? loadedAverage
+                : propertyRating
         );
     };
 
 
     useEffect(() => {
-        loadReviews();
+        let isMounted = true;
 
-        const handleReviewsStorageChange = (
-            event: StorageEvent
-        ) => {
-            if (
-                event.key === "stayway_reviews"
-            ) {
-                loadReviews();
+        const load = async () => {
+            try {
+                const [
+                    loadedReviews,
+                    loadedAverage,
+                ] = await Promise.all([
+                    getReviewsByPropertyIdFromApi(
+                        propertyId
+                    ),
+                    getAverageRatingFromApi(
+                        propertyId
+                    ),
+                ]);
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setPropertyReviews(
+                    loadedReviews
+                );
+
+                setAverageRating(
+                    loadedAverage > 0
+                        ? loadedAverage
+                        : propertyRating
+                );
+            } catch (loadError) {
+                console.error(
+                    "Could not load reviews from backend:",
+                    loadError
+                );
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setPropertyReviews([]);
+                setAverageRating(
+                    propertyRating
+                );
             }
         };
 
-        window.addEventListener(
-            "storage",
-            handleReviewsStorageChange
-        );
+        void load();
 
         return () => {
-            window.removeEventListener(
-                "storage",
-                handleReviewsStorageChange
-            );
+            isMounted = false;
         };
     }, [
         propertyId,
+        propertyRating,
         currentUser?.id,
     ]);
 
 
-    const averageRating = useMemo(() => {
-
-        const calculatedRating =
-            getAverageRating(propertyId);
-
-        if (calculatedRating > 0) {
-            return calculatedRating;
-        }
-
-        return propertyRating;
-
-    }, [
-        propertyId,
-        propertyRating,
-        propertyReviews,
-    ]);
-
-
-    const handleSubmit = (
+    const handleSubmit = async (
         event: React.FormEvent<HTMLFormElement>
     ) => {
 
@@ -2306,20 +2338,19 @@ export default function ReviewSection({
 
         try {
 
-            createReview({
+            await createReviewInApi({
                 propertyId,
                 userId: currentUser.id,
                 userName: currentUser.name,
                 rating: selectedRating,
                 comment: comment.trim(),
-                isMock: false,
             });
 
 
             setComment("");
             setSelectedRating(0);
 
-            loadReviews();
+            await loadReviews();
 
 
             setSuccess(
@@ -2340,7 +2371,7 @@ export default function ReviewSection({
     };
 
 
-    const handleDelete = (
+    const handleDelete = async (
         reviewId: number
     ) => {
 
@@ -2364,29 +2395,20 @@ export default function ReviewSection({
         }
 
 
+        setError("");
+        setSuccess("");
         setDeletingId(reviewId);
 
 
         try {
 
-            const deleted =
-                deleteReview(
-                    reviewId,
-                    currentUser.id
-                );
+            await deleteReviewInApi(
+                reviewId,
+                currentUser.id
+            );
 
 
-            if (!deleted) {
-
-                setError(
-                    text.deleteOwnError
-                );
-
-                return;
-            }
-
-
-            loadReviews();
+            await loadReviews();
 
 
             setSuccess(
@@ -2576,8 +2598,12 @@ export default function ReviewSection({
                                 currentUser?.role ===
                                 "user" &&
                                 !review.isMock &&
-                                review.userId ===
-                                currentUser.id;
+                                String(
+                                    review.userId
+                                ) ===
+                                String(
+                                    currentUser.id
+                                );
 
 
                             return (

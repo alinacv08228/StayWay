@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 
 import {
-    bookings as mockBookings,
     properties as mockProperties,
     users,
     rooms as mockRooms,
@@ -29,6 +28,13 @@ import {
 
 import { getProperties } from "../../services/propertyService";
 import { getRooms } from "../../services/roomService";
+
+import {
+    getBookingsFromApi,
+    getBookingsByUserIdFromApi,
+    updateBookingInApi,
+    type Booking,
+} from "../../services/bookingService";
 
 import { useSettings } from "../../context/SettingsContext";
 import { useUser } from "../../context/UserContext";
@@ -1352,26 +1358,6 @@ function getLocalizedBookingRoomName(
     return roomName;
 }
 
-type Booking = {
-    id: number;
-    userId: number;
-    propertyId: number;
-    roomId?: number;
-    checkIn: string;
-    checkOut: string;
-    adults?: number;
-    children?: number;
-    infants?: number;
-    guests: number;
-    totalPrice: number;
-    status: "pending" | "confirmed" | "cancelled" | string;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    phone?: string;
-    specialRequests?: string;
-};
-
 function formatDate(date: string) {
     const [year, month, day] = date.split("-");
     return `${day}.${month}.${year}`;
@@ -1432,79 +1418,80 @@ function BookingsContent() {
             return;
         }
 
-        /*
-         * Load properties and rooms created from Admin.
-         */
-        try {
-            const savedProperties = getProperties();
-            setAllProperties(savedProperties);
-        } catch {
-            setAllProperties(mockProperties);
-        }
+        let isActive = true;
 
-        try {
-            const savedRooms = getRooms();
-            setAllRooms(savedRooms);
-        } catch {
-            setAllRooms(mockRooms);
-        }
+        const loadPageData = async () => {
+            setIsLoaded(false);
 
-        /*
-         * Load bookings.
-         */
-        const savedBookings =
-            localStorage.getItem("stayway_bookings");
-
-        let allBookings: Booking[] = [];
-
-        if (savedBookings) {
+            /*
+             * Properties and rooms still use their current services.
+             * Stay bookings now come from the ASP.NET Core backend.
+             */
             try {
-                // localStorage is the source of truth.
-                // Never re-add mock bookings after they were removed.
-                allBookings =
-                    JSON.parse(savedBookings) as Booking[];
+                const savedProperties = getProperties();
+                if (isActive) {
+                    setAllProperties(savedProperties);
+                }
             } catch {
-                allBookings = [];
-                localStorage.setItem(
-                    "stayway_bookings",
-                    JSON.stringify(allBookings)
-                );
+                if (isActive) {
+                    setAllProperties(mockProperties);
+                }
             }
-        } else {
-            // No saved bookings means there are currently no bookings.
-            // Do not seed mock bookings again after they were deleted.
-            allBookings = [];
 
-            localStorage.setItem(
-                "stayway_bookings",
-                JSON.stringify(allBookings)
-            );
-        }
+            try {
+                const savedRooms = getRooms();
+                if (isActive) {
+                    setAllRooms(savedRooms);
+                }
+            } catch {
+                if (isActive) {
+                    setAllRooms(mockRooms);
+                }
+            }
 
-        const visibleBookings =
-            currentUser.role === "admin"
-                ? allBookings
-                : allBookings.filter(
-                    (booking) =>
-                        booking.userId ===
-                        currentUser.id
+            try {
+                const visibleBookings =
+                    currentUser.role === "admin"
+                        ? await getBookingsFromApi()
+                        : await getBookingsByUserIdFromApi(
+                            currentUser.id
+                        );
+
+                if (isActive) {
+                    setUserBookings(visibleBookings);
+                }
+            } catch (error) {
+                console.error(
+                    "Could not load stay bookings from the backend.",
+                    error
                 );
 
-        setUserBookings(visibleBookings);
+                if (isActive) {
+                    setUserBookings([]);
+                }
+            }
 
-        const savedTransferBookings = getTransferBookings();
+            const savedTransferBookings = getTransferBookings();
 
-        const visibleTransferBookings =
-            currentUser.role === "admin"
-                ? savedTransferBookings
-                : savedTransferBookings.filter(
-                    (booking) =>
-                        booking.email === currentUser.email
-                );
+            const visibleTransferBookings =
+                currentUser.role === "admin"
+                    ? savedTransferBookings
+                    : savedTransferBookings.filter(
+                        (booking) =>
+                            booking.email === currentUser.email
+                    );
 
-        setTransferBookings(visibleTransferBookings);
+            if (isActive) {
+                setTransferBookings(visibleTransferBookings);
+                setIsLoaded(true);
+            }
+        };
 
-        setIsLoaded(true);
+        void loadPageData();
+
+        return () => {
+            isActive = false;
+        };
     }, [currentUser]);
 
     const formatPrice = (price: number) => {
@@ -1588,7 +1575,7 @@ function BookingsContent() {
         const uniqueUsers = new Map<
             string,
             {
-                userId: number;
+                userId: string;
                 name: string;
                 email: string;
             }
@@ -1597,7 +1584,8 @@ function BookingsContent() {
         userBookings.forEach((booking) => {
             const fallbackUser = users.find(
                 (item) =>
-                    item.id === booking.userId
+                    String(item.id) ===
+                    String(booking.userId)
             );
 
             const name =
@@ -1928,7 +1916,7 @@ function BookingsContent() {
         statusFilter !== "All" ||
         sortBy !== "newest";
 
-    const handleCancelBooking = (
+    const handleCancelBooking = async (
         bookingId: number
     ) => {
         const confirmed =
@@ -1943,58 +1931,53 @@ function BookingsContent() {
             return;
         }
 
-        const savedBookings =
-            localStorage.getItem(
-                "stayway_bookings"
-            );
+        const booking = userBookings.find(
+            (item) => item.id === bookingId
+        );
 
-        if (!savedBookings) {
+        if (!booking) {
             return;
         }
-
-        let allBookings: Booking[];
 
         try {
-            allBookings =
-                JSON.parse(
-                    savedBookings
-                ) as Booking[];
-        } catch {
-            return;
-        }
-
-        const updatedAllBookings =
-            allBookings.map(
-                (booking) =>
-                    booking.id ===
-                    bookingId
-                        ? {
-                            ...booking,
-                            status:
-                                "cancelled",
-                        }
-                        : booking
-            );
-
-        localStorage.setItem(
-            "stayway_bookings",
-            JSON.stringify(
-                updatedAllBookings
-            )
-        );
-
-        const visibleBookings =
-            currentUser?.role === "admin"
-                ? updatedAllBookings
-                : updatedAllBookings.filter(
-                    (booking) =>
-                        booking.userId ===
-                        currentUser?.id
+            const updatedBooking =
+                await updateBookingInApi(
+                    bookingId,
+                    {
+                        userId: booking.userId,
+                        propertyId: booking.propertyId,
+                        roomId: booking.roomId,
+                        checkIn: booking.checkIn,
+                        checkOut: booking.checkOut,
+                        adults: booking.adults,
+                        children: booking.children,
+                        infants: booking.infants,
+                        guests: booking.guests,
+                        totalPrice: booking.totalPrice,
+                        status: "cancelled",
+                        firstName: booking.firstName,
+                        lastName: booking.lastName,
+                        email: booking.email,
+                        phone: booking.phone,
+                        specialRequests: booking.specialRequests,
+                    }
                 );
 
-        setUserBookings(
-            visibleBookings
-        );
+            setUserBookings(
+                (currentBookings) =>
+                    currentBookings.map(
+                        (item) =>
+                            item.id === bookingId
+                                ? updatedBooking
+                                : item
+                    )
+            );
+        } catch (error) {
+            console.error(
+                "Could not cancel the booking through the backend.",
+                error
+            );
+        }
     };
 
     const handleCancelTransferBooking = (

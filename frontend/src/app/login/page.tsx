@@ -1,4 +1,3 @@
-
 "use client";
 
 import { FormEvent, useState } from "react";
@@ -318,7 +317,7 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] =
         useState(false);
 
-    const handleSubmit = (
+    const handleSubmit = async (
         event: FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
@@ -337,23 +336,28 @@ export default function LoginPage() {
 
         setIsLoading(true);
 
-        const user = login(
-            email.trim(),
-            password
-        );
+        try {
+            const user = await login(
+                email.trim(),
+                password
+            );
 
-        if (!user) {
+            if (!user) {
+                setError(text.invalidCredentials);
+                return;
+            }
+
+            setCurrentUser(user);
+
+            if (user.role === "admin") {
+                router.push("/admin");
+            } else {
+                router.push("/");
+            }
+        } catch {
             setError(text.invalidCredentials);
+        } finally {
             setIsLoading(false);
-            return;
-        }
-
-        setCurrentUser(user);
-
-        if (user.role === "admin") {
-            router.push("/admin");
-        } else {
-            router.push("/");
         }
     };
 

@@ -24,6 +24,11 @@ import {
 } from "../../../services/roomService";
 
 import {
+    checkRoomAvailabilityFromApi,
+    createBookingInApi,
+} from "../../../services/bookingService";
+
+import {
     useSettings,
 } from "../../../context/SettingsContext";
 
@@ -2623,7 +2628,7 @@ function NewBookingForm() {
        ===================================================== */
 
     const handleConfirmBooking =
-        () => {
+        async () => {
             if (!handleBooking()) {
                 return;
             }
@@ -2632,7 +2637,10 @@ function NewBookingForm() {
 
             if (!currentUser) {
                 setError(
-                    getBookingText(language, "loggedIn")
+                    getBookingText(
+                        language,
+                        "loggedIn"
+                    )
                 );
 
                 return;
@@ -2640,7 +2648,10 @@ function NewBookingForm() {
 
             if (!property) {
                 setError(
-                    getBookingText(language, "propertyMissing")
+                    getBookingText(
+                        language,
+                        "propertyMissing"
+                    )
                 );
 
                 return;
@@ -2667,9 +2678,7 @@ function NewBookingForm() {
                     email.trim()
                 );
 
-            if (
-                !emailIsValid
-            ) {
+            if (!emailIsValid) {
                 setError(
                     getBookingText(
                         language,
@@ -2680,166 +2689,70 @@ function NewBookingForm() {
                 return;
             }
 
-            /* ---------------------------------------------
-               CREATE BOOKING
-               --------------------------------------------- */
+            try {
+                /* ---------------------------------------------
+                   CHECK ROOM AVAILABILITY THROUGH BACKEND
+                   --------------------------------------------- */
 
-            const newBooking = {
-                id:
-                    Date.now(),
-
-                userId:
-                currentUser.id,
-
-                propertyId:
-                property.id,
-
-                roomId:
-                selectedRoom?.id,
-
-                checkIn,
-
-                checkOut,
-
-                adults,
-
-                children,
-
-                infants,
-
-                /*
-                 * Total number of guests.
-                 */
-                guests:
-                totalGuests,
-
-                /*
-                 * Price is stored in the
-                 * application's base currency.
-                 */
-                totalPrice,
-
-                status:
-                    "pending" as const,
-
-                firstName:
-                    firstName.trim(),
-
-                lastName:
-                    lastName.trim(),
-
-                email:
-                    email.trim(),
-
-                phone:
-                    phone.trim(),
-
-                specialRequests:
-                    specialRequests.trim(),
-            };
-
-
-            /* ---------------------------------------------
-               LOAD EXISTING BOOKINGS
-               --------------------------------------------- */
-
-            const savedBookings =
-                localStorage.getItem(
-                    "stayway_bookings"
-                );
-
-
-            let bookings: typeof newBooking[] =
-                [];
-
-
-            if (
-                savedBookings
-            ) {
-
-                try {
-
-                    bookings =
-                        JSON.parse(
-                            savedBookings
+                if (selectedRoom) {
+                    const isAvailable =
+                        await checkRoomAvailabilityFromApi(
+                            property.id,
+                            selectedRoom.id,
+                            checkIn,
+                            checkOut
                         );
 
-                } catch {
+                    if (!isAvailable) {
+                        setError(
+                            getBookingText(
+                                language,
+                                "roomUnavailable"
+                            )
+                        );
 
-                    bookings = [];
-
+                        return;
+                    }
                 }
 
+                /* ---------------------------------------------
+                   CREATE BOOKING THROUGH BACKEND
+                   --------------------------------------------- */
+
+                await createBookingInApi({
+                    userId: String(currentUser.id),
+                    propertyId: property.id,
+                    roomId: selectedRoom?.id,
+                    checkIn,
+                    checkOut,
+                    adults,
+                    children,
+                    infants,
+                    guests: totalGuests,
+                    totalPrice,
+                    status: "pending",
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                    specialRequests:
+                        specialRequests.trim(),
+                });
+
+                /* ---------------------------------------------
+                   REDIRECT
+                   --------------------------------------------- */
+
+                router.push("/bookings");
+            } catch {
+                setError(
+                    getBookingText(
+                        language,
+                        "roomUnavailable"
+                    )
+                );
             }
-
-
-            /* ---------------------------------------------
-               ROOM AVAILABILITY
-               --------------------------------------------- */
-
-            if (selectedRoom) {
-
-                const roomAlreadyBooked =
-                    bookings.some(
-                        (booking) =>
-                            booking.propertyId ===
-                            property.id &&
-                            booking.roomId ===
-                            selectedRoom.id &&
-                            booking.status !==
-                            "cancelled" &&
-                            Boolean(
-                                booking.checkIn &&
-                                booking.checkOut
-                            ) &&
-                            booking.checkIn <
-                            checkOut &&
-                            booking.checkOut >
-                            checkIn
-                    );
-
-                if (
-                    roomAlreadyBooked
-                ) {
-
-                    setError(
-                        getBookingText(
-                            language,
-                            "roomUnavailable"
-                        )
-                    );
-
-                    return;
-                }
-            }
-
-
-            /* ---------------------------------------------
-               SAVE
-               --------------------------------------------- */
-
-            bookings.push(
-                newBooking
-            );
-
-
-            localStorage.setItem(
-                "stayway_bookings",
-                JSON.stringify(
-                    bookings
-                )
-            );
-
-
-            /* ---------------------------------------------
-               REDIRECT
-               --------------------------------------------- */
-
-            router.push(
-                "/bookings"
-            );
         };
-
 
     /* =====================================================
        ADULTS

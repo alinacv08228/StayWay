@@ -25,6 +25,30 @@ var destinationDataPath = Path.Combine(
     "destinations.json"
 );
 
+var bookingDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "bookings.json"
+);
+
+var reviewDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "reviews.json"
+);
+
+var userDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "users.json"
+);
+
+var transferVehicleDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "transferVehicles.json"
+);
+
 builder.Services.AddSingleton<IPropertyService>(
     _ => new PropertyService(propertyDataPath)
 );
@@ -37,7 +61,25 @@ builder.Services.AddSingleton<IDestinationService>(
     _ => new DestinationService(destinationDataPath)
 );
 
+builder.Services.AddSingleton<IBookingService>(
+    _ => new BookingService(bookingDataPath)
+);
+
+builder.Services.AddSingleton<IReviewService>(
+    _ => new ReviewService(reviewDataPath)
+);
+
 builder.Services.AddSingleton<BusinessLogic>();
+
+builder.Services.AddSingleton<IUserService>(
+    _ => new UserService(userDataPath)
+);
+
+builder.Services.AddSingleton<ITransferVehicleService>(
+    _ => new TransferVehicleService(
+        transferVehicleDataPath
+    )
+);
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
