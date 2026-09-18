@@ -88,6 +88,8 @@ builder.Services.AddScoped<
     JwtTokenService
 >();
 
+builder.Services.AddScoped<EmailService>();
+
 // JWT
 var jwtKey =
     builder.Configuration["Jwt:Key"]

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StayWay.API.Services;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
 
@@ -14,34 +15,44 @@ public class SupportMessagesController
     private readonly ISupportMessageService
         _supportMessageService;
 
+    private readonly EmailService
+        _emailService;
+
+    private readonly ILogger<SupportMessagesController>
+        _logger;
+
     public SupportMessagesController(
-        ISupportMessageService
-            supportMessageService
+        ISupportMessageService supportMessageService,
+        EmailService emailService,
+        ILogger<SupportMessagesController> logger
     )
     {
         _supportMessageService =
             supportMessageService;
+
+        _emailService =
+            emailService;
+
+        _logger =
+            logger;
     }
 
     [Authorize(Roles = "admin")]
     [HttpGet]
-    public ActionResult<
-        List<SupportMessageDto>
-    > GetAll()
+    public ActionResult<List<SupportMessageDto>>
+        GetAll()
     {
         return Ok(
-            _supportMessageService
-                .GetAll()
+            _supportMessageService.GetAll()
         );
     }
 
     [Authorize]
     [HttpPost]
-    public ActionResult<
-        SupportMessageDto
-    > Create(
-        SupportMessageDto message
-    )
+    public async Task<ActionResult<SupportMessageDto>>
+        Create(
+            SupportMessageDto message
+        )
     {
         var currentUserId =
             User.FindFirstValue(
@@ -61,33 +72,80 @@ public class SupportMessagesController
         if (
             string.IsNullOrWhiteSpace(
                 currentUserId
+            ) ||
+            string.IsNullOrWhiteSpace(
+                currentUserEmail
             )
         )
         {
             return Unauthorized();
         }
 
-        message.UserId =
-            currentUserId;
-
         if (
-            !string.IsNullOrWhiteSpace(
-                currentUserName
+            string.IsNullOrWhiteSpace(
+                message.Subject
             )
         )
         {
-            message.Name =
-                currentUserName;
+            return BadRequest(
+                new
+                {
+                    message =
+                        "Subject is required."
+                }
+            );
         }
 
         if (
-            !string.IsNullOrWhiteSpace(
-                currentUserEmail
+            string.IsNullOrWhiteSpace(
+                message.Message
             )
         )
         {
-            message.Email =
-                currentUserEmail;
+            return BadRequest(
+                new
+                {
+                    message =
+                        "Message is required."
+                }
+            );
+        }
+
+        message.UserId =
+            currentUserId;
+
+        message.Name =
+            string.IsNullOrWhiteSpace(
+                currentUserName
+            )
+                ? "StayWay user"
+                : currentUserName;
+
+        message.Email =
+            currentUserEmail;
+
+        try
+        {
+            await _emailService
+                .SendSupportMessageAsync(
+                    message
+                );
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(
+                exception,
+                "StayWay support email could not be sent."
+            );
+
+            return StatusCode(
+                StatusCodes.Status502BadGateway,
+                new
+                {
+                    message =
+                        "The support email could not be sent."
+                }
+            );
         }
 
         var createdMessage =
@@ -95,8 +153,7 @@ public class SupportMessagesController
                 .Create(message);
 
         return StatusCode(
-            StatusCodes
-                .Status201Created,
+            StatusCodes.Status201Created,
             createdMessage
         );
     }
