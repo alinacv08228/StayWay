@@ -3,6 +3,8 @@ namespace StayWay.Domain.Entities;
 public class TransferBookingEntity
 {
     public string Id { get; set; } = string.Empty;
+    
+    public string? UserId { get; set; }
 
     public string TransferType { get; set; } = string.Empty;
 

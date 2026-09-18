@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
@@ -6,32 +7,41 @@ namespace StayWay.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransferDriversController : ControllerBase
+public class TransferDriversController
+    : ControllerBase
 {
-    private readonly ITransferDriverService _transferDriverService;
+    private readonly ITransferDriverService
+        _transferDriverService;
 
     public TransferDriversController(
-        ITransferDriverService transferDriverService
+        ITransferDriverService
+            transferDriverService
     )
     {
-        _transferDriverService = transferDriverService;
+        _transferDriverService =
+            transferDriverService;
     }
 
     [HttpGet]
-    public ActionResult<List<TransferDriverDto>> GetAll()
+    public ActionResult<
+        List<TransferDriverDto>
+    > GetAll()
     {
         return Ok(
-            _transferDriverService.GetAll()
+            _transferDriverService
+                .GetAll()
         );
     }
 
     [HttpGet("{id}")]
-    public ActionResult<TransferDriverDto> GetById(
-        string id
-    )
+    public ActionResult<TransferDriverDto>
+        GetById(
+            string id
+        )
     {
         var driver =
-            _transferDriverService.GetById(id);
+            _transferDriverService
+                .GetById(id);
 
         if (driver is null)
         {
@@ -42,118 +52,73 @@ public class TransferDriversController : ControllerBase
     }
 
     [HttpGet("city/{city}")]
-    public ActionResult<List<TransferDriverDto>> GetByCity(
+    public ActionResult<
+        List<TransferDriverDto>
+    > GetByCity(
         string city
     )
     {
         return Ok(
-            _transferDriverService.GetByCity(city)
+            _transferDriverService
+                .GetByCity(city)
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
-    public ActionResult<TransferDriverDto> Create(
-        TransferDriverDto driver
-    )
-    {
-        if (string.IsNullOrWhiteSpace(driver.City))
-        {
-            return BadRequest(
-                "City is required."
-            );
-        }
-
-        if (string.IsNullOrWhiteSpace(driver.Name))
-        {
-            return BadRequest(
-                "Name is required."
-            );
-        }
-
-        if (string.IsNullOrWhiteSpace(driver.Phone))
-        {
-            return BadRequest(
-                "Phone is required."
-            );
-        }
-
-        var allowedStatuses =
-            new[]
-            {
-                "available",
-                "busy",
-                "inactive"
-            };
-
-        if (
-            !allowedStatuses.Contains(
-                driver.Status,
-                StringComparer.OrdinalIgnoreCase
-            )
+    public ActionResult<TransferDriverDto>
+        Create(
+            TransferDriverDto driver
         )
+    {
+        var validationError =
+            ValidateDriver(driver);
+
+        if (validationError is not null)
         {
             return BadRequest(
-                "Status must be available, busy, or inactive."
+                new
+                {
+                    message =
+                        validationError
+                }
             );
         }
 
         var createdDriver =
-            _transferDriverService.Create(driver);
+            _transferDriverService
+                .Create(driver);
 
         return CreatedAtAction(
             nameof(GetById),
             new
             {
-                id = createdDriver.Id
+                id =
+                    createdDriver.Id
             },
             createdDriver
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPut("{id}")]
-    public ActionResult<TransferDriverDto> Update(
-        string id,
-        TransferDriverDto driver
-    )
-    {
-        if (string.IsNullOrWhiteSpace(driver.City))
-        {
-            return BadRequest(
-                "City is required."
-            );
-        }
-
-        if (string.IsNullOrWhiteSpace(driver.Name))
-        {
-            return BadRequest(
-                "Name is required."
-            );
-        }
-
-        if (string.IsNullOrWhiteSpace(driver.Phone))
-        {
-            return BadRequest(
-                "Phone is required."
-            );
-        }
-
-        var allowedStatuses =
-            new[]
-            {
-                "available",
-                "busy",
-                "inactive"
-            };
-
-        if (
-            !allowedStatuses.Contains(
-                driver.Status,
-                StringComparer.OrdinalIgnoreCase
-            )
+    public ActionResult<TransferDriverDto>
+        Update(
+            string id,
+            TransferDriverDto driver
         )
+    {
+        var validationError =
+            ValidateDriver(driver);
+
+        if (validationError is not null)
         {
             return BadRequest(
-                "Status must be available, busy, or inactive."
+                new
+                {
+                    message =
+                        validationError
+                }
             );
         }
 
@@ -171,13 +136,15 @@ public class TransferDriversController : ControllerBase
         return Ok(updatedDriver);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(
         string id
     )
     {
         var deleted =
-            _transferDriverService.Delete(id);
+            _transferDriverService
+                .Delete(id);
 
         if (!deleted)
         {
@@ -185,5 +152,59 @@ public class TransferDriversController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private static string?
+        ValidateDriver(
+            TransferDriverDto driver
+        )
+    {
+        if (
+            string.IsNullOrWhiteSpace(
+                driver.City
+            )
+        )
+        {
+            return "City is required.";
+        }
+
+        if (
+            string.IsNullOrWhiteSpace(
+                driver.Name
+            )
+        )
+        {
+            return "Name is required.";
+        }
+
+        if (
+            string.IsNullOrWhiteSpace(
+                driver.Phone
+            )
+        )
+        {
+            return "Phone is required.";
+        }
+
+        var allowedStatuses =
+            new[]
+            {
+                "available",
+                "busy",
+                "inactive"
+            };
+
+        if (
+            !allowedStatuses.Contains(
+                driver.Status,
+                StringComparer.OrdinalIgnoreCase
+            )
+        )
+        {
+            return
+                "Status must be available, busy, or inactive.";
+        }
+
+        return null;
     }
 }

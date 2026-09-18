@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
@@ -21,6 +23,7 @@ public class SupportMessagesController
             supportMessageService;
     }
 
+    [Authorize(Roles = "admin")]
     [HttpGet]
     public ActionResult<
         List<SupportMessageDto>
@@ -32,6 +35,7 @@ public class SupportMessagesController
         );
     }
 
+    [Authorize]
     [HttpPost]
     public ActionResult<
         SupportMessageDto
@@ -39,12 +43,60 @@ public class SupportMessagesController
         SupportMessageDto message
     )
     {
+        var currentUserId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+        var currentUserName =
+            User.FindFirstValue(
+                ClaimTypes.Name
+            );
+
+        var currentUserEmail =
+            User.FindFirstValue(
+                ClaimTypes.Email
+            );
+
+        if (
+            string.IsNullOrWhiteSpace(
+                currentUserId
+            )
+        )
+        {
+            return Unauthorized();
+        }
+
+        message.UserId =
+            currentUserId;
+
+        if (
+            !string.IsNullOrWhiteSpace(
+                currentUserName
+            )
+        )
+        {
+            message.Name =
+                currentUserName;
+        }
+
+        if (
+            !string.IsNullOrWhiteSpace(
+                currentUserEmail
+            )
+        )
+        {
+            message.Email =
+                currentUserEmail;
+        }
+
         var createdMessage =
             _supportMessageService
                 .Create(message);
 
         return StatusCode(
-            201,
+            StatusCodes
+                .Status201Created,
             createdMessage
         );
     }

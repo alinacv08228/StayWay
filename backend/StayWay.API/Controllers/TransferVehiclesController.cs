@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
@@ -6,32 +7,41 @@ namespace StayWay.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransferVehiclesController : ControllerBase
+public class TransferVehiclesController
+    : ControllerBase
 {
-    private readonly ITransferVehicleService _transferVehicleService;
+    private readonly ITransferVehicleService
+        _transferVehicleService;
 
     public TransferVehiclesController(
-        ITransferVehicleService transferVehicleService
+        ITransferVehicleService
+            transferVehicleService
     )
     {
-        _transferVehicleService = transferVehicleService;
+        _transferVehicleService =
+            transferVehicleService;
     }
 
     [HttpGet]
-    public ActionResult<List<TransferVehicleDto>> GetAll()
+    public ActionResult<
+        List<TransferVehicleDto>
+    > GetAll()
     {
         return Ok(
-            _transferVehicleService.GetAll()
+            _transferVehicleService
+                .GetAll()
         );
     }
 
     [HttpGet("{id}")]
-    public ActionResult<TransferVehicleDto> GetById(
-        string id
-    )
+    public ActionResult<TransferVehicleDto>
+        GetById(
+            string id
+        )
     {
         var vehicle =
-            _transferVehicleService.GetById(id);
+            _transferVehicleService
+                .GetById(id);
 
         if (vehicle is null)
         {
@@ -42,19 +52,24 @@ public class TransferVehiclesController : ControllerBase
     }
 
     [HttpGet("city/{city}")]
-    public ActionResult<List<TransferVehicleDto>> GetByCity(
+    public ActionResult<
+        List<TransferVehicleDto>
+    > GetByCity(
         string city
     )
     {
         return Ok(
-            _transferVehicleService.GetByCity(city)
+            _transferVehicleService
+                .GetByCity(city)
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
-    public ActionResult<TransferVehicleDto> Create(
-        TransferVehicleDto vehicle
-    )
+    public ActionResult<TransferVehicleDto>
+        Create(
+            TransferVehicleDto vehicle
+        )
     {
         var validationError =
             ValidateVehicle(vehicle);
@@ -64,31 +79,34 @@ public class TransferVehiclesController : ControllerBase
             return BadRequest(
                 new
                 {
-                    message = validationError
+                    message =
+                        validationError
                 }
             );
         }
 
         var createdVehicle =
-            _transferVehicleService.Create(
-                vehicle
-            );
+            _transferVehicleService
+                .Create(vehicle);
 
         return CreatedAtAction(
             nameof(GetById),
             new
             {
-                id = createdVehicle.Id
+                id =
+                    createdVehicle.Id
             },
             createdVehicle
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPut("{id}")]
-    public ActionResult<TransferVehicleDto> Update(
-        string id,
-        TransferVehicleDto vehicle
-    )
+    public ActionResult<TransferVehicleDto>
+        Update(
+            string id,
+            TransferVehicleDto vehicle
+        )
     {
         var validationError =
             ValidateVehicle(vehicle);
@@ -98,7 +116,8 @@ public class TransferVehiclesController : ControllerBase
             return BadRequest(
                 new
                 {
-                    message = validationError
+                    message =
+                        validationError
                 }
             );
         }
@@ -117,15 +136,15 @@ public class TransferVehiclesController : ControllerBase
         return Ok(updatedVehicle);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(
         string id
     )
     {
         var deleted =
-            _transferVehicleService.Delete(
-                id
-            );
+            _transferVehicleService
+                .Delete(id);
 
         if (!deleted)
         {
@@ -135,23 +154,38 @@ public class TransferVehiclesController : ControllerBase
         return NoContent();
     }
 
-    private static string? ValidateVehicle(
-        TransferVehicleDto vehicle
-    )
+    private static string?
+        ValidateVehicle(
+            TransferVehicleDto vehicle
+        )
     {
-        if (string.IsNullOrWhiteSpace(vehicle.City))
+        if (
+            string.IsNullOrWhiteSpace(
+                vehicle.City
+            )
+        )
         {
             return "City is required.";
         }
 
-        if (string.IsNullOrWhiteSpace(vehicle.Name))
+        if (
+            string.IsNullOrWhiteSpace(
+                vehicle.Name
+            )
+        )
         {
-            return "Vehicle name is required.";
+            return
+                "Vehicle name is required.";
         }
 
-        if (string.IsNullOrWhiteSpace(vehicle.LicensePlate))
+        if (
+            string.IsNullOrWhiteSpace(
+                vehicle.LicensePlate
+            )
+        )
         {
-            return "License plate is required.";
+            return
+                "License plate is required.";
         }
 
         var allowedCategories =
@@ -169,17 +203,20 @@ public class TransferVehiclesController : ControllerBase
             )
         )
         {
-            return "Category must be Private, Comfort or Family.";
+            return
+                "Category must be Private, Comfort or Family.";
         }
 
         if (vehicle.Passengers <= 0)
         {
-            return "Passengers must be greater than 0.";
+            return
+                "Passengers must be greater than 0.";
         }
 
         if (vehicle.Luggage < 0)
         {
-            return "Luggage cannot be negative.";
+            return
+                "Luggage cannot be negative.";
         }
 
         return null;

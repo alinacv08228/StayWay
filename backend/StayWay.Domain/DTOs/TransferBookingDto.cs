@@ -3,6 +3,8 @@ namespace StayWay.Domain.DTOs;
 public class TransferBookingDto
 {
     public string Id { get; set; } = string.Empty;
+    
+    public string? UserId { get; set; }
 
     public string TransferType { get; set; } = string.Empty;
 

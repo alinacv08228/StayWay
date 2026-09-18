@@ -28,6 +28,7 @@ public class TransferBookingService : ITransferBookingService
                 new TransferBookingDto
                 {
                     Id = booking.Id,
+                    UserId = booking.UserId,
                     TransferType = booking.TransferType,
                     OptionId = booking.OptionId,
                     OptionTitle = booking.OptionTitle,
@@ -87,10 +88,11 @@ public class TransferBookingService : ITransferBookingService
 
         return _context.TransferBookings
             .AsNoTracking()
-            .Where(booking =>
-                booking.DriverId != null &&
-                booking.DriverId.ToLower() ==
-                normalizedDriverId
+            .Where(
+                booking =>
+                    booking.DriverId != null &&
+                    booking.DriverId.ToLower() ==
+                    normalizedDriverId
             )
             .OrderByDescending(
                 booking => booking.CreatedAt
@@ -99,6 +101,7 @@ public class TransferBookingService : ITransferBookingService
                 new TransferBookingDto
                 {
                     Id = booking.Id,
+                    UserId = booking.UserId,
                     TransferType = booking.TransferType,
                     OptionId = booking.OptionId,
                     OptionTitle = booking.OptionTitle,
@@ -141,6 +144,13 @@ public class TransferBookingService : ITransferBookingService
                     )
                         ? GenerateBookingId()
                         : booking.Id.Trim(),
+
+                UserId =
+                    string.IsNullOrWhiteSpace(
+                        booking.UserId
+                    )
+                        ? null
+                        : booking.UserId.Trim(),
 
                 TransferType =
                     booking.TransferType,
@@ -228,7 +238,10 @@ public class TransferBookingService : ITransferBookingService
                         : booking.CreatedAt
             };
 
-        _context.TransferBookings.Add(entity);
+        _context.TransferBookings.Add(
+            entity
+        );
+
         _context.SaveChanges();
 
         return ToDto(entity);
@@ -329,9 +342,11 @@ public class TransferBookingService : ITransferBookingService
         existing.Status =
             booking.Status;
 
-        if (!string.IsNullOrWhiteSpace(
+        if (
+            !string.IsNullOrWhiteSpace(
                 booking.CreatedAt
-            ))
+            )
+        )
         {
             existing.CreatedAt =
                 booking.CreatedAt;
@@ -382,7 +397,8 @@ public class TransferBookingService : ITransferBookingService
         }
         while (
             _context.TransferBookings.Any(
-                booking => booking.Id == id
+                booking =>
+                    booking.Id == id
             )
         );
 
@@ -396,6 +412,7 @@ public class TransferBookingService : ITransferBookingService
         return new TransferBookingDto
         {
             Id = booking.Id,
+            UserId = booking.UserId,
             TransferType = booking.TransferType,
             OptionId = booking.OptionId,
             OptionTitle = booking.OptionTitle,

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
@@ -8,23 +9,33 @@ namespace StayWay.API.Controllers;
 [Route("api/[controller]")]
 public class RoomsController : ControllerBase
 {
-    private readonly IRoomService _roomService;
+    private readonly IRoomService
+        _roomService;
 
-    public RoomsController(IRoomService roomService)
+    public RoomsController(
+        IRoomService roomService
+    )
     {
         _roomService = roomService;
     }
 
     [HttpGet]
-    public ActionResult<List<RoomDto>> GetAll()
+    public ActionResult<List<RoomDto>>
+        GetAll()
     {
-        return Ok(_roomService.GetAll());
+        return Ok(
+            _roomService.GetAll()
+        );
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<RoomDto> GetById(int id)
+    public ActionResult<RoomDto>
+        GetById(
+            int id
+        )
     {
-        var room = _roomService.GetById(id);
+        var room =
+            _roomService.GetById(id);
 
         if (room is null)
         {
@@ -35,27 +46,51 @@ public class RoomsController : ControllerBase
     }
 
     [HttpGet("property/{propertyId:int}")]
-    public ActionResult<List<RoomDto>> GetByPropertyId(int propertyId)
+    public ActionResult<List<RoomDto>>
+        GetByPropertyId(
+            int propertyId
+        )
     {
-        return Ok(_roomService.GetByPropertyId(propertyId));
+        return Ok(
+            _roomService.GetByPropertyId(
+                propertyId
+            )
+        );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
-    public ActionResult<RoomDto> Create(RoomDto room)
+    public ActionResult<RoomDto>
+        Create(
+            RoomDto room
+        )
     {
-        var createdRoom = _roomService.Create(room);
+        var createdRoom =
+            _roomService.Create(room);
 
         return CreatedAtAction(
             nameof(GetById),
-            new { id = createdRoom.Id },
+            new
+            {
+                id = createdRoom.Id
+            },
             createdRoom
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPut("{id:int}")]
-    public ActionResult<RoomDto> Update(int id, RoomDto room)
+    public ActionResult<RoomDto>
+        Update(
+            int id,
+            RoomDto room
+        )
     {
-        var updatedRoom = _roomService.Update(id, room);
+        var updatedRoom =
+            _roomService.Update(
+                id,
+                room
+            );
 
         if (updatedRoom is null)
         {
@@ -65,10 +100,14 @@ public class RoomsController : ControllerBase
         return Ok(updatedRoom);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id)
+    public IActionResult Delete(
+        int id
+    )
     {
-        var deleted = _roomService.Delete(id);
+        var deleted =
+            _roomService.Delete(id);
 
         if (!deleted)
         {

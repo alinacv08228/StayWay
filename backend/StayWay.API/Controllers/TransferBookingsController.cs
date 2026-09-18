@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
@@ -6,7 +8,8 @@ namespace StayWay.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransferBookingsController : ControllerBase
+public class TransferBookingsController
+    : ControllerBase
 {
     private readonly ITransferBookingService
         _transferBookingService;
@@ -19,15 +22,40 @@ public class TransferBookingsController : ControllerBase
             transferBookingService;
     }
 
+    [Authorize]
     [HttpGet]
     public ActionResult<List<TransferBookingDto>>
         GetAll()
     {
-        return Ok(
-            _transferBookingService.GetAll()
-        );
+        var currentUserId =
+            GetCurrentUserId();
+
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        var bookings =
+            _transferBookingService.GetAll();
+
+        if (IsAdmin())
+        {
+            return Ok(bookings);
+        }
+
+        var userBookings =
+            bookings
+                .Where(
+                    booking =>
+                        booking.UserId ==
+                        currentUserId
+                )
+                .ToList();
+
+        return Ok(userBookings);
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public ActionResult<TransferBookingDto>
         GetById(
@@ -44,9 +72,26 @@ public class TransferBookingsController : ControllerBase
             return NotFound();
         }
 
+        var currentUserId =
+            GetCurrentUserId();
+
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        if (
+            !IsAdmin() &&
+            booking.UserId != currentUserId
+        )
+        {
+            return Forbid();
+        }
+
         return Ok(booking);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpGet("driver/{driverId}")]
     public ActionResult<List<TransferBookingDto>>
         GetByDriverId(
@@ -59,28 +104,47 @@ public class TransferBookingsController : ControllerBase
         );
     }
 
+    [Authorize]
     [HttpPost]
     public ActionResult<TransferBookingDto>
         Create(
             TransferBookingDto booking
         )
     {
+        var currentUserId =
+            GetCurrentUserId();
+
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        booking.UserId =
+            currentUserId;
+
+        if (!IsAdmin())
+        {
+            booking.Status =
+                "pending";
+        }
+
+        booking.CreatedAt =
+            string.Empty;
+
         var validationError =
             ValidateBooking(booking);
 
         if (validationError is not null)
         {
             return BadRequest(
-                validationError
+                new
+                {
+                    message =
+                        validationError
+                }
             );
         }
 
-        /*
-         * Booking IDs are unique.
-         * This also protects legacy localStorage migration
-         * from creating the same booking twice when two
-         * requests arrive almost at the same time.
-         */
         if (
             !string.IsNullOrWhiteSpace(
                 booking.Id
@@ -90,7 +154,11 @@ public class TransferBookingsController : ControllerBase
         )
         {
             return Conflict(
-                "A transfer booking with this ID already exists."
+                new
+                {
+                    message =
+                        "A transfer booking with this ID already exists."
+                }
             );
         }
 
@@ -109,6 +177,7 @@ public class TransferBookingsController : ControllerBase
         );
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public ActionResult<TransferBookingDto>
         Update(
@@ -116,30 +185,101 @@ public class TransferBookingsController : ControllerBase
             TransferBookingDto booking
         )
     {
-        var validationError =
-            ValidateBooking(booking);
-
-        if (validationError is not null)
-        {
-            return BadRequest(
-                validationError
-            );
-        }
-
-        var updatedBooking =
-            _transferBookingService.Update(
-                id,
-                booking
+        var existingBooking =
+            _transferBookingService.GetById(
+                id
             );
 
-        if (updatedBooking is null)
+        if (existingBooking is null)
         {
             return NotFound();
         }
 
-        return Ok(updatedBooking);
+        var currentUserId =
+            GetCurrentUserId();
+
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        if (IsAdmin())
+        {
+            booking.UserId =
+                existingBooking.UserId;
+
+            var validationError =
+                ValidateBooking(booking);
+
+            if (validationError is not null)
+            {
+                return BadRequest(
+                    new
+                    {
+                        message =
+                            validationError
+                    }
+                );
+            }
+
+            var updatedBooking =
+                _transferBookingService.Update(
+                    id,
+                    booking
+                );
+
+            if (updatedBooking is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedBooking);
+        }
+
+        if (
+            existingBooking.UserId !=
+            currentUserId
+        )
+        {
+            return Forbid();
+        }
+
+        if (
+            !string.Equals(
+                booking.Status,
+                "cancelled",
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                new
+                {
+                    message =
+                        "Users can only cancel their own transfer bookings."
+                }
+            );
+        }
+
+        existingBooking.Status =
+            "cancelled";
+
+        var cancelledBooking =
+            _transferBookingService.Update(
+                id,
+                existingBooking
+            );
+
+        if (cancelledBooking is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(cancelledBooking);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(
         string id
@@ -156,6 +296,18 @@ public class TransferBookingsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private string? GetCurrentUserId()
+    {
+        return User.FindFirstValue(
+            ClaimTypes.NameIdentifier
+        );
+    }
+
+    private bool IsAdmin()
+    {
+        return User.IsInRole("admin");
     }
 
     private static string? ValidateBooking(
@@ -195,7 +347,8 @@ public class TransferBookingsController : ControllerBase
             )
         )
         {
-            return "Option title is required.";
+            return
+                "Option title is required.";
         }
 
         var allowedOptionTitles =
@@ -229,8 +382,7 @@ public class TransferBookingsController : ControllerBase
             )
         )
         {
-            return
-                "Pickup is required.";
+            return "Pickup is required.";
         }
 
         if (
@@ -312,8 +464,7 @@ public class TransferBookingsController : ControllerBase
             )
         )
         {
-            return
-                "Email is required.";
+            return "Email is required.";
         }
 
         if (
@@ -322,8 +473,7 @@ public class TransferBookingsController : ControllerBase
             )
         )
         {
-            return
-                "Phone is required.";
+            return "Phone is required.";
         }
 
         var allowedStatuses =

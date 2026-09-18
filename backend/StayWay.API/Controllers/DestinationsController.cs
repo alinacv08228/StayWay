@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
@@ -35,7 +36,9 @@ public class DestinationsController : ControllerBase
         )
     {
         var destination =
-            _destinationService.GetById(id);
+            _destinationService.GetById(
+                id
+            );
 
         if (destination is null)
         {
@@ -45,6 +48,7 @@ public class DestinationsController : ControllerBase
         return Ok(destination);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public ActionResult<DestinationDto>
         Create(
@@ -60,13 +64,13 @@ public class DestinationsController : ControllerBase
             nameof(GetById),
             new
             {
-                id =
-                    createdDestination.Id
+                id = createdDestination.Id
             },
             createdDestination
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPut("{id:long}")]
     public ActionResult<DestinationDto>
         Update(
@@ -90,6 +94,7 @@ public class DestinationsController : ControllerBase
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id:long}")]
     public IActionResult Delete(
         long id
@@ -98,7 +103,9 @@ public class DestinationsController : ControllerBase
         try
         {
             var deleted =
-                _destinationService.Delete(id);
+                _destinationService.Delete(
+                    id
+                );
 
             if (!deleted)
             {
@@ -107,7 +114,10 @@ public class DestinationsController : ControllerBase
 
             return NoContent();
         }
-        catch (InvalidOperationException exception)
+        catch (
+            InvalidOperationException
+            exception
+        )
         {
             return Conflict(
                 new

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StayWay.BusinessLayer;
 using StayWay.Domain.DTOs;
@@ -27,10 +28,14 @@ public class PropertiesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
+    public IActionResult GetById(
+        int id
+    )
     {
         var property =
-            _businessLogic.Properties.GetById(id);
+            _businessLogic.Properties.GetById(
+                id
+            );
 
         if (property is null)
         {
@@ -40,6 +45,7 @@ public class PropertiesController : ControllerBase
         return Ok(property);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public IActionResult Create(
         [FromBody] PropertyDto property
@@ -52,11 +58,15 @@ public class PropertiesController : ControllerBase
 
         return CreatedAtAction(
             nameof(GetById),
-            new { id = createdProperty.Id },
+            new
+            {
+                id = createdProperty.Id
+            },
             createdProperty
         );
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPut("{id:int}")]
     public IActionResult Update(
         int id,
@@ -77,11 +87,16 @@ public class PropertiesController : ControllerBase
         return Ok(updatedProperty);
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id)
+    public IActionResult Delete(
+        int id
+    )
     {
         var deleted =
-            _businessLogic.Properties.Delete(id);
+            _businessLogic.Properties.Delete(
+                id
+            );
 
         if (!deleted)
         {
