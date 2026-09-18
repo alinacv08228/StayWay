@@ -5,8 +5,13 @@ import { useEffect, useState } from "react";
 
 import PropertyCard from "../../../components/PropertyCard";
 
-import { getDestinations } from "../../../services/destinationService";
-import { getProperties } from "../../../services/propertyService";
+import {
+    getDestinationsFromApi,
+} from "../../../services/destinationService";
+
+import {
+    getPropertiesFromApi,
+} from "../../../services/propertyService";
 
 import {
     Destination,
@@ -222,62 +227,89 @@ export default function DestinationPage({
 
         const loadDestination = async () => {
 
-            const { id } = await params;
+            setLoading(true);
 
-            const destinationId =
-                Number(id);
+            try {
+                const { id } =
+                    await params;
 
+                const destinationId =
+                    Number(id);
 
-            const savedDestinations =
-                getDestinations();
+                if (
+                    !Number.isInteger(
+                        destinationId
+                    ) ||
+                    destinationId <= 0
+                ) {
+                    if (mounted) {
+                        setDestination(null);
+                        setDestinationProperties([]);
+                        setLoading(false);
+                    }
 
-            const savedProperties =
-                getProperties();
+                    return;
+                }
 
+                const [
+                    loadedDestinations,
+                    loadedProperties,
+                ] = await Promise.all([
+                    getDestinationsFromApi(),
+                    getPropertiesFromApi(),
+                ]);
 
-            const foundDestination =
-                savedDestinations.find(
-                    (item) =>
-                        item.id === destinationId
+                if (!mounted) {
+                    return;
+                }
+
+                const foundDestination =
+                    loadedDestinations.find(
+                        (item) =>
+                            item.id ===
+                            destinationId
+                    );
+
+                if (!foundDestination) {
+                    setDestination(null);
+                    setDestinationProperties([]);
+                    setLoading(false);
+
+                    return;
+                }
+
+                setDestination(
+                    foundDestination
                 );
 
+                setDestinationProperties(
+                    loadedProperties.filter(
+                        (property) =>
+                            property.destinationId ===
+                            foundDestination.id
+                    )
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load destination from the backend.",
+                    error
+                );
 
-            if (!mounted) {
-                return;
-            }
-
-
-            if (!foundDestination) {
+                if (!mounted) {
+                    return;
+                }
 
                 setDestination(null);
-
                 setDestinationProperties([]);
-
-                setLoading(false);
-
-                return;
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
             }
-
-
-            setDestination(
-                foundDestination
-            );
-
-
-            setDestinationProperties(
-                savedProperties.filter(
-                    (property) =>
-                        property.destinationId ===
-                        foundDestination.id
-                )
-            );
-
-
-            setLoading(false);
         };
 
 
-        loadDestination();
+        void loadDestination();
 
 
         return () => {

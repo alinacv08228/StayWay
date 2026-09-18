@@ -16,11 +16,11 @@ import Link from "next/link";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
 import {
-    getProperties,
+    getPropertiesFromApi,
 } from "../../../services/propertyService";
 
 import {
-    getRoomsByPropertyId,
+    getRoomsByPropertyIdFromApi,
 } from "../../../services/roomService";
 
 import {
@@ -2325,50 +2325,95 @@ function NewBookingForm() {
 
 
     /*
-     * IMPORTANT:
-     *
-     * getProperties() and getRoomsByPropertyId()
-     * use localStorage.
-     *
-     * Therefore we load them only after the
-     * component has mounted in the browser.
-     *
-     * This prevents the Next.js hydration error.
+     * Property and room data come from the ASP.NET Core backend.
+     * No localStorage or mock fallback is used on this page.
      */
 
     useEffect(() => {
 
-        const allProperties =
-            getProperties();
+        let mounted = true;
 
-        const foundProperty =
-            allProperties.find(
-                (item) =>
-                    item.id ===
-                    propertyId
-            );
+        const loadBookingData =
+            async () => {
 
-        setProperty(
-            foundProperty ?? null
-        );
+                setIsLoaded(false);
 
-        if (foundProperty) {
+                if (
+                    !Number.isInteger(propertyId) ||
+                    propertyId <= 0
+                ) {
+                    if (mounted) {
+                        setProperty(null);
+                        setPropertyRooms([]);
+                        setIsLoaded(true);
+                    }
 
-            const rooms =
-                getRoomsByPropertyId(
-                    foundProperty.id
-                );
+                    return;
+                }
 
-            setPropertyRooms(
-                rooms
-            );
-        } else {
+                try {
+                    const allProperties =
+                        await getPropertiesFromApi();
 
-            setPropertyRooms([]);
+                    const foundProperty =
+                        allProperties.find(
+                            (item) =>
+                                item.id ===
+                                propertyId
+                        );
 
-        }
+                    if (!mounted) {
+                        return;
+                    }
 
-        setIsLoaded(true);
+                    if (!foundProperty) {
+                        setProperty(null);
+                        setPropertyRooms([]);
+                        setIsLoaded(true);
+
+                        return;
+                    }
+
+                    const rooms =
+                        await getRoomsByPropertyIdFromApi(
+                            foundProperty.id
+                        );
+
+                    if (!mounted) {
+                        return;
+                    }
+
+                    setProperty(
+                        foundProperty
+                    );
+
+                    setPropertyRooms(
+                        rooms
+                    );
+                } catch (loadError) {
+                    console.error(
+                        "Could not load booking data from the backend.",
+                        loadError
+                    );
+
+                    if (!mounted) {
+                        return;
+                    }
+
+                    setProperty(null);
+                    setPropertyRooms([]);
+                } finally {
+                    if (mounted) {
+                        setIsLoaded(true);
+                    }
+                }
+            };
+
+        void loadBookingData();
+
+        return () => {
+            mounted = false;
+        };
 
     }, [propertyId]);
 

@@ -17,7 +17,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer booked",
         successfully: "successfully.",
         description:
-            "Your transfer has been confirmed. We hope you have a comfortable journey.",
+            "Your transfer booking has been received and is awaiting StayWay confirmation.",
         backToTransfers: "Back to transfers",
     },
 
@@ -26,7 +26,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezervat",
         successfully: "cu succes.",
         description:
-            "Transferul tău a fost confirmat. Îți dorim o călătorie confortabilă.",
+            "Rezervarea transferului tău a fost înregistrată și așteaptă confirmarea StayWay.",
         backToTransfers: "Înapoi la transferuri",
     },
 
@@ -35,7 +35,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Трансфер забронирован",
         successfully: "успешно.",
         description:
-            "Ваш трансфер подтвержден. Желаем вам комфортной поездки.",
+            "Ваша заявка на трансфер зарегистрирована и ожидает подтверждения StayWay.",
         backToTransfers: "Назад к трансферам",
     },
 
@@ -44,7 +44,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Трансфер заброньовано",
         successfully: "успішно.",
         description:
-            "Ваш трансфер підтверджено. Бажаємо вам комфортної подорожі.",
+            "Ваше бронювання трансферу зареєстровано та очікує підтвердження StayWay.",
         backToTransfers: "Назад до трансферів",
     },
 
@@ -53,7 +53,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfert réservé",
         successfully: "avec succès.",
         description:
-            "Votre transfert a été confirmé. Nous vous souhaitons un voyage confortable.",
+            "Votre réservation de transfert a bien été enregistrée et attend la confirmation de StayWay.",
         backToTransfers: "Retour aux transferts",
     },
 
@@ -62,7 +62,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Traslado reservado",
         successfully: "correctamente.",
         description:
-            "Tu traslado ha sido confirmado. Esperamos que disfrutes de un viaje cómodo.",
+            "Tu reserva de traslado ha sido registrada y está pendiente de confirmación por StayWay.",
         backToTransfers: "Volver a traslados",
     },
 
@@ -71,7 +71,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer gebucht",
         successfully: "erfolgreich.",
         description:
-            "Ihr Transfer wurde bestätigt. Wir wünschen Ihnen eine angenehme Fahrt.",
+            "Ihre Transferbuchung wurde erfasst und wartet auf die Bestätigung durch StayWay.",
         backToTransfers: "Zurück zu Transfers",
     },
 
@@ -80,7 +80,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Trasferimento prenotato",
         successfully: "con successo.",
         description:
-            "Il tuo trasferimento è stato confermato. Ti auguriamo un viaggio confortevole.",
+            "La tua prenotazione del trasferimento è stata registrata ed è in attesa di conferma da StayWay.",
         backToTransfers: "Torna ai trasferimenti",
     },
 
@@ -89,7 +89,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer reservado",
         successfully: "com sucesso.",
         description:
-            "O seu transfer foi confirmado. Desejamos-lhe uma viagem confortável.",
+            "A sua reserva de transfer foi registada e aguarda confirmação da StayWay.",
         backToTransfers: "Voltar aos transferes",
     },
 
@@ -98,7 +98,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer geboekt",
         successfully: "met succes.",
         description:
-            "Je transfer is bevestigd. We wensen je een comfortabele reis.",
+            "Je transferboeking is ontvangen en wacht op bevestiging van StayWay.",
         backToTransfers: "Terug naar transfers",
     },
 
@@ -107,7 +107,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transport bestilt",
         successfully: "vellykket.",
         description:
-            "Transporten din er bekreftet. Vi ønsker deg en komfortabel reise.",
+            "Transportbestillingen din er registrert og venter på bekreftelse fra StayWay.",
         backToTransfers: "Tilbake til transport",
     },
 
@@ -116,7 +116,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer bokad",
         successfully: "framgångsrikt.",
         description:
-            "Din transfer har bekräftats. Vi önskar dig en bekväm resa.",
+            "Din transferbokning har registrerats och väntar på bekräftelse från StayWay.",
         backToTransfers: "Tillbaka till transfer",
     },
 
@@ -125,7 +125,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer booket",
         successfully: "med succes.",
         description:
-            "Din transfer er bekræftet. Vi ønsker dig en behagelig rejse.",
+            "Din transferbooking er registreret og afventer bekræftelse fra StayWay.",
         backToTransfers: "Tilbage til transfer",
     },
 
@@ -134,7 +134,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Kuljetus varattu",
         successfully: "onnistuneesti.",
         description:
-            "Kuljetuksesi on vahvistettu. Toivotamme sinulle mukavaa matkaa.",
+            "Kuljetusvarauksesi on vastaanotettu ja odottaa StayWayn vahvistusta.",
         backToTransfers: "Takaisin kuljetuksiin",
     },
 
@@ -143,7 +143,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer zarezerwowany",
         successfully: "pomyślnie.",
         description:
-            "Twój transfer został potwierdzony. Życzymy komfortowej podróży.",
+            "Twoja rezerwacja transferu została zarejestrowana i oczekuje na potwierdzenie StayWay.",
         backToTransfers: "Wróć do transferów",
     },
 
@@ -152,7 +152,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezervován",
         successfully: "úspěšně.",
         description:
-            "Váš transfer byl potvrzen. Přejeme vám pohodlnou cestu.",
+            "Vaše rezervace transferu byla přijata a čeká na potvrzení StayWay.",
         backToTransfers: "Zpět k transferům",
     },
 
@@ -161,7 +161,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezervovaný",
         successfully: "úspešne.",
         description:
-            "Váš transfer bol potvrdený. Prajeme vám pohodlnú cestu.",
+            "Vaša rezervácia transferu bola prijatá a čaká na potvrdenie StayWay.",
         backToTransfers: "Späť na transfery",
     },
 
@@ -170,7 +170,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transzfer lefoglalva",
         successfully: "sikeresen.",
         description:
-            "A transzferét megerősítettük. Kellemes utazást kívánunk.",
+            "A transzferfoglalását rögzítettük, és a StayWay visszaigazolására vár.",
         backToTransfers: "Vissza a transzferekhez",
     },
 
@@ -179,7 +179,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Трансферът е резервиран",
         successfully: "успешно.",
         description:
-            "Вашият трансфер е потвърден. Пожелаваме ви комфортно пътуване.",
+            "Вашата резервация за трансфер е регистрирана и очаква потвърждение от StayWay.",
         backToTransfers: "Назад към трансферите",
     },
 
@@ -188,7 +188,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezerviran",
         successfully: "uspješno.",
         description:
-            "Vaš transfer je potvrđen. Želimo vam ugodno putovanje.",
+            "Vaša rezervacija transfera je evidentirana i čeka potvrdu StayWaya.",
         backToTransfers: "Natrag na transfere",
     },
 
@@ -197,7 +197,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Prevoz rezerviran",
         successfully: "uspešno.",
         description:
-            "Vaš prevoz je potrjen. Želimo vam udobno potovanje.",
+            "Vaša rezervacija prevoza je zabeležena in čaka na potrditev StayWay.",
         backToTransfers: "Nazaj na prevoze",
     },
 
@@ -206,7 +206,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezervisan",
         successfully: "uspešno.",
         description:
-            "Vaš transfer je potvrđen. Želimo vam udobno putovanje.",
+            "Vaša rezervacija transfera je zabeležena i čeka potvrdu StayWay-a.",
         backToTransfers: "Nazad na transfere",
     },
 
@@ -215,7 +215,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezervisan",
         successfully: "uspješno.",
         description:
-            "Vaš transfer je potvrđen. Želimo vam ugodno putovanje.",
+            "Vaša rezervacija transfera je evidentirana i čeka potvrdu StayWaya.",
         backToTransfers: "Nazad na transfere",
     },
 
@@ -224,7 +224,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Η μεταφορά κρατήθηκε",
         successfully: "με επιτυχία.",
         description:
-            "Η μεταφορά σας επιβεβαιώθηκε. Σας ευχόμαστε ένα άνετο ταξίδι.",
+            "Η κράτηση της μεταφοράς σας καταχωρήθηκε και αναμένει επιβεβαίωση από το StayWay.",
         backToTransfers: "Πίσω στις μεταφορές",
     },
 
@@ -233,7 +233,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer rezervasyonu",
         successfully: "başarıyla tamamlandı.",
         description:
-            "Transferiniz onaylandı. Size konforlu bir yolculuk dileriz.",
+            "Transfer rezervasyonunuz alındı ve StayWay onayı bekleniyor.",
         backToTransfers: "Transferlere dön",
     },
 
@@ -242,7 +242,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "تم حجز خدمة النقل",
         successfully: "بنجاح.",
         description:
-            "تم تأكيد خدمة النقل الخاصة بك. نتمنى لك رحلة مريحة.",
+            "تم تسجيل حجز خدمة النقل الخاصة بك وهو بانتظار تأكيد StayWay.",
         backToTransfers: "العودة إلى خدمات النقل",
     },
 
@@ -251,7 +251,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "ההסעה הוזמנה",
         successfully: "בהצלחה.",
         description:
-            "ההסעה שלך אושרה. אנו מאחלים לך נסיעה נוחה.",
+            "הזמנת ההסעה שלך התקבלה וממתינה לאישור StayWay.",
         backToTransfers: "חזרה להסעות",
     },
 
@@ -260,7 +260,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "ट्रांसफ़र बुक हुआ",
         successfully: "सफलतापूर्वक।",
         description:
-            "आपका ट्रांसफ़र पुष्टि हो गया है। हम आपके आरामदायक सफ़र की कामना करते हैं।",
+            "आपकी ट्रांसफ़र बुकिंग दर्ज हो गई है और StayWay की पुष्टि की प्रतीक्षा कर रही है।",
         backToTransfers: "ट्रांसफ़र पर वापस जाएँ",
     },
 
@@ -269,7 +269,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "จองบริการรับส่ง",
         successfully: "สำเร็จแล้ว",
         description:
-            "ยืนยันบริการรับส่งของคุณแล้ว ขอให้คุณเดินทางอย่างสะดวกสบาย",
+            "ได้รับการจองบริการรับส่งของคุณแล้ว และกำลังรอการยืนยันจาก StayWay",
         backToTransfers: "กลับไปที่บริการรับส่ง",
     },
 
@@ -278,7 +278,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfer berhasil dipesan",
         successfully: "dengan sukses.",
         description:
-            "Transfer Anda telah dikonfirmasi. Semoga perjalanan Anda nyaman.",
+            "Pemesanan transfer Anda telah diterima dan sedang menunggu konfirmasi dari StayWay.",
         backToTransfers: "Kembali ke transfer",
     },
 
@@ -287,7 +287,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Đã đặt xe đưa đón",
         successfully: "thành công.",
         description:
-            "Dịch vụ đưa đón của bạn đã được xác nhận. Chúc bạn có một hành trình thoải mái.",
+            "Đặt chỗ đưa đón của bạn đã được ghi nhận và đang chờ StayWay xác nhận.",
         backToTransfers: "Quay lại dịch vụ đưa đón",
     },
 
@@ -296,7 +296,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "픽업 서비스 예약이",
         successfully: "완료되었습니다.",
         description:
-            "픽업 서비스가 확정되었습니다. 편안한 여행 되시기 바랍니다.",
+            "픽업 서비스 예약이 접수되었으며 StayWay의 확인을 기다리고 있습니다.",
         backToTransfers: "픽업 서비스로 돌아가기",
     },
 
@@ -305,7 +305,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "送迎予約が",
         successfully: "完了しました。",
         description:
-            "送迎サービスが確定しました。快適なご移動をお楽しみください。",
+            "送迎予約を受け付けました。現在StayWayの確認待ちです。",
         backToTransfers: "送迎サービスに戻る",
     },
 
@@ -314,7 +314,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "接送服务预订",
         successfully: "成功。",
         description:
-            "您的接送服务已确认。祝您旅途舒适。",
+            "您的接送服务预订已提交，目前正在等待 StayWay 确认。",
         backToTransfers: "返回接送服务",
     },
 
@@ -323,7 +323,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "接送服務預訂",
         successfully: "成功。",
         description:
-            "您的接送服務已確認。祝您旅途舒適。",
+            "您的接送服務預訂已提交，目前正在等待 StayWay 確認。",
         backToTransfers: "返回接送服務",
     },
 
@@ -332,7 +332,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Trasllat reservat",
         successfully: "correctament.",
         description:
-            "El teu trasllat ha estat confirmat. Et desitgem un viatge còmode.",
+            "La teva reserva de trasllat s'ha registrat i està pendent de confirmació de StayWay.",
         backToTransfers: "Torna als trasllats",
     },
 
@@ -341,7 +341,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfeer broneeritud",
         successfully: "edukalt.",
         description:
-            "Teie transfeer on kinnitatud. Soovime teile mugavat reisi.",
+            "Teie transfeeribroneering on registreeritud ja ootab StayWay kinnitust.",
         backToTransfers: "Tagasi transfeeride juurde",
     },
 
@@ -350,7 +350,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Transfērs rezervēts",
         successfully: "veiksmīgi.",
         description:
-            "Jūsu transfērs ir apstiprināts. Novēlam jums ērtu ceļojumu.",
+            "Jūsu transfēra rezervācija ir reģistrēta un gaida StayWay apstiprinājumu.",
         backToTransfers: "Atpakaļ uz transfēriem",
     },
 
@@ -359,7 +359,7 @@ const confirmationTranslations: Record<string, ConfirmationTranslation> = {
         booked: "Pervežimas užsakytas",
         successfully: "sėkmingai.",
         description:
-            "Jūsų pervežimas patvirtintas. Linkime patogios kelionės.",
+            "Jūsų pervežimo rezervacija užregistruota ir laukia StayWay patvirtinimo.",
         backToTransfers: "Grįžti į pervežimus",
     },
 };

@@ -146,7 +146,7 @@ export default function SignupPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (
+    const handleSubmit = async (
         event: FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
@@ -175,20 +175,25 @@ export default function SignupPage() {
 
         setIsLoading(true);
 
-        const user = register(
-            firstName.trim(),
-            lastName.trim(),
-            email.trim(),
-            password
-        );
+        try {
+            const user = await register(
+                firstName.trim(),
+                lastName.trim(),
+                email.trim(),
+                password
+            );
 
-        if (!user) {
+            if (!user) {
+                setError(text.emailExists);
+                return;
+            }
+
+            router.push("/login");
+        } catch {
             setError(text.emailExists);
+        } finally {
             setIsLoading(false);
-            return;
         }
-
-        router.push("/login");
     };
 
     return (

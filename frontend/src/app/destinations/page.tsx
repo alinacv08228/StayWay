@@ -15,15 +15,11 @@ import {
 } from "lucide-react";
 
 import {
-    properties as mockProperties,
-} from "../../data/mockData";
-
-import {
-    getProperties,
+    getPropertiesFromApi,
 } from "../../services/propertyService";
 
 import {
-    getDestinations,
+    getDestinationsFromApi,
 } from "../../services/destinationService";
 
 import {
@@ -57,9 +53,7 @@ export default function DestinationsPage() {
     const [
         properties,
         setProperties,
-    ] = useState<Property[]>(
-        mockProperties
-    );
+    ] = useState<Property[]>([]);
 
     const [
         isLoading,
@@ -87,20 +81,57 @@ export default function DestinationsPage() {
     ] = useState("az");
 
     useEffect(() => {
-        try {
-            setDestinations(
-                getDestinations()
-            );
+        let isActive = true;
 
-            setProperties(
-                getProperties()
-            );
+        const loadDestinations = async () => {
+            setIsLoading(true);
+            setHasError(false);
 
-            setIsLoading(false);
-        } catch {
-            setHasError(true);
-            setIsLoading(false);
-        }
+            try {
+                const [
+                    loadedDestinations,
+                    loadedProperties,
+                ] = await Promise.all([
+                    getDestinationsFromApi(),
+                    getPropertiesFromApi(),
+                ]);
+
+                if (!isActive) {
+                    return;
+                }
+
+                setDestinations(
+                    loadedDestinations
+                );
+
+                setProperties(
+                    loadedProperties
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load destinations from the backend.",
+                    error
+                );
+
+                if (!isActive) {
+                    return;
+                }
+
+                setDestinations([]);
+                setProperties([]);
+                setHasError(true);
+            } finally {
+                if (isActive) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        void loadDestinations();
+
+        return () => {
+            isActive = false;
+        };
     }, []);
 
     /*

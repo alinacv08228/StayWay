@@ -1,3 +1,5 @@
+import api from "../lib/api";
+
 export type TransferBooking = {
     id: string;
     transferType: "one-way" | "return";
@@ -8,6 +10,7 @@ export type TransferBooking = {
     vehicleId?: string;
     vehicleName?: string;
     licensePlate?: string;
+    vehicleImage?: string;
     driverId?: string;
     driverName?: string;
 
@@ -32,15 +35,140 @@ export type TransferBooking = {
     createdAt: string;
 };
 
-const STORAGE_KEY = "stayway_transfers";
+export function getCanonicalTransferOptionTitle(
+    optionId: string,
+    optionTitle?: string
+): string {
+    const normalizedOptionId =
+        optionId.trim().toLowerCase();
 
-/**
- * Only pending and confirmed bookings occupy a vehicle/driver.
- * Cancelled bookings must never block availability.
- *
- * Older bookings without a status are treated as confirmed
- * for backwards compatibility with existing localStorage data.
- */
+    const titlesByOptionId: Record<string, string> = {
+        "1": "Private transfer",
+        "private": "Private transfer",
+        "2": "Comfort transfer",
+        "comfort": "Comfort transfer",
+        "3": "Family transfer",
+        "family": "Family transfer",
+    };
+
+    const titleFromId =
+        titlesByOptionId[normalizedOptionId];
+
+    if (titleFromId) {
+        return titleFromId;
+    }
+
+    const normalizedTitle =
+        (optionTitle ?? "")
+            .trim()
+            .toLowerCase();
+
+    if (normalizedTitle.includes("comfort")) {
+        return "Comfort transfer";
+    }
+
+    if (normalizedTitle.includes("family")) {
+        return "Family transfer";
+    }
+
+    if (
+        normalizedTitle.includes("private") ||
+        normalizedTitle.includes("individual")
+    ) {
+        return "Private transfer";
+    }
+
+    /*
+     * StayWay currently has three fixed transfer options.
+     * If an old/localized title reaches this point and the
+     * option ID is unknown, keep a stable English fallback.
+     */
+    return "Private transfer";
+}
+
+// =========================================
+// BACKEND API
+// =========================================
+
+export async function getTransferBookingsFromApi(): Promise<
+    TransferBooking[]
+> {
+    const response = await api.get<TransferBooking[]>(
+        "/api/TransferBookings"
+    );
+
+    return response.data;
+}
+
+export async function getTransferBookingFromApi(
+    bookingId: string
+): Promise<TransferBooking> {
+    const response = await api.get<TransferBooking>(
+        `/api/TransferBookings/${encodeURIComponent(bookingId)}`
+    );
+
+    return response.data;
+}
+
+export async function getTransferBookingsByDriverIdFromApi(
+    driverId: string
+): Promise<TransferBooking[]> {
+    const response = await api.get<TransferBooking[]>(
+        `/api/TransferBookings/driver/${encodeURIComponent(driverId)}`
+    );
+
+    return response.data;
+}
+
+export async function createTransferBookingInApi(
+    booking: TransferBooking
+): Promise<TransferBooking> {
+    const normalizedBooking: TransferBooking = {
+        ...booking,
+        optionTitle:
+            getCanonicalTransferOptionTitle(
+                booking.optionId,
+                booking.optionTitle
+            ),
+    };
+
+    const response = await api.post<TransferBooking>(
+        "/api/TransferBookings",
+        normalizedBooking
+    );
+
+    return response.data;
+}
+
+export async function updateTransferBookingInApi(
+    bookingId: string,
+    booking: TransferBooking
+): Promise<TransferBooking> {
+    const normalizedBooking: TransferBooking = {
+        ...booking,
+        optionTitle:
+            getCanonicalTransferOptionTitle(
+                booking.optionId,
+                booking.optionTitle
+            ),
+    };
+
+    const response = await api.put<TransferBooking>(
+        `/api/TransferBookings/${encodeURIComponent(bookingId)}`,
+        normalizedBooking
+    );
+
+    return response.data;
+}
+
+export async function deleteTransferBookingInApi(
+    bookingId: string
+): Promise<void> {
+    await api.delete(
+        `/api/TransferBookings/${encodeURIComponent(bookingId)}`
+    );
+}
+
 export function isActiveTransferBooking(
     booking: TransferBooking
 ): boolean {
@@ -48,55 +176,6 @@ export function isActiveTransferBooking(
         booking.status === undefined ||
         booking.status === "pending" ||
         booking.status === "confirmed"
-    );
-}
-
-export function getTransferBookings(): TransferBooking[] {
-    if (typeof window === "undefined") {
-        return [];
-    }
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-
-    if (!stored) {
-        return [];
-    }
-
-    try {
-        const parsed = JSON.parse(stored);
-
-        if (!Array.isArray(parsed)) {
-            return [];
-        }
-
-        return parsed as TransferBooking[];
-    } catch {
-        return [];
-    }
-}
-
-export function saveTransferBooking(
-    booking: TransferBooking
-): void {
-    if (typeof window === "undefined") {
-        return;
-    }
-
-    const bookings = getTransferBookings();
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify([booking, ...bookings])
-    );
-}
-
-export function getTransferDriverBookings(
-    driverId: string
-): TransferBooking[] {
-    return getTransferBookings().filter(
-        (booking) =>
-            booking.driverId === driverId &&
-            isActiveTransferBooking(booking)
     );
 }
 
@@ -186,83 +265,4 @@ export function isTransferLegBusy(
         existingStart,
         existingEnd
     );
-}
-
-/**
- * Checks a requested leg against every occupied leg
- * of the driver's existing bookings.
- *
- * For Return bookings, both the outbound and return
- * legs are checked.
- */
-export function isTransferDriverBusy(
-    driverId: string,
-    date: string,
-    time: string,
-    durationMinutes: number = 60,
-    returnDate?: string,
-    returnTime?: string
-): boolean {
-    const bookings =
-        getTransferDriverBookings(driverId);
-
-    const requestedLegs: {
-        date: string;
-        time: string;
-    }[] = [
-        {
-            date,
-            time,
-        },
-    ];
-
-    if (returnDate && returnTime) {
-        requestedLegs.push({
-            date: returnDate,
-            time: returnTime,
-        });
-    }
-
-    return bookings.some((booking) => {
-        const existingDuration =
-            getTransferDuration(
-                booking.optionTitle
-            );
-
-        const existingLegs: {
-            date: string;
-            time: string;
-        }[] = [
-            {
-                date: booking.date,
-                time: booking.time,
-            },
-        ];
-
-        if (
-            booking.transferType === "return" &&
-            booking.returnDate &&
-            booking.returnTime
-        ) {
-            existingLegs.push({
-                date: booking.returnDate,
-                time: booking.returnTime,
-            });
-        }
-
-        return requestedLegs.some(
-            (requestedLeg) =>
-                existingLegs.some(
-                    (existingLeg) =>
-                        isTransferLegBusy(
-                            existingLeg.date,
-                            existingLeg.time,
-                            existingDuration,
-                            requestedLeg.date,
-                            requestedLeg.time,
-                            durationMinutes
-                        )
-                )
-        );
-    });
 }

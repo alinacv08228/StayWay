@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "userId": "1",
+    "name": "Alina",
+    "email": "alina@example.com",
+    "subject": "Test support message",
+    "message": "This is a test message from the StayWay Help page.",
+    "status": "new",
+    "createdAt": "2026-09-18T06:17:10.653381Z"
+  }
+]

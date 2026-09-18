@@ -7,9 +7,17 @@ import ReviewSection from "../../../components/ReviewSection";
 import DynamicRoomList from "../../../components/DynamicRoomList";
 import PhotoGallery from "../../../components/PhotoGallery";
 
-import { getProperties } from "../../../services/propertyService";
-import { getRoomsByPropertyId } from "../../../services/roomService";
-import { getDestinations } from "../../../services/destinationService";
+import {
+    getPropertiesFromApi,
+} from "../../../services/propertyService";
+
+import {
+    getRoomsByPropertyIdFromApi,
+} from "../../../services/roomService";
+
+import {
+    getDestinationsFromApi,
+} from "../../../services/destinationService";
 
 import {
     Property,
@@ -727,68 +735,101 @@ export default function StayPageClient({
         let mounted = true;
 
 
-        const loadStay = () => {
+        const loadStay = async () => {
+
+            setLoading(true);
 
             const propertyId =
                 Number(id);
 
-            const savedProperties =
-                getProperties();
+            if (
+                !Number.isInteger(propertyId) ||
+                propertyId <= 0
+            ) {
+                if (mounted) {
+                    setProperty(null);
+                    setPropertyRooms([]);
+                    setDestination(null);
+                    setLoading(false);
+                }
 
-            const savedDestinations =
-                getDestinations();
-
-
-            const foundProperty =
-                savedProperties.find(
-                    (item) =>
-                        item.id === propertyId
-                );
-
-
-            if (!mounted) {
                 return;
             }
 
+            try {
+                const loadedProperties =
+                    await getPropertiesFromApi();
 
-            if (!foundProperty) {
+                const foundProperty =
+                    loadedProperties.find(
+                        (item) =>
+                            item.id === propertyId
+                    );
+
+                if (!mounted) {
+                    return;
+                }
+
+                if (!foundProperty) {
+                    setProperty(null);
+                    setPropertyRooms([]);
+                    setDestination(null);
+                    setLoading(false);
+
+                    return;
+                }
+
+                const [
+                    loadedRooms,
+                    loadedDestinations,
+                ] = await Promise.all([
+                    getRoomsByPropertyIdFromApi(
+                        foundProperty.id
+                    ),
+                    getDestinationsFromApi(),
+                ]);
+
+                if (!mounted) {
+                    return;
+                }
+
+                setProperty(
+                    foundProperty
+                );
+
+                setPropertyRooms(
+                    loadedRooms
+                );
+
+                setDestination(
+                    loadedDestinations.find(
+                        (item) =>
+                            item.id ===
+                            foundProperty.destinationId
+                    ) ?? null
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load stay details from the backend.",
+                    error
+                );
+
+                if (!mounted) {
+                    return;
+                }
 
                 setProperty(null);
                 setPropertyRooms([]);
                 setDestination(null);
-                setLoading(false);
-
-                return;
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
             }
-
-
-            const savedRooms =
-                getRoomsByPropertyId(
-                    foundProperty.id
-                );
-
-
-            setProperty(
-                foundProperty
-            );
-
-            setPropertyRooms(
-                savedRooms
-            );
-
-            setDestination(
-                savedDestinations.find(
-                    (item) =>
-                        item.id ===
-                        foundProperty.destinationId
-                ) ?? null
-            );
-
-            setLoading(false);
         };
 
 
-        loadStay();
+        void loadStay();
 
 
         return () => {

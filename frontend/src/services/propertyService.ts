@@ -1,21 +1,9 @@
 import api from "../lib/api";
-import { properties as mockProperties } from "../data/mockData";
 import { Property } from "../types/types";
-
-const STORAGE_KEY = "stayway_properties";
-
-function getInitialProperties(): Property[] {
-    return mockProperties.filter(
-        (property) =>
-            property.destinationId === 1 ||
-            property.destinationId === 2 ||
-            property.destinationId === 3
-    );
-}
 
 /* =========================================================
    BACKEND API
-   ========================================================= */
+========================================================= */
 
 export async function getPropertiesFromApi(): Promise<Property[]> {
     const response =
@@ -23,16 +11,7 @@ export async function getPropertiesFromApi(): Promise<Property[]> {
             "/api/Properties"
         );
 
-    const properties =
-        response.data;
-
-    /*
-     * Keep a synchronized local copy while the rest of the
-     * StayWay pages are migrated to the backend.
-     */
-    saveProperties(properties);
-
-    return properties;
+    return response.data;
 }
 
 export async function createPropertyInApi(
@@ -46,8 +25,6 @@ export async function createPropertyInApi(
                 ...property,
             }
         );
-
-    await getPropertiesFromApi();
 
     return response.data;
 }
@@ -65,8 +42,6 @@ export async function updatePropertyInApi(
             }
         );
 
-    await getPropertiesFromApi();
-
     return response.data;
 }
 
@@ -76,252 +51,11 @@ export async function deletePropertyInApi(
     await api.delete(
         `/api/Properties/${id}`
     );
-
-    await getPropertiesFromApi();
 }
 
 /* =========================================================
-   LEGACY LOCAL FALLBACK
-   ========================================================= */
-
-export function getProperties(): Property[] {
-    // Pe server nu există localStorage.
-    // Folosim datele mock până când codul ajunge în browser.
-    if (typeof window === "undefined") {
-        return getInitialProperties();
-    }
-
-    const savedProperties =
-        localStorage.getItem(STORAGE_KEY);
-
-    if (!savedProperties) {
-        const initialProperties =
-            getInitialProperties();
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(initialProperties)
-        );
-
-        return [...initialProperties];
-    }
-
-    try {
-        const parsedProperties =
-            JSON.parse(savedProperties) as Property[];
-
-        /*
-         * Proprietățile existente în localStorage
-         * pot proveni din versiunea anterioară,
-         * unde nu exista câmpul "stars".
-         *
-         * Pentru acestea folosim numărul de stele
-         * din mockData, dacă proprietatea există acolo.
-         *
-         * Proprietățile create de Admin și care au deja
-         * "stars" își păstrează valoarea.
-         */
-        const updatedProperties =
-            parsedProperties.map((property) => {
-                if (
-                    typeof property.stars === "number"
-                ) {
-                    return property;
-                }
-
-                const mockProperty =
-                    mockProperties.find(
-                        (item) =>
-                            item.id === property.id
-                    );
-
-                return {
-                    ...property,
-                    stars:
-                        mockProperty?.stars ?? 1,
-                };
-            });
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(updatedProperties)
-        );
-
-        return updatedProperties;
-    } catch {
-        localStorage.removeItem(STORAGE_KEY);
-
-        const initialProperties =
-            getInitialProperties();
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(initialProperties)
-        );
-
-        return [...initialProperties];
-    }
-}
-
-
-/* =========================================================
-   CREATE
-   ========================================================= */
-export function createProperty(
-    property: Omit<Property, "id">
-): Property {
-    const currentProperties =
-        getProperties();
-
-    const ID_KEY =
-        "stayway_next_property_id";
-
-    const savedNextId =
-        localStorage.getItem(ID_KEY);
-
-    const maxExistingId =
-        currentProperties.length > 0
-            ? Math.max(
-                ...currentProperties.map(
-                    (item) => item.id
-                )
-            )
-            : 0;
-
-    const newId = savedNextId
-        ? Math.max(
-            Number(savedNextId),
-            maxExistingId + 1
-        )
-        : maxExistingId + 1;
-
-    const newProperty: Property = {
-        id: newId,
-        ...property,
-    };
-
-    const updatedProperties = [
-        ...currentProperties,
-        newProperty,
-    ];
-
-    saveProperties(updatedProperties);
-
-    localStorage.setItem(
-        ID_KEY,
-        String(newId + 1)
-    );
-
-    return newProperty;
-}
-
-/* =========================================================
-   UPDATE
-   ========================================================= */
-
-export function updateProperty(
-    id: number,
-    updatedData: Omit<Property, "id">
-): Property | null {
-    const currentProperties =
-        getProperties();
-
-    const propertyExists =
-        currentProperties.find(
-            (property) =>
-                property.id === id
-        );
-
-    if (!propertyExists) {
-        return null;
-    }
-
-    const updatedProperty: Property = {
-        id,
-        ...updatedData,
-    };
-
-    const updatedProperties =
-        currentProperties.map(
-            (property) =>
-                property.id === id
-                    ? updatedProperty
-                    : property
-        );
-
-    saveProperties(updatedProperties);
-
-    return updatedProperty;
-}
-
-
-/* =========================================================
-   DELETE
-   ========================================================= */
-
-export function deleteProperty(
-    id: number
-): boolean {
-    const currentProperties =
-        getProperties();
-
-    const propertyExists =
-        currentProperties.some(
-            (property) =>
-                property.id === id
-        );
-
-    if (!propertyExists) {
-        return false;
-    }
-
-    const updatedProperties =
-        currentProperties.filter(
-            (property) =>
-                property.id !== id
-        );
-
-    saveProperties(updatedProperties);
-
-    return true;
-}
-
-
-/* =========================================================
-   SAVE
-   ========================================================= */
-
-export function saveProperties(
-    propertiesList: Property[]
-): void {
-    if (typeof window === "undefined") {
-        return;
-    }
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(propertiesList)
-    );
-}
-
-
-/* =========================================================
-   GET BY ID
-   ========================================================= */
-
-export function getPropertyById(
-    id: number
-): Property | undefined {
-    return getProperties().find(
-        (property) =>
-            property.id === id
-    );
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
+   PURE FRONTEND HELPERS
+========================================================= */
 
 export function searchProperties(
     propertiesList: Property[],
@@ -345,11 +79,6 @@ export function searchProperties(
     );
 }
 
-
-/* =========================================================
-   FILTER BY RATING
-   ========================================================= */
-
 export function filterPropertiesByRating(
     propertiesList: Property[],
     minimumRating: number
@@ -363,11 +92,6 @@ export function filterPropertiesByRating(
             property.rating >= minimumRating
     );
 }
-
-
-/* =========================================================
-   SORT
-   ========================================================= */
 
 export function sortProperties(
     propertiesList: Property[],

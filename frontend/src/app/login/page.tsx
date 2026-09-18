@@ -442,24 +442,6 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className="login-demo stayway-load-in stayway-load-3">
-                    <strong>
-                        {text.demoAccounts}
-                    </strong>
-
-                    <p>
-                        {text.user}: alina@example.com
-                    </p>
-
-                    <p>
-                        {text.admin}: admin@stayway.com
-                    </p>
-
-                    <p>
-                        {text.password}: 123456
-                    </p>
-                </div>
-
             </div>
         </main>
     );

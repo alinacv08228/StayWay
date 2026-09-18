@@ -55,5 +55,24 @@
     "email": "test@gmail.com",
     "phone": "179470471",
     "specialRequests": ""
+  },
+  {
+    "id": 1789705810070,
+    "userId": "2",
+    "propertyId": 7,
+    "roomId": 26,
+    "checkIn": "2026-10-15",
+    "checkOut": "2026-10-20",
+    "adults": 2,
+    "children": 0,
+    "infants": 0,
+    "guests": 2,
+    "totalPrice": 2100,
+    "status": "cancelled",
+    "firstName": "Test",
+    "lastName": "Backend",
+    "email": "backend@gmail.com",
+    "phone": "2080285905282",
+    "specialRequests": ""
   }
 ]

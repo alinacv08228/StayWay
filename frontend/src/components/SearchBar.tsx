@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSettings } from "../context/SettingsContext";
 
@@ -11,8 +11,12 @@ import {
 } from "../data/translations";
 
 import {
-    getDestinations,
+    getDestinationsFromApi,
 } from "../services/destinationService";
+
+import {
+    Destination,
+} from "../types/types";
 
 export default function SearchBar() {
     const router = useRouter();
@@ -22,6 +26,44 @@ export default function SearchBar() {
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
     const [guests, setGuests] = useState("2");
+
+    const [
+        availableDestinations,
+        setAvailableDestinations,
+    ] = useState<Destination[]>([]);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const loadDestinations =
+            async () => {
+                try {
+                    const loadedDestinations =
+                        await getDestinationsFromApi();
+
+                    if (mounted) {
+                        setAvailableDestinations(
+                            loadedDestinations
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        "Could not load search destinations from the backend.",
+                        error
+                    );
+
+                    if (mounted) {
+                        setAvailableDestinations([]);
+                    }
+                }
+            };
+
+        void loadDestinations();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     const languageName = language.split("|")[0];
 
@@ -252,11 +294,8 @@ export default function SearchBar() {
                     .trim()
                     .toLowerCase();
 
-            const destinations =
-                getDestinations();
-
             const matchingDestination =
-                destinations.find(
+                availableDestinations.find(
                     (item) => {
                         if (
                             item.name
@@ -321,7 +360,7 @@ export default function SearchBar() {
                 );
 
             const matchingCountry =
-                destinations.find(
+                availableDestinations.find(
                     (item) => {
                         if (
                             item.country

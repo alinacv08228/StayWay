@@ -10,12 +10,6 @@ import {
     useState,
 } from "react";
 
-import {
-    properties,
-    users,
-    destinations as mockDestinations,
-} from "../../data/mockData";
-
 import { useUser } from "../../context/UserContext";
 
 import { useSettings } from "../../context/SettingsContext";
@@ -30,7 +24,6 @@ import {
 import { currencyInfo } from "../../data/currency";
 
 import {
-    Booking,
     Property,
     Destination,
     Room,
@@ -38,9 +31,14 @@ import {
 } from "../../types/types";
 
 import {
+    getBookingsFromApi,
+    updateBookingInApi,
+    type Booking,
+} from "../../services/bookingService";
+
+import {
     createPropertyInApi,
     deletePropertyInApi,
-    getProperties,
     getPropertiesFromApi,
     updatePropertyInApi,
 } from "../../services/propertyService";
@@ -48,43 +46,36 @@ import {
 import {
     createRoomInApi,
     deleteRoomInApi,
-    getRooms,
     getRoomsFromApi,
     updateRoomInApi,
 } from "../../services/roomService";
 
 import {
     createDestinationInApi,
-    getDestinations,
     getDestinationsFromApi,
     updateDestinationInApi,
 } from "../../services/destinationService";
 
 import {
-    createTransferVehicle,
     createTransferVehicleInApi,
-    deleteTransferVehicle,
     deleteTransferVehicleInApi,
-    getTransferVehicles,
     getTransferVehiclesFromApi,
-    updateTransferVehicle,
     updateTransferVehicleInApi,
 } from "../../services/transferVehicleService";
 
 import {
-    createTransferDriver,
-    deleteTransferDriver,
-    getTransferDriverBookings,
-    getTransferDriverStatus,
-    getTransferDrivers,
-    updateTransferDriver,
+    createTransferDriverInApi,
+    deleteTransferDriverInApi,
+    getTransferDriversFromApi,
+    updateTransferDriverInApi,
     TransferDriver,
 } from "../../services/transferDriverService";
 
 import { TransferVehicle } from "../../data/transferVehicles";
 
 import {
-    getTransferBookings,
+    getTransferBookingsFromApi,
+    updateTransferBookingInApi,
     TransferBooking,
 } from "../../services/transferService";
 
@@ -129,28 +120,28 @@ export default function AdminPage() {
         useState<Booking[]>([]);
 
     const [allProperties, setAllProperties] =
-        useState<Property[]>(properties);
+        useState<Property[]>([]);
 
     const [activeAdminTab, setActiveAdminTab] =
         useState<"stays" | "transfers" | "users">("stays");
 
     const [allDestinations, setAllDestinations] =
-        useState<Destination[]>(mockDestinations);
+        useState<Destination[]>([]);
 
     const [allRooms, setAllRooms] =
-        useState<Room[]>(getRooms());
+        useState<Room[]>([]);
 
     const [allTransferVehicles, setAllTransferVehicles] =
-        useState<TransferVehicle[]>(getTransferVehicles());
+        useState<TransferVehicle[]>([]);
 
     const [allTransferDrivers, setAllTransferDrivers] =
-        useState<TransferDriver[]>(getTransferDrivers());
+        useState<TransferDriver[]>([]);
 
     const [allTransferBookings, setAllTransferBookings] =
-        useState<TransferBooking[]>(getTransferBookings());
+        useState<TransferBooking[]>([]);
 
     const [adminUsers, setAdminUsers] =
-        useState<User[]>(users);
+        useState<User[]>([]);
 
     const [selectedTransferCity, setSelectedTransferCity] =
         useState("Athens");
@@ -254,9 +245,11 @@ export default function AdminPage() {
     };
 
     const getScheduleBookings = (driverId: string) => {
-        return getTransferDriverBookings(driverId)
+        return allTransferBookings
             .filter(
                 (booking) =>
+                    booking.driverId === driverId &&
+                    booking.status !== "cancelled" &&
                     Boolean(booking.date && booking.time)
             )
             .sort((a, b) => {
@@ -278,6 +271,76 @@ export default function AdminPage() {
             .includes("family")
             ? 40
             : 35;
+    };
+
+    const getAdminTransferDriverStatus = (
+        driver: TransferDriver
+    ): "available" | "busy" | "inactive" => {
+        if (driver.status === "inactive") {
+            return "inactive";
+        }
+
+        if (driver.status === "busy") {
+            return "busy";
+        }
+
+        const now = Date.now();
+        const bookings = allTransferBookings.filter(
+            (booking) =>
+                booking.driverId === driver.id &&
+                booking.status !== "cancelled"
+        );
+
+        const isLegActive = (
+            date?: string,
+            time?: string,
+            durationMinutes: number = 35
+        ) => {
+            if (!date || !time) {
+                return false;
+            }
+
+            const start = new Date(
+                `${date}T${time}`
+            ).getTime();
+
+            if (Number.isNaN(start)) {
+                return false;
+            }
+
+            const end =
+                start +
+                durationMinutes * 60 * 1000;
+
+            return now >= start && now <= end;
+        };
+
+        const isCurrentlyBusy = bookings.some((booking) => {
+            const duration = getBookingDuration(booking);
+
+            if (
+                isLegActive(
+                    booking.date,
+                    booking.time,
+                    duration
+                )
+            ) {
+                return true;
+            }
+
+            return (
+                booking.transferType === "return" &&
+                isLegActive(
+                    booking.returnDate,
+                    booking.returnTime,
+                    duration
+                )
+            );
+        });
+
+        return isCurrentlyBusy
+            ? "busy"
+            : "available";
     };
 
     const handleTransferVehicleSubmit = async (
@@ -399,7 +462,7 @@ export default function AdminPage() {
         setIsVehicleFormOpen(true);
     };
 
-    const handleTransferDriverSubmit = (event: FormEvent) => {
+    const handleTransferDriverSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
         setDriverError("");
@@ -414,25 +477,28 @@ export default function AdminPage() {
             return;
         }
 
-        if (!transferDriverVehicleId) {
-            setDriverError("Please assign a vehicle to this driver.");
-            return;
-        }
-
         const driverId =
             editingDriverId || `driver-${Date.now()}`;
 
-        const selectedVehicle = allTransferVehicles.find(
-            (vehicle) => vehicle.id === transferDriverVehicleId
-        );
+        const selectedVehicle = transferDriverVehicleId
+            ? allTransferVehicles.find(
+                (vehicle) =>
+                    vehicle.id === transferDriverVehicleId
+            )
+            : undefined;
 
-        if (!selectedVehicle || selectedVehicle.city !== driverCity) {
-            setDriverError("Please select a valid vehicle from the same city.");
+        if (
+            selectedVehicle &&
+            selectedVehicle.city !== driverCity
+        ) {
+            setDriverError(
+                "Please select a valid vehicle from the same city."
+            );
             return;
         }
 
         if (
-            selectedVehicle.driverId &&
+            selectedVehicle?.driverId &&
             selectedVehicle.driverId !== driverId
         ) {
             setDriverError(
@@ -449,60 +515,116 @@ export default function AdminPage() {
             status: driverStatus,
         };
 
-        if (editingDriverId) {
-            updateTransferDriver(editingDriverId, driverData);
-        } else {
-            createTransferDriver(driverData);
+        try {
+            if (editingDriverId) {
+                await updateTransferDriverInApi(
+                    editingDriverId,
+                    driverData
+                );
+            } else {
+                await createTransferDriverInApi(
+                    driverData
+                );
+            }
+
+            const previousVehicles =
+                allTransferVehicles.filter(
+                    (vehicle) =>
+                        vehicle.driverId === driverId &&
+                        vehicle.id !== selectedVehicle?.id
+                );
+
+            await Promise.all(
+                previousVehicles.map((vehicle) =>
+                    updateTransferVehicleInApi(
+                        vehicle.id,
+                        {
+                            ...vehicle,
+                            driverId: undefined,
+                        }
+                    )
+                )
+            );
+
+            if (
+                selectedVehicle &&
+                selectedVehicle.driverId !== driverId
+            ) {
+                await updateTransferVehicleInApi(
+                    selectedVehicle.id,
+                    {
+                        ...selectedVehicle,
+                        driverId,
+                    }
+                );
+            }
+
+            setAllTransferDrivers(
+                await getTransferDriversFromApi()
+            );
+
+            setAllTransferVehicles(
+                await getTransferVehiclesFromApi()
+            );
+
+            setDriverName("");
+            setDriverPhone("");
+            setDriverStatus("available");
+            setDriverCity(selectedTransferCity);
+            setTransferDriverVehicleId("");
+            setEditingDriverId(null);
+            setIsDriverFormOpen(false);
+        } catch {
+            setDriverError(
+                "Could not save the driver. Please try again."
+            );
         }
-
-        // Remove this driver from any previous vehicle.
-        allTransferVehicles
-            .filter((vehicle) => vehicle.driverId === driverId)
-            .forEach((vehicle) => {
-                updateTransferVehicle(vehicle.id, {
-                    ...vehicle,
-                    driverId: undefined,
-                });
-            });
-
-        // Assign the selected vehicle to this driver.
-        updateTransferVehicle(selectedVehicle.id, {
-            ...selectedVehicle,
-            driverId,
-        });
-
-        setAllTransferDrivers(getTransferDrivers());
-        setAllTransferVehicles(getTransferVehicles());
-
-        setDriverName("");
-        setDriverPhone("");
-        setDriverStatus("available");
-        setDriverCity(selectedTransferCity);
-        setTransferDriverVehicleId("");
-        setEditingDriverId(null);
-        setIsDriverFormOpen(false);
     };
 
-    const handleDeleteTransferDriver = (driverId: string) => {
+    const handleDeleteTransferDriver = async (
+        driverId: string
+    ) => {
         const confirmed = window.confirm(
             "Are you sure you want to delete this driver?"
         );
 
         if (!confirmed) return;
 
-        deleteTransferDriver(driverId);
+        try {
+            const assignedVehicles =
+                allTransferVehicles.filter(
+                    (vehicle) =>
+                        vehicle.driverId === driverId
+                );
 
-        allTransferVehicles
-            .filter((vehicle) => vehicle.driverId === driverId)
-            .forEach((vehicle) => {
-                updateTransferVehicle(vehicle.id, {
-                    ...vehicle,
-                    driverId: undefined,
-                });
-            });
+            await Promise.all(
+                assignedVehicles.map((vehicle) =>
+                    updateTransferVehicleInApi(
+                        vehicle.id,
+                        {
+                            ...vehicle,
+                            driverId: undefined,
+                        }
+                    )
+                )
+            );
 
-        setAllTransferDrivers(getTransferDrivers());
-        setAllTransferVehicles(getTransferVehicles());
+            await deleteTransferDriverInApi(
+                driverId
+            );
+
+            setAllTransferDrivers(
+                await getTransferDriversFromApi()
+            );
+
+            setAllTransferVehicles(
+                await getTransferVehiclesFromApi()
+            );
+        } catch {
+            window.alert(
+                "Could not delete the driver. Please try again."
+            );
+        }
     };
 
     const handleEditTransferDriver = (driver: TransferDriver) => {
@@ -674,7 +796,9 @@ export default function AdminPage() {
         allBookings.forEach((booking) => {
             const customer = booking as AdminBooking;
             const fallbackUser = adminUsers.find(
-                (user) => user.id === booking.userId
+                (user) =>
+                    String(user.id) ===
+                    String(booking.userId)
             );
 
             const name = [
@@ -972,7 +1096,9 @@ export default function AdminPage() {
             const customer = booking as AdminBooking;
 
             const user = adminUsers.find(
-                (item) => item.id === booking.userId
+                (user) =>
+                    String(user.id) ===
+                    String(booking.userId)
             );
 
             const propertyName =
@@ -1122,15 +1248,12 @@ export default function AdminPage() {
             (booking) => booking.status === "confirmed"
         ).length;
 
-        const confirmedTransferBookings = allTransferBookings.filter(
-            (booking) =>
-                (booking as TransferBooking & {
-                    status?: "pending" | "confirmed" | "cancelled";
-                }).status !== "pending" &&
-                (booking as TransferBooking & {
-                    status?: "pending" | "confirmed" | "cancelled";
-                }).status !== "cancelled"
-        );
+        const confirmedTransferBookings =
+            allTransferBookings.filter(
+                (booking) =>
+                    booking.status ===
+                    "confirmed"
+            );
 
         const confirmedTotal =
             confirmedStayBookings + confirmedTransferBookings.length;
@@ -1253,14 +1376,11 @@ export default function AdminPage() {
             );
 
         const transferEvents = allTransferBookings
-            .filter((booking) => {
-                const status =
-                    (booking as TransferBooking & {
-                        status?: "pending" | "confirmed" | "cancelled";
-                    }).status;
-
-                return status !== "pending" && status !== "cancelled";
-            })
+            .filter(
+                (booking) =>
+                    booking.status ===
+                    "confirmed"
+            )
             .map((booking) => ({
                 date: getDate(booking.date),
                 revenue: booking.price,
@@ -1383,14 +1503,11 @@ export default function AdminPage() {
             filteredStayBookings.filter(
                 (booking) => booking.status === "confirmed"
             ).length +
-            filteredTransferBookings.filter((booking) => {
-                const status =
-                    (booking as TransferBooking & {
-                        status?: "pending" | "confirmed" | "cancelled";
-                    }).status;
-
-                return status !== "pending" && status !== "cancelled";
-            }).length;
+            filteredTransferBookings.filter(
+                (booking) =>
+                    booking.status ===
+                    "confirmed"
+            ).length;
 
         const cancelled = filteredStayBookings.filter(
             (booking) => booking.status === "cancelled"
@@ -1435,14 +1552,11 @@ export default function AdminPage() {
             );
 
         const transferRevenue = filteredTransferBookings
-            .filter((booking) => {
-                const status =
-                    (booking as TransferBooking & {
-                        status?: "pending" | "confirmed" | "cancelled";
-                    }).status;
-
-                return status !== "pending" && status !== "cancelled";
-            })
+            .filter(
+                (booking) =>
+                    booking.status ===
+                    "confirmed"
+            )
             .reduce(
                 (sum, booking) => sum + booking.price,
                 0
@@ -1525,54 +1639,23 @@ export default function AdminPage() {
     // =========================================
 
     useEffect(() => {
-        const savedBookings =
-            localStorage.getItem(
-                "stayway_bookings"
-            );
-
-        if (savedBookings !== null) {
+        const loadStayBookingsFromBackend = async () => {
             try {
-                /*
-                 * localStorage is the source of truth.
-                 * If the saved value is [] it must remain [].
-                 * Never re-add mock bookings after the key exists.
-                 */
-                const parsedBookings =
-                    JSON.parse(
-                        savedBookings
-                    ) as Booking[];
+                const loadedBookings =
+                    await getBookingsFromApi();
 
                 setAllBookings(
-                    parsedBookings
+                    loadedBookings
                 );
-            } catch {
-                /*
-                 * If the saved value is corrupted, recover with
-                 * an empty booking list instead of restoring mocks.
-                 */
-                localStorage.setItem(
-                    "stayway_bookings",
-                    JSON.stringify([])
+            } catch (error) {
+                console.error(
+                    "Could not load stay bookings from the backend.",
+                    error
                 );
 
                 setAllBookings([]);
             }
-        } else {
-            /*
-             * No booking data exists in localStorage.
-             * Start with an empty list.
-             *
-             * IMPORTANT:
-             * Do not seed mockBookings here. Otherwise a booking
-             * deleted by the user/admin would return after reload.
-             */
-            localStorage.setItem(
-                "stayway_bookings",
-                JSON.stringify([])
-            );
-
-            setAllBookings([]);
-        }
+        };
 
         const loadPropertiesFromBackend = async () => {
             try {
@@ -1582,14 +1665,13 @@ export default function AdminPage() {
                 setAllProperties(
                     loadedProperties
                 );
-            } catch {
-                /*
-                 * Fallback to the synchronized local copy only if
-                 * the API is temporarily unavailable.
-                 */
-                setAllProperties(
-                    getProperties()
+            } catch (error) {
+                console.error(
+                    "Could not load properties from the backend.",
+                    error
                 );
+
+                setAllProperties([]);
             }
         };
 
@@ -1601,14 +1683,13 @@ export default function AdminPage() {
                 setAllRooms(
                     loadedRooms
                 );
-            } catch {
-                /*
-                 * Fallback to the synchronized local copy only if
-                 * the API is temporarily unavailable.
-                 */
-                setAllRooms(
-                    getRooms()
+            } catch (error) {
+                console.error(
+                    "Could not load rooms from the backend.",
+                    error
                 );
+
+                setAllRooms([]);
             }
         };
 
@@ -1620,14 +1701,13 @@ export default function AdminPage() {
                 setAllDestinations(
                     loadedDestinations
                 );
-            } catch {
-                /*
-                 * Fallback to the synchronized local copy only if
-                 * the API is temporarily unavailable.
-                 */
-                setAllDestinations(
-                    getDestinations()
+            } catch (error) {
+                console.error(
+                    "Could not load destinations from the backend.",
+                    error
                 );
+
+                setAllDestinations([]);
             }
         };
 
@@ -1639,107 +1719,121 @@ export default function AdminPage() {
                 setAllTransferVehicles(
                     loadedVehicles
                 );
-            } catch {
-                setAllTransferVehicles(
-                    getTransferVehicles()
+            } catch (error) {
+                console.error(
+                    "Could not load transfer vehicles from the backend.",
+                    error
                 );
+
+                setAllTransferVehicles([]);
             }
         };
 
-        void loadPropertiesFromBackend();
-        void loadRoomsFromBackend();
-        void loadDestinationsFromBackend();
-        void loadTransferVehiclesFromBackend();
+        const loadTransferDriversFromBackend = async () => {
+            try {
+                const loadedDrivers =
+                    await getTransferDriversFromApi();
 
-        setAllTransferBookings(
-            getTransferBookings()
-        );
+                setAllTransferDrivers(
+                    loadedDrivers
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load transfer drivers from the backend.",
+                    error
+                );
 
-        /*
-         * Refresh dashboard booking data whenever bookings/transfers
-         * change elsewhere in the app or when the Admin page becomes
-         * active again.
-         */
-        const loadDashboardBookings = () => {
-            const currentBookings =
-                localStorage.getItem("stayway_bookings");
-
-            if (currentBookings !== null) {
-                try {
-                    const parsedBookings =
-                        JSON.parse(currentBookings) as Booking[];
-
-                    setAllBookings(parsedBookings);
-                } catch {
-                    setAllBookings([]);
-                }
-            } else {
-                setAllBookings([]);
+                setAllTransferDrivers([]);
             }
+        };
 
-            setAllTransferBookings(
-                getTransferBookings()
-            );
+        const loadTransferBookingsFromBackend = async () => {
+            try {
+                const loadedTransferBookings =
+                    await getTransferBookingsFromApi();
+
+                setAllTransferBookings(
+                    loadedTransferBookings
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load transfer bookings from the backend.",
+                    error
+                );
+
+                setAllTransferBookings([]);
+            }
         };
 
         const loadRegisteredUsers = async () => {
             try {
                 const response =
-                    await api.get<User[]>("/api/Users");
+                    await api.get<User[]>(
+                        "/api/Users"
+                    );
 
-                setAdminUsers(response.data);
-            } catch {
-                /*
-                 * Keep the original demo users as a fallback only when
-                 * the backend is temporarily unavailable.
-                 */
-                setAdminUsers(users);
+                setAdminUsers(
+                    response.data
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load users from the backend.",
+                    error
+                );
+
+                setAdminUsers([]);
             }
         };
 
+        const loadDashboardBookings = async () => {
+            await Promise.all([
+                loadStayBookingsFromBackend(),
+                loadTransferBookingsFromBackend(),
+            ]);
+        };
+
+        void loadStayBookingsFromBackend();
+        void loadPropertiesFromBackend();
+        void loadRoomsFromBackend();
+        void loadDestinationsFromBackend();
+        void loadTransferVehiclesFromBackend();
+        void loadTransferDriversFromBackend();
+        void loadTransferBookingsFromBackend();
         void loadRegisteredUsers();
 
         const handleRegisteredUsersChange = () => {
             void loadRegisteredUsers();
-            loadDashboardBookings();
+            void loadDashboardBookings();
         };
 
         const handleDashboardBookingsChange = () => {
-            loadDashboardBookings();
+            void loadDashboardBookings();
         };
 
         const handleWindowFocus = () => {
             void loadRegisteredUsers();
-            loadDashboardBookings();
+            void loadDashboardBookings();
             void loadPropertiesFromBackend();
             void loadRoomsFromBackend();
             void loadDestinationsFromBackend();
             void loadTransferVehiclesFromBackend();
+            void loadTransferDriversFromBackend();
         };
 
         const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
                 void loadRegisteredUsers();
-                loadDashboardBookings();
+                void loadDashboardBookings();
                 void loadPropertiesFromBackend();
                 void loadRoomsFromBackend();
                 void loadDestinationsFromBackend();
                 void loadTransferVehiclesFromBackend();
+                void loadTransferDriversFromBackend();
             }
         };
-
-        /*
-         * "storage" handles changes made from another browser tab/window.
-         * The focus/visibility handlers make sure the Admin page also
-         * refreshes when the user returns to it after signing up.
-         *
-         * The custom event is supported for same-window updates if the
-         * Sign Up flow dispatches "stayway_registered_users_changed".
-         */
-        window.addEventListener(
-            "storage",
-            handleRegisteredUsersChange
-        );
 
         window.addEventListener(
             "stayway_registered_users_changed",
@@ -1767,11 +1861,6 @@ export default function AdminPage() {
         );
 
         return () => {
-            window.removeEventListener(
-                "storage",
-                handleRegisteredUsersChange
-            );
-
             window.removeEventListener(
                 "stayway_registered_users_changed",
                 handleRegisteredUsersChange
@@ -1851,10 +1940,8 @@ export default function AdminPage() {
         setCityImage("");
         setCountryImage("");
 
-        const destinations = getDestinations();
-
         // Căutăm dacă primul oraș din catalogul Admin
-        // există deja în destinations.
+        // există deja în destinations încărcate din backend.
         const firstAdminCity = adminCities[value]?.[0];
 
         if (!firstAdminCity) {
@@ -1863,7 +1950,7 @@ export default function AdminPage() {
             return;
         }
 
-        const existingDestination = destinations.find(
+        const existingDestination = allDestinations.find(
             (destination) =>
                 destination.country === value &&
                 destination.name.toLowerCase().trim() ===
@@ -2317,40 +2404,120 @@ export default function AdminPage() {
     // BOOKING CONFIRMATION
     // =========================================
 
-    const updateStayBookingStatus = (
-        bookingId: string,
+    const updateStayBookingStatus = async (
+        bookingId: number,
         status: "pending" | "confirmed" | "cancelled"
     ) => {
-        const updatedBookings = allBookings.map((booking) =>
-            booking.id === bookingId
-                ? { ...booking, status }
-                : booking
-        );
+        const booking =
+            allBookings.find(
+                (item) => item.id === bookingId
+            );
 
-        localStorage.setItem(
-            "stayway_bookings",
-            JSON.stringify(updatedBookings)
-        );
+        if (!booking) {
+            return;
+        }
 
-        setAllBookings(updatedBookings);
+        try {
+            const updatedBooking =
+                await updateBookingInApi(
+                    bookingId,
+                    {
+                        userId: booking.userId,
+                        propertyId: booking.propertyId,
+                        roomId: booking.roomId,
+                        checkIn: booking.checkIn,
+                        checkOut: booking.checkOut,
+                        adults: booking.adults,
+                        children: booking.children,
+                        infants: booking.infants,
+                        guests: booking.guests,
+                        totalPrice: booking.totalPrice,
+                        status,
+                        firstName: booking.firstName,
+                        lastName: booking.lastName,
+                        email: booking.email,
+                        phone: booking.phone,
+                        specialRequests:
+                        booking.specialRequests,
+                    }
+                );
+
+            const updatedBookings =
+                allBookings.map((item) =>
+                    item.id === bookingId
+                        ? updatedBooking
+                        : item
+                );
+
+            setAllBookings(
+                updatedBookings
+            );
+
+            window.dispatchEvent(
+                new Event(
+                    "stayway_bookings_changed"
+                )
+            );
+        } catch (error) {
+            console.error(
+                "Could not update the stay booking status through the backend.",
+                error
+            );
+
+            window.alert(
+                "Could not update the booking status. Please try again."
+            );
+        }
     };
 
-    const updateTransferBookingStatus = (
+    const updateTransferBookingStatus = async (
         bookingId: string,
         status: "pending" | "confirmed" | "cancelled"
     ) => {
-        const updatedBookings = allTransferBookings.map((booking) =>
-            booking.id === bookingId
-                ? { ...booking, status }
-                : booking
-        );
+        const booking =
+            allTransferBookings.find(
+                (item) => item.id === bookingId
+            );
 
-        localStorage.setItem(
-            "stayway_transfers",
-            JSON.stringify(updatedBookings)
-        );
+        if (!booking) {
+            return;
+        }
 
-        setAllTransferBookings(updatedBookings);
+        try {
+            const updatedBooking =
+                await updateTransferBookingInApi(
+                    bookingId,
+                    {
+                        ...booking,
+                        status,
+                    }
+                );
+
+            setAllTransferBookings(
+                (currentBookings) =>
+                    currentBookings.map(
+                        (item) =>
+                            item.id === bookingId
+                                ? updatedBooking
+                                : item
+                    )
+            );
+
+            window.dispatchEvent(
+                new Event(
+                    "stayway_transfers_changed"
+                )
+            );
+        } catch (error) {
+            console.error(
+                "Could not update the transfer booking status through the backend.",
+                error
+            );
+
+            window.alert(
+                "Could not update the transfer booking status. Please try again."
+            );
+        }
     };
 
     // =========================================
@@ -2374,9 +2541,7 @@ export default function AdminPage() {
             }
 
             const bookingStatus =
-                (booking as TransferBooking & {
-                    status?: "pending" | "confirmed" | "cancelled";
-                }).status ?? "confirmed";
+                booking.status;
 
             if (
                 transferBookingStatusFilter !== "All" &&
@@ -5379,13 +5544,7 @@ export default function AdminPage() {
                                                                 vehicle.city.toLowerCase() ===
                                                                 selectedTransferCity.toLowerCase() &&
                                                                 !vehicle.driverId
-                                                        )?.id ||
-                                                        allTransferVehicles.find(
-                                                            (vehicle) =>
-                                                                vehicle.city.toLowerCase() ===
-                                                                selectedTransferCity.toLowerCase()
-                                                        )?.id ||
-                                                        ""
+                                                        )?.id || ""
                                                     );
                                                     setDriverError("");
                                                     setIsDriverFormOpen(true);
@@ -5650,7 +5809,7 @@ export default function AdminPage() {
                                                     return false;
                                                 }
 
-                                                const status = getTransferDriverStatus(driver.id);
+                                                const status = getAdminTransferDriverStatus(driver);
 
                                                 if (
                                                     transferDriverStatusFilter !== "all" &&
@@ -5683,15 +5842,15 @@ export default function AdminPage() {
                                                             <span
                                                                 style={{
                                                                     color:
-                                                                        getTransferDriverStatus(driver.id) === "available"
+                                                                        getAdminTransferDriverStatus(driver) === "available"
                                                                             ? "var(--admin-color-16a34a)"
-                                                                            : getTransferDriverStatus(driver.id) === "busy"
+                                                                            : getAdminTransferDriverStatus(driver) === "busy"
                                                                                 ? "var(--admin-color-f59e0b)"
                                                                                 : "var(--admin-misc-dc2626)",
                                                                     fontWeight: 700,
                                                                 }}
                                                             >
-                                                                {getTransferDriverStatus(driver.id)}
+                                                                {getAdminTransferDriverStatus(driver)}
                                                             </span>
                                                         </span>
 
@@ -5948,9 +6107,7 @@ export default function AdminPage() {
                                             const vehicleImage = vehicle?.image;
                                             const isReturn = booking.transferType === "return";
                                             const bookingStatus =
-                                                (booking as TransferBooking & {
-                                                    status?: "pending" | "confirmed" | "cancelled";
-                                                }).status ?? "confirmed";
+                                                booking.status;
                                             const isPending = bookingStatus === "pending";
 
                                             return (
@@ -6593,7 +6750,9 @@ export default function AdminPage() {
                                         {filteredBookings.map((booking) => {
                                             const customer = booking as AdminBooking;
                                             const user = adminUsers.find(
-                                                (item) => item.id === booking.userId
+                                                (user) =>
+                                                    String(user.id) ===
+                                                    String(booking.userId)
                                             );
                                             const property = allProperties.find(
                                                 (item) => item.id === booking.propertyId
@@ -7713,4 +7872,3 @@ export default function AdminPage() {
         </main>
     );
 }
-

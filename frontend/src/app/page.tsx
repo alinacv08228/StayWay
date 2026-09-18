@@ -9,10 +9,6 @@ import {
     useState,
 } from "react";
 
-import {
-    properties as mockProperties,
-} from "../data/mockData";
-
 import SearchBar from "../components/SearchBar";
 
 import {
@@ -30,11 +26,11 @@ import {
 } from "../data/currency";
 
 import {
-    getProperties,
+    getPropertiesFromApi,
 } from "../services/propertyService";
 
 import {
-    getDestinations,
+    getDestinationsFromApi,
 } from "../services/destinationService";
 
 import {
@@ -205,40 +201,59 @@ export default function Home() {
     // =========================================
 
     useEffect(() => {
-        try {
-            const loadedProperties =
-                getProperties();
+        let mounted = true;
 
-            const loadedDestinations =
-                getDestinations();
+        const loadHomeData =
+            async () => {
+                setIsLoading(true);
 
-            setAvailableProperties(
-                loadedProperties
-            );
+                try {
+                    const [
+                        loadedProperties,
+                        loadedDestinations,
+                    ] = await Promise.all([
+                        getPropertiesFromApi(),
+                        getDestinationsFromApi(),
+                    ]);
 
-            setAvailableDestinations(
-                loadedDestinations
-            );
+                    if (!mounted) {
+                        return;
+                    }
 
-            setHasError(false);
-        } catch {
-            /*
-             * Dacă serviciul nu poate încărca
-             * datele, folosim mock properties
-             * pentru ca pagina să nu rămână goală.
-             */
-            setAvailableProperties(
-                mockProperties
-            );
+                    setAvailableProperties(
+                        loadedProperties
+                    );
 
-            setAvailableDestinations(
-                getDestinations()
-            );
+                    setAvailableDestinations(
+                        loadedDestinations
+                    );
 
-            setHasError(true);
-        } finally {
-            setIsLoading(false);
-        }
+                    setHasError(false);
+                } catch (error) {
+                    console.error(
+                        "Could not load Home data from the backend.",
+                        error
+                    );
+
+                    if (!mounted) {
+                        return;
+                    }
+
+                    setAvailableProperties([]);
+                    setAvailableDestinations([]);
+                    setHasError(true);
+                } finally {
+                    if (mounted) {
+                        setIsLoading(false);
+                    }
+                }
+            };
+
+        void loadHomeData();
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     // =========================================

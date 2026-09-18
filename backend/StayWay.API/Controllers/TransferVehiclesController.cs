@@ -56,69 +56,15 @@ public class TransferVehiclesController : ControllerBase
         TransferVehicleDto vehicle
     )
     {
-        if (string.IsNullOrWhiteSpace(vehicle.City))
-        {
-            return BadRequest(
-                new
-                {
-                    message = "City is required."
-                }
-            );
-        }
+        var validationError =
+            ValidateVehicle(vehicle);
 
-        if (string.IsNullOrWhiteSpace(vehicle.Name))
+        if (validationError is not null)
         {
             return BadRequest(
                 new
                 {
-                    message = "Vehicle name is required."
-                }
-            );
-        }
-
-        if (string.IsNullOrWhiteSpace(vehicle.LicensePlate))
-        {
-            return BadRequest(
-                new
-                {
-                    message = "License plate is required."
-                }
-            );
-        }
-
-        if (
-            vehicle.Category != "Private" &&
-            vehicle.Category != "Comfort" &&
-            vehicle.Category != "Family"
-        )
-        {
-            return BadRequest(
-                new
-                {
-                    message =
-                        "Category must be Private, Comfort or Family."
-                }
-            );
-        }
-
-        if (vehicle.Passengers <= 0)
-        {
-            return BadRequest(
-                new
-                {
-                    message =
-                        "Passengers must be greater than 0."
-                }
-            );
-        }
-
-        if (vehicle.Luggage < 0)
-        {
-            return BadRequest(
-                new
-                {
-                    message =
-                        "Luggage cannot be negative."
+                    message = validationError
                 }
             );
         }
@@ -144,6 +90,19 @@ public class TransferVehiclesController : ControllerBase
         TransferVehicleDto vehicle
     )
     {
+        var validationError =
+            ValidateVehicle(vehicle);
+
+        if (validationError is not null)
+        {
+            return BadRequest(
+                new
+                {
+                    message = validationError
+                }
+            );
+        }
+
         var updatedVehicle =
             _transferVehicleService.Update(
                 id,
@@ -174,5 +133,55 @@ public class TransferVehiclesController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private static string? ValidateVehicle(
+        TransferVehicleDto vehicle
+    )
+    {
+        if (string.IsNullOrWhiteSpace(vehicle.City))
+        {
+            return "City is required.";
+        }
+
+        if (string.IsNullOrWhiteSpace(vehicle.Name))
+        {
+            return "Vehicle name is required.";
+        }
+
+        if (string.IsNullOrWhiteSpace(vehicle.LicensePlate))
+        {
+            return "License plate is required.";
+        }
+
+        var allowedCategories =
+            new[]
+            {
+                "Private",
+                "Comfort",
+                "Family"
+            };
+
+        if (
+            !allowedCategories.Contains(
+                vehicle.Category,
+                StringComparer.OrdinalIgnoreCase
+            )
+        )
+        {
+            return "Category must be Private, Comfort or Family.";
+        }
+
+        if (vehicle.Passengers <= 0)
+        {
+            return "Passengers must be greater than 0.";
+        }
+
+        if (vehicle.Luggage < 0)
+        {
+            return "Luggage cannot be negative.";
+        }
+
+        return null;
     }
 }

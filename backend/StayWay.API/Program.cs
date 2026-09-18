@@ -49,6 +49,24 @@ var transferVehicleDataPath = Path.Combine(
     "transferVehicles.json"
 );
 
+var transferDriverDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "transferDrivers.json"
+);
+
+var transferBookingDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "transferBookings.json"
+);
+
+var supportMessageDataPath = Path.Combine(
+    builder.Environment.ContentRootPath,
+    "Data",
+    "supportMessages.json"
+);
+
 builder.Services.AddSingleton<IPropertyService>(
     _ => new PropertyService(propertyDataPath)
 );
@@ -78,6 +96,24 @@ builder.Services.AddSingleton<IUserService>(
 builder.Services.AddSingleton<ITransferVehicleService>(
     _ => new TransferVehicleService(
         transferVehicleDataPath
+    )
+);
+
+builder.Services.AddSingleton<ITransferDriverService>(
+    _ => new TransferDriverService(
+        transferDriverDataPath
+    )
+);
+
+builder.Services.AddSingleton<ITransferBookingService>(
+    _ => new TransferBookingService(
+        transferBookingDataPath
+    )
+);
+
+builder.Services.AddSingleton<ISupportMessageService>(
+    _ => new SupportMessageService(
+        supportMessageDataPath
     )
 );
 

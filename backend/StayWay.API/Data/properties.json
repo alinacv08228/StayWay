@@ -1,8 +1,8 @@
 [
   {
     "id": 1,
-    "name": "H\u00F4tel Balzac",
-    "description": "Located in the heart of Paris, H\u00F4tel Balzac offers a comfortable and elegant stay close to the Champs-\u00C9lys\u00E9es and many of the city\u0027s famous attractions. The property combines a classic Parisian atmosphere with modern amenities, making it a convenient choice for both leisure and business travelers.",
+    "name": "Hôtel Balzac",
+    "description": "Located in the heart of Paris, Hôtel Balzac offers a comfortable and elegant stay close to the Champs-Élysées and many of the city's famous attractions. The property combines a classic Parisian atmosphere with modern amenities, making it a convenient choice for both leisure and business travelers.",
     "destinationId": 1,
     "address": "6 Rue Balzac, 75008 Paris, France",
     "stars": 5,
@@ -13,7 +13,7 @@
   {
     "id": 2,
     "name": "Hyatt Paris Madeleine",
-    "description": "Hyatt Paris Madeleine is an elegant hotel located in central Paris, offering a refined and comfortable atmosphere near the city\u0027s most iconic landmarks. Guests can enjoy stylish rooms, modern amenities, and convenient access to shopping, dining, and major attractions.",
+    "description": "Hyatt Paris Madeleine is an elegant hotel located in central Paris, offering a refined and comfortable atmosphere near the city's most iconic landmarks. Guests can enjoy stylish rooms, modern amenities, and convenient access to shopping, dining, and major attractions.",
     "destinationId": 1,
     "address": "24 Boulevard Malesherbes, 75008 Paris, France",
     "stars": 5,
@@ -24,7 +24,7 @@
   {
     "id": 3,
     "name": "Pullman Paris Tour Eiffel",
-    "description": "Located near the Eiffel Tower, Pullman Paris Tour Eiffel offers a modern and stylish stay in one of Paris\u0027s most recognizable areas. The hotel features contemporary rooms, comfortable facilities, and easy access to the Eiffel Tower, the Seine, and central Paris.",
+    "description": "Located near the Eiffel Tower, Pullman Paris Tour Eiffel offers a modern and stylish stay in one of Paris's most recognizable areas. The hotel features contemporary rooms, comfortable facilities, and easy access to the Eiffel Tower, the Seine, and central Paris.",
     "destinationId": 1,
     "address": "18 Avenue de Suffren, 75015 Paris, France",
     "stars": 4,
@@ -35,7 +35,7 @@
   {
     "id": 4,
     "name": "Hotel Artemide",
-    "description": "Hotel Artemide is a stylish property in the center of Rome, offering a comfortable base for exploring the city\u0027s historic landmarks. Its convenient location provides easy access to attractions, restaurants, shops, and public transportation.",
+    "description": "Hotel Artemide is a stylish property in the center of Rome, offering a comfortable base for exploring the city's historic landmarks. Its convenient location provides easy access to attractions, restaurants, shops, and public transportation.",
     "destinationId": 2,
     "address": "Via Nazionale 22, 00184 Rome, Italy",
     "stars": 4,
@@ -46,7 +46,7 @@
   {
     "id": 5,
     "name": "Rome Marriott Grand Hotel Flora",
-    "description": "Set in an elegant area of Rome, the Rome Marriott Grand Hotel Flora combines classic style with modern comfort. The property offers spacious accommodation and a convenient location for discovering Rome\u0027s historic center, cultural attractions, and vibrant streets.",
+    "description": "Set in an elegant area of Rome, the Rome Marriott Grand Hotel Flora combines classic style with modern comfort. The property offers spacious accommodation and a convenient location for discovering Rome's historic center, cultural attractions, and vibrant streets.",
     "destinationId": 2,
     "address": "Via Vittorio Veneto 191, 00187 Rome, Italy",
     "stars": 5,
@@ -57,7 +57,7 @@
   {
     "id": 6,
     "name": "Palazzo Manfredi",
-    "description": "Palazzo Manfredi offers an elegant stay in the heart of historic Rome, surrounded by some of the city\u0027s most impressive landmarks. With its refined atmosphere and privileged location, it is an excellent choice for travelers looking for a memorable Roman experience.",
+    "description": "Palazzo Manfredi offers an elegant stay in the heart of historic Rome, surrounded by some of the city's most impressive landmarks. With its refined atmosphere and privileged location, it is an excellent choice for travelers looking for a memorable Roman experience.",
     "destinationId": 2,
     "address": "Via Labicana 125, 00184 Rome, Italy",
     "stars": 5,
@@ -68,7 +68,7 @@
   {
     "id": 7,
     "name": "Hotel Arts Barcelona",
-    "description": "Hotel Arts Barcelona offers a sophisticated stay along the city\u0027s waterfront, combining contemporary comfort with beautiful views of Barcelona. Its location provides easy access to the beach, Port Ol\u00EDmpic, restaurants, and the city\u0027s main attractions.",
+    "description": "Hotel Arts Barcelona offers a sophisticated stay along the city's waterfront, combining contemporary comfort with beautiful views of Barcelona. Its location provides easy access to the beach, Port Olímpic, restaurants, and the city's main attractions.",
     "destinationId": 3,
     "address": "Marina 19-21, 08005 Barcelona, Spain",
     "stars": 5,
@@ -79,9 +79,9 @@
   {
     "id": 8,
     "name": "W Barcelona",
-    "description": "W Barcelona is a contemporary waterfront hotel offering a stylish and vibrant atmosphere beside the Mediterranean Sea. Guests can enjoy modern accommodation, impressive views, and convenient access to Barcelona\u0027s beaches, nightlife, and city center.",
+    "description": "W Barcelona is a contemporary waterfront hotel offering a stylish and vibrant atmosphere beside the Mediterranean Sea. Guests can enjoy modern accommodation, impressive views, and convenient access to Barcelona's beaches, nightlife, and city center.",
     "destinationId": 3,
-    "address": "Pla\u00E7a Rosa dels Vents 1, 08039 Barcelona, Spain",
+    "address": "Plaça Rosa dels Vents 1, 08039 Barcelona, Spain",
     "stars": 5,
     "rating": 4.5,
     "pricePerNight": 380,
@@ -89,10 +89,10 @@
   },
   {
     "id": 9,
-    "name": "Majestic Hotel \u0026 Spa Barcelona",
-    "description": "Majestic Hotel \u0026 Spa Barcelona is an elegant property located on Passeig de Gr\u00E0cia, one of Barcelona\u0027s most prestigious avenues. The hotel combines classic elegance with modern comfort and provides convenient access to designer shops, restaurants, and major cultural attractions.",
+    "name": "Majestic Hotel & Spa Barcelona",
+    "description": "Majestic Hotel & Spa Barcelona is an elegant property located on Passeig de Gràcia, one of Barcelona's most prestigious avenues. The hotel combines classic elegance with modern comfort and provides convenient access to designer shops, restaurants, and major cultural attractions.",
     "destinationId": 3,
-    "address": "Passeig de Gr\u00E0cia 68, 08007 Barcelona, Spain",
+    "address": "Passeig de Gràcia 68, 08007 Barcelona, Spain",
     "stars": 5,
     "rating": 4.6,
     "pricePerNight": 340,
@@ -112,7 +112,7 @@
   {
     "id": 11,
     "name": "Olivia Lisboa Hotel",
-    "description": "Elegant Accommodation: Olivia Lisboa Hotel in Lisbon offers a five-star experience with a terrace, restaurant, bar, and free WiFi. Guests enjoy air conditioning, private bathrooms, and city views.\n\nDining and Leisure: The hotel serves Spanish cuisine for lunch and dinner, complemented by a buffet breakfast. Additional facilities include an elevator, 24-hour front desk, electric vehicle charging station, and room service.\n\nPrime Location: Located in the city center, the hotel is a 17-minute walk from Dona Maria II National Theatre and about one mile from Rossio. Nearby attractions include St. George\u0027s Castle and Lisbon Oceanarium, each about two miles away. Humberto Delgado Airport is around four miles from the property.",
+    "description": "Elegant Accommodation: Olivia Lisboa Hotel in Lisbon offers a five-star experience with a terrace, restaurant, bar, and free WiFi. Guests enjoy air conditioning, private bathrooms, and city views.\n\nDining and Leisure: The hotel serves Spanish cuisine for lunch and dinner, complemented by a buffet breakfast. Additional facilities include an elevator, 24-hour front desk, electric vehicle charging station, and room service.\n\nPrime Location: Located in the city center, the hotel is a 17-minute walk from Dona Maria II National Theatre and about one mile from Rossio. Nearby attractions include St. George's Castle and Lisbon Oceanarium, each about two miles away. Humberto Delgado Airport is around four miles from the property.",
     "destinationId": 1788867600382,
     "address": "Alexandre Herculano 35, 1250-009 Lisbon, Portugal",
     "stars": 5,
@@ -122,8 +122,8 @@
   },
   {
     "id": 12,
-    "name": "AMERON M\u00FCnchen Motorworld",
-    "description": "Comfortable Accommodations: AMERON M\u00FCnchen Motorworld in Munich offers family rooms with air conditioning, private bathrooms, and modern amenities. Each room includes a flat-screen TV, iPad, and free WiFi.\n\nExceptional Facilities: Guests can enjoy a sauna, fitness center, terrace, restaurant, and bar. Additional services include private check-in and check-out, a 24-hour front desk, and paid on-site parking.\n\nDining Experience: The modern, family-friendly restaurant serves Italian cuisine with vegetarian, vegan, and gluten-free options. Breakfast includes continental, American, buffet, and vegetarian selections.\n\nPrime Location: Located about 18 miles from Munich Airport, the hotel is a short walk from MOC M\u00FCnchen. Nearby attractions include Allianz Arena (about 3 miles) and English Garden (about 4 miles). Guests appreciate the bike rentals and convenient location.",
+    "name": "AMERON München Motorworld",
+    "description": "Comfortable Accommodations: AMERON München Motorworld in Munich offers family rooms with air conditioning, private bathrooms, and modern amenities. Each room includes a flat-screen TV, iPad, and free WiFi.\n\nExceptional Facilities: Guests can enjoy a sauna, fitness center, terrace, restaurant, and bar. Additional services include private check-in and check-out, a 24-hour front desk, and paid on-site parking.\n\nDining Experience: The modern, family-friendly restaurant serves Italian cuisine with vegetarian, vegan, and gluten-free options. Breakfast includes continental, American, buffet, and vegetarian selections.\n\nPrime Location: Located about 18 miles from Munich Airport, the hotel is a short walk from MOC München. Nearby attractions include Allianz Arena (about 3 miles) and English Garden (about 4 miles). Guests appreciate the bike rentals and convenient location.",
     "destinationId": 1788898052375,
     "address": "Am Ausbesserungswerk 8, Schwabing-Freimann, 80939 Munich, Germany",
     "stars": 4,
@@ -134,7 +134,7 @@
   {
     "id": 13,
     "name": "The Londoner",
-    "description": "Comfortable Accommodations: Bell\u00E9n Athens Hotel in Athens offers family rooms with air conditioning, private bathrooms, and city views. Each room includes a tea and coffee maker, minibar, and complimentary toiletries.\n\nExceptional Facilities: Guests can enjoy a sauna, fitness center, and free WiFi. Additional amenities include a pool with a view, balcony, and sofa bed.\n\nPrime Location: Located in the city center, the hotel is a three-minute walk from Monastiraki Metro Station and about 1,000 feet from Monastiraki Railway Station. Nearby attractions include the Temple of Hephaestus (around 650 feet) and the Acropolis (about 0.6 miles). Eleftherios Venizelos Airport is about 18 miles away.",
+    "description": "The Londoner is a luxury hotel located in Leicester Square, in the heart of London’s West End. The property offers elegant rooms and suites, modern facilities, restaurants and bars, wellness and fitness spaces, and convenient access to many of London’s major attractions, theatres, shopping areas, and entertainment venues.",
     "destinationId": 1789380690713,
     "address": "38 Leicester Square, Westminster Borough, London, WC2H 7DX, United Kingdom",
     "stars": 4,

@@ -3,6 +3,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useSettings } from "../../context/SettingsContext";
 import { useUser } from "../../context/UserContext";
+import {
+    createSupportMessageInApi,
+} from "../../services/supportService";
 
 type HelpTranslation = {
     title: string;
@@ -1539,15 +1542,19 @@ export default function HelpPage() {
 
     const [submitted, setSubmitted] = useState(false);
 
+    const [isSubmitting, setIsSubmitting] =
+        useState(false);
+
+    const [submitError, setSubmitError] =
+        useState("");
+
     useEffect(() => {
         if (!currentUser) {
             return;
         }
 
         setName(
-            currentUser.name ??
-            currentUser.firstName ??
-            ""
+            currentUser.name ?? ""
         );
 
         setEmail(currentUser.email ?? "");
@@ -1584,7 +1591,7 @@ export default function HelpPage() {
         return !Object.values(newErrors).some(Boolean);
     };
 
-    const handleSubmit = (
+    const handleSubmit = async (
         event: FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
@@ -1594,30 +1601,56 @@ export default function HelpPage() {
             return;
         }
 
+        setSubmitted(false);
+        setSubmitError("");
+
         if (!validateForm()) {
-            setSubmitted(false);
             return;
         }
 
-        /*
-         * Frontend simulation for now.
-         *
-         * Later, when the backend is created,
-         * this section will send the message
-         * to the backend and then to the
-         * StayWay support email.
-         */
-        setSubmitted(true);
+        setIsSubmitting(true);
 
-        setSubject("");
-        setMessage("");
+        try {
+            await createSupportMessageInApi({
+                userId:
+                    String(currentUser.id),
 
-        setErrors({
-            name: "",
-            email: "",
-            subject: "",
-            message: "",
-        });
+                name:
+                    name.trim(),
+
+                email:
+                    email.trim(),
+
+                subject:
+                    subject.trim(),
+
+                message:
+                    message.trim(),
+            });
+
+            setSubmitted(true);
+
+            setSubject("");
+            setMessage("");
+
+            setErrors({
+                name: "",
+                email: "",
+                subject: "",
+                message: "",
+            });
+        } catch (error) {
+            console.error(
+                "Could not send support message.",
+                error
+            );
+
+            setSubmitError(
+                "Could not send your message. Please try again."
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -1746,6 +1779,12 @@ export default function HelpPage() {
                             <span>
                                 {text.success}
                             </span>
+                        </div>
+                    )}
+
+                    {submitError && (
+                        <div className="support-submit-error">
+                            {submitError}
                         </div>
                     )}
 
@@ -2048,9 +2087,12 @@ export default function HelpPage() {
                                 <button
                                     type="submit"
                                     className="support-button"
+                                    disabled={isSubmitting}
                                 >
                                     <span>
-                                        {text.send}
+                                        {isSubmitting
+                                            ? "..."
+                                            : text.send}
                                     </span>
 
                                     <span className="button-arrow">
@@ -2407,6 +2449,25 @@ export default function HelpPage() {
     ease both;
 }
 
+    .support-submit-error {
+        margin-bottom: 17px;
+        padding: 13px 16px;
+
+        border:
+                1px solid
+                rgba(216, 91, 112, 0.22);
+
+        border-radius: 12px;
+
+        background:
+                rgba(216, 91, 112, 0.07);
+
+        color: #b33f55;
+
+        font-size: 14px;
+        font-weight: 600;
+    }
+
 .success-icon {
     width: 24px;
     height: 24px;
@@ -2698,7 +2759,15 @@ export default function HelpPage() {
         filter 0.2s ease;
 }
 
-.support-button:hover {
+    .support-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.68;
+        transform: none;
+        box-shadow: none;
+    }
+
+
+.support-button:not(:disabled):hover {
     transform: translateY(-2px);
     filter: brightness(1.03);
     box-shadow:
@@ -2706,7 +2775,7 @@ export default function HelpPage() {
     rgba(112, 86, 228, 0.27);
 }
 
-.support-button:active {
+.support-button:not(:disabled):active {
     transform: translateY(0);
 }
 
@@ -2727,7 +2796,7 @@ export default function HelpPage() {
     transition: transform 0.2s ease;
 }
 
-.support-button:hover
+.support-button:not(:disabled):hover
     .button-arrow {
     transform: translateX(2px);
 }

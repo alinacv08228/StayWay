@@ -7,7 +7,12 @@ import { getTranslation } from "../../data/translations";
 import { currencyInfo } from "../../data/currency";
 
 import TransferLocationInput from "../../components/TransferLocationInput";
-import { getTransferLocations } from "../../services/transferLocationService";
+
+import {
+    getTransferLocationsFromApi,
+    type TransferLocation,
+} from "../../services/transferLocationService";
+
 import { isAuthenticated } from "../../services/authService";
 
 type TransferType = "one-way" | "return";
@@ -1635,25 +1640,42 @@ export default function TransfersPage() {
     const [
         transferLocations,
         setTransferLocations,
-    ] = useState<
-        ReturnType<typeof getTransferLocations>
-    >([]);
+    ] = useState<TransferLocation[]>([]);
 
     useEffect(() => {
-        const updateTransferLocations = () => {
-            setTransferLocations(
-                getTransferLocations()
-            );
-        };
+        let isActive = true;
 
-        updateTransferLocations();
+        const loadTransferLocations =
+            async () => {
+                try {
+                    const locations =
+                        await getTransferLocationsFromApi();
 
-        const interval = setInterval(() => {
-            updateTransferLocations();
-        }, 1000);
+                    if (isActive) {
+                        setTransferLocations(
+                            locations
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        "Could not load transfer locations from the backend.",
+                        error
+                    );
+
+                    /*
+                     * Temporary fallback to the synchronized
+                     * local copy if the API is unavailable.
+                     */
+                    if (isActive) {
+                        setTransferLocations([]);
+                    }
+                }
+            };
+
+        void loadTransferLocations();
 
         return () => {
-            clearInterval(interval);
+            isActive = false;
         };
     }, []);
 

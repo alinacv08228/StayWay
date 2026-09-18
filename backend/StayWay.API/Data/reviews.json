@@ -35,7 +35,7 @@
     "userId": null,
     "userName": "Daniel",
     "rating": 5,
-    "comment": "Wonderful stay at H\u00F4tel Balzac. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "comment": "Wonderful stay at Hôtel Balzac. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
     "createdAt": "2026-08-21",
     "isMock": true
   },
@@ -45,7 +45,7 @@
     "userId": null,
     "userName": "Emma",
     "rating": 4,
-    "comment": "We really enjoyed our stay at H\u00F4tel Balzac. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "comment": "We really enjoyed our stay at Hôtel Balzac. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
     "createdAt": "2026-08-24",
     "isMock": true
   },
@@ -55,7 +55,7 @@
     "userId": null,
     "userName": "Olivia",
     "rating": 5,
-    "comment": "Excellent experience at H\u00F4tel Balzac. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "comment": "Excellent experience at Hôtel Balzac. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
     "createdAt": "2026-08-18",
     "isMock": true
   },
@@ -245,7 +245,7 @@
     "userId": null,
     "userName": "Mia",
     "rating": 5,
-    "comment": "Wonderful stay at Majestic Hotel \u0026 Spa Barcelona. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "comment": "Wonderful stay at Majestic Hotel & Spa Barcelona. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
     "createdAt": "2026-09-01",
     "isMock": true
   },
@@ -255,7 +255,7 @@
     "userId": null,
     "userName": "Sophie",
     "rating": 4,
-    "comment": "We really enjoyed our stay at Majestic Hotel \u0026 Spa Barcelona. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "comment": "We really enjoyed our stay at Majestic Hotel & Spa Barcelona. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
     "createdAt": "2026-09-03",
     "isMock": true
   },
@@ -265,7 +265,7 @@
     "userId": null,
     "userName": "Daniel",
     "rating": 5,
-    "comment": "Excellent experience at Majestic Hotel \u0026 Spa Barcelona. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "comment": "Excellent experience at Majestic Hotel & Spa Barcelona. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
     "createdAt": "2026-08-30",
     "isMock": true
   },
@@ -275,7 +275,7 @@
     "userId": null,
     "userName": "Sophie",
     "rating": 5,
-    "comment": "Wonderful stay at Stayway Nice Hotel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "comment": "Wonderful stay at The Athenaeum Luxury Hotel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
     "createdAt": "2026-08-11",
     "isMock": true
   },
@@ -285,7 +285,7 @@
     "userId": null,
     "userName": "Daniel",
     "rating": 4,
-    "comment": "We really enjoyed our stay at Stayway Nice Hotel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "comment": "We really enjoyed our stay at The Athenaeum Luxury Hotel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
     "createdAt": "2026-08-14",
     "isMock": true
   },
@@ -295,37 +295,37 @@
     "userId": null,
     "userName": "Emma",
     "rating": 5,
-    "comment": "Excellent experience at Stayway Nice Hotel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "comment": "Excellent experience at The Athenaeum Luxury Hotel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
     "createdAt": "2026-08-08",
     "isMock": true
   },
   {
     "id": 31,
     "propertyId": 11,
-    "userId": "1110",
+    "userId": null,
     "userName": "Daniel",
     "rating": 5,
-    "comment": "Wonderful stay at Hotel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "comment": "Wonderful stay at Olivia Lisboa Hotel. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
     "createdAt": "2026-08-18",
     "isMock": true
   },
   {
     "id": 32,
     "propertyId": 11,
-    "userId": "1111",
+    "userId": null,
     "userName": "Emma",
     "rating": 4,
-    "comment": "We really enjoyed our stay at Hotel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "comment": "We really enjoyed our stay at Olivia Lisboa Hotel. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
     "createdAt": "2026-08-21",
     "isMock": true
   },
   {
     "id": 33,
     "propertyId": 11,
-    "userId": "1112",
+    "userId": null,
     "userName": "Olivia",
     "rating": 5,
-    "comment": "Excellent experience at Hotel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "comment": "Excellent experience at Olivia Lisboa Hotel. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
     "createdAt": "2026-08-24",
     "isMock": true
   },
@@ -372,37 +372,37 @@
   {
     "id": 39,
     "propertyId": 12,
-    "userId": "1120",
+    "userId": null,
     "userName": "Emma",
     "rating": 5,
-    "comment": "Wonderful stay at AMERON M\u00FCnchen Motorworld. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
+    "comment": "Wonderful stay at AMERON München Motorworld. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
     "createdAt": "2026-08-27",
     "isMock": true
   },
   {
     "id": 40,
     "propertyId": 12,
-    "userId": "1121",
+    "userId": null,
     "userName": "Olivia",
     "rating": 4,
-    "comment": "We really enjoyed our stay at AMERON M\u00FCnchen Motorworld. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
+    "comment": "We really enjoyed our stay at AMERON München Motorworld. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
     "createdAt": "2026-08-30",
     "isMock": true
   },
   {
     "id": 41,
     "propertyId": 12,
-    "userId": "1122",
+    "userId": null,
     "userName": "Lucas",
     "rating": 5,
-    "comment": "Excellent experience at AMERON M\u00FCnchen Motorworld. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
+    "comment": "Excellent experience at AMERON München Motorworld. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",
     "createdAt": "2026-09-01",
     "isMock": true
   },
   {
     "id": 42,
     "propertyId": 13,
-    "userId": "1130",
+    "userId": null,
     "userName": "Olivia",
     "rating": 5,
     "comment": "Wonderful stay at The Londoner. The room was beautiful, clean and very comfortable. The location was excellent and everything felt well organised.",
@@ -412,7 +412,7 @@
   {
     "id": 43,
     "propertyId": 13,
-    "userId": "1131",
+    "userId": null,
     "userName": "Lucas",
     "rating": 4,
     "comment": "We really enjoyed our stay at The Londoner. The hotel has a lovely atmosphere, friendly service and everything we needed for a comfortable trip.",
@@ -422,7 +422,7 @@
   {
     "id": 44,
     "propertyId": 13,
-    "userId": "1132",
+    "userId": null,
     "userName": "Amelia",
     "rating": 5,
     "comment": "Excellent experience at The Londoner. The accommodation was comfortable, the room was very pleasant and the location made exploring the city easy.",

@@ -21,13 +21,12 @@ import {
 } from "lucide-react";
 
 import {
-    properties as mockProperties,
-    users,
-    rooms as mockRooms,
-} from "../../data/mockData";
+    getPropertiesFromApi,
+} from "../../services/propertyService";
 
-import { getProperties } from "../../services/propertyService";
-import { getRooms } from "../../services/roomService";
+import {
+    getRoomsFromApi,
+} from "../../services/roomService";
 
 import {
     getBookingsFromApi,
@@ -42,12 +41,28 @@ import { currencyInfo } from "../../data/currency";
 import { getTranslation } from "../../data/translations";
 
 import {
-    getTransferBookings,
+    getTransferBookingsFromApi,
+    updateTransferBookingInApi,
     type TransferBooking,
 } from "../../services/transferService";
 
-import { getTransferVehicleById } from "../../services/transferVehicleService";
-import { getTransferDriverById } from "../../services/transferDriverService";
+import {
+    getTransferVehiclesFromApi,
+} from "../../services/transferVehicleService";
+
+import {
+    getTransferDriversFromApi,
+    type TransferDriver,
+} from "../../services/transferDriverService";
+
+import type {
+    TransferVehicle,
+} from "../../data/transferVehicles";
+
+import type {
+    Property,
+    Room,
+} from "../../types/types";
 
 
 /* =========================================================
@@ -1383,15 +1398,23 @@ function BookingsContent() {
         useState<"stays" | "transfers">("stays");
 
     /*
-     * IMPORTANT:
-     * We keep the mock data as fallback, but the real data
-     * comes from localStorage through the services.
+     * Property and room data come only from the backend.
      */
     const [allProperties, setAllProperties] =
-        useState(mockProperties);
+        useState<Property[]>([]);
 
     const [allRooms, setAllRooms] =
-        useState(mockRooms);
+        useState<Room[]>([]);
+
+    const [
+        allTransferVehicles,
+        setAllTransferVehicles,
+    ] = useState<TransferVehicle[]>([]);
+
+    const [
+        allTransferDrivers,
+        setAllTransferDrivers,
+    ] = useState<TransferDriver[]>([]);
 
     const [search, setSearch] = useState("");
     const [userFilter, setUserFilter] = useState("All");
@@ -1424,28 +1447,86 @@ function BookingsContent() {
             setIsLoaded(false);
 
             /*
-             * Properties and rooms still use their current services.
-             * Stay bookings now come from the ASP.NET Core backend.
+             * Property and room information is loaded from
+             * the ASP.NET Core backend.
              */
             try {
-                const savedProperties = getProperties();
+                const loadedProperties =
+                    await getPropertiesFromApi();
+
                 if (isActive) {
-                    setAllProperties(savedProperties);
+                    setAllProperties(
+                        loadedProperties
+                    );
                 }
-            } catch {
+            } catch (error) {
+                console.error(
+                    "Could not load properties from the backend.",
+                    error
+                );
+
                 if (isActive) {
-                    setAllProperties(mockProperties);
+                    setAllProperties([]);
                 }
             }
 
             try {
-                const savedRooms = getRooms();
+                const loadedRooms =
+                    await getRoomsFromApi();
+
                 if (isActive) {
-                    setAllRooms(savedRooms);
+                    setAllRooms(
+                        loadedRooms
+                    );
                 }
-            } catch {
+            } catch (error) {
+                console.error(
+                    "Could not load rooms from the backend.",
+                    error
+                );
+
                 if (isActive) {
-                    setAllRooms(mockRooms);
+                    setAllRooms([]);
+                }
+            }
+
+            try {
+                const loadedVehicles =
+                    await getTransferVehiclesFromApi();
+
+                if (isActive) {
+                    setAllTransferVehicles(
+                        loadedVehicles
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "Could not load transfer vehicles from the backend.",
+                    error
+                );
+
+                if (isActive) {
+                    setAllTransferVehicles([]);
+                }
+            }
+
+            try {
+                const loadedDrivers =
+                    await getTransferDriversFromApi();
+
+                if (isActive) {
+                    setAllTransferDrivers(
+                        loadedDrivers
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "Could not load transfer drivers from the backend.",
+                    error
+                );
+
+                if (isActive) {
+                    setAllTransferDrivers([]);
                 }
             }
 
@@ -1471,18 +1552,35 @@ function BookingsContent() {
                 }
             }
 
-            const savedTransferBookings = getTransferBookings();
+            try {
+                const allTransferBookings =
+                    await getTransferBookingsFromApi();
 
-            const visibleTransferBookings =
-                currentUser.role === "admin"
-                    ? savedTransferBookings
-                    : savedTransferBookings.filter(
-                        (booking) =>
-                            booking.email === currentUser.email
+                const visibleTransferBookings =
+                    currentUser.role === "admin"
+                        ? allTransferBookings
+                        : allTransferBookings.filter(
+                            (booking) =>
+                                booking.email === currentUser.email
+                        );
+
+                if (isActive) {
+                    setTransferBookings(
+                        visibleTransferBookings
                     );
+                }
+            } catch (error) {
+                console.error(
+                    "Could not load transfer bookings from the backend.",
+                    error
+                );
+
+                if (isActive) {
+                    setTransferBookings([]);
+                }
+            }
 
             if (isActive) {
-                setTransferBookings(visibleTransferBookings);
                 setIsLoaded(true);
             }
         };
@@ -1582,26 +1680,17 @@ function BookingsContent() {
         >();
 
         userBookings.forEach((booking) => {
-            const fallbackUser = users.find(
-                (item) =>
-                    String(item.id) ===
-                    String(booking.userId)
-            );
-
             const name =
                 booking.firstName ||
                 booking.lastName
                     ? `${booking.firstName ?? ""} ${booking.lastName ?? ""}`.trim()
-                    : fallbackUser?.name ??
-                    getBookingPageText(
+                    : getBookingPageText(
                         language,
                         "unknownUser"
                     );
 
             const email =
-                booking.email ??
-                fallbackUser?.email ??
-                "";
+                booking.email ?? "";
 
             const key = String(booking.userId);
 
@@ -1757,7 +1846,11 @@ function BookingsContent() {
 
         const filtered = transferBookings.filter((booking) => {
             const transferVehicle = booking.vehicleId
-                ? getTransferVehicleById(booking.vehicleId)
+                ? allTransferVehicles.find(
+                    (vehicle) =>
+                        vehicle.id ===
+                        booking.vehicleId
+                )
                 : undefined;
 
             const vehicleName =
@@ -1862,6 +1955,7 @@ function BookingsContent() {
         });
     }, [
         transferBookings,
+        allTransferVehicles,
         transferSearch,
         transferTypeFilter,
         transferDateFilter,
@@ -1876,7 +1970,11 @@ function BookingsContent() {
                 transferBookings
                     .map((booking) => {
                         const transferVehicle = booking.vehicleId
-                            ? getTransferVehicleById(booking.vehicleId)
+                            ? allTransferVehicles.find(
+                                (vehicle) =>
+                                    vehicle.id ===
+                                    booking.vehicleId
+                            )
                             : undefined;
 
                         return (
@@ -1888,7 +1986,10 @@ function BookingsContent() {
                     .filter(Boolean)
             )
         ).sort((a, b) => a.localeCompare(b));
-    }, [transferBookings]);
+    }, [
+        transferBookings,
+        allTransferVehicles,
+    ]);
 
     const clearTransferFilters = () => {
         setTransferSearch("");
@@ -1980,7 +2081,7 @@ function BookingsContent() {
         }
     };
 
-    const handleCancelTransferBooking = (
+    const handleCancelTransferBooking = async (
         bookingId: string
     ) => {
         const confirmed =
@@ -1995,54 +2096,50 @@ function BookingsContent() {
             return;
         }
 
-        const savedTransferBookings =
-            localStorage.getItem(
-                "stayway_transfers"
+        const booking =
+            transferBookings.find(
+                (item) => item.id === bookingId
             );
 
-        if (!savedTransferBookings) {
+        if (!booking) {
             return;
         }
-
-        let allTransferBookings: TransferBooking[];
 
         try {
-            allTransferBookings =
-                JSON.parse(
-                    savedTransferBookings
-                ) as TransferBooking[];
-        } catch {
-            return;
-        }
-
-        const updatedTransferBookings =
-            allTransferBookings.map(
-                (booking) =>
-                    booking.id === bookingId
-                        ? {
-                            ...booking,
-                            status: "cancelled" as const,
-                        }
-                        : booking
-            );
-
-        localStorage.setItem(
-            "stayway_transfers",
-            JSON.stringify(updatedTransferBookings)
-        );
-
-        const visibleTransferBookings =
-            currentUser?.role === "admin"
-                ? updatedTransferBookings
-                : updatedTransferBookings.filter(
-                    (booking) =>
-                        booking.email ===
-                        currentUser?.email
+            const updatedBooking =
+                await updateTransferBookingInApi(
+                    bookingId,
+                    {
+                        ...booking,
+                        status: "cancelled",
+                    }
                 );
 
-        setTransferBookings(
-            visibleTransferBookings
-        );
+            setTransferBookings(
+                (currentBookings) =>
+                    currentBookings.map(
+                        (item) =>
+                            item.id === bookingId
+                                ? updatedBooking
+                                : item
+                    )
+            );
+
+            window.dispatchEvent(
+                new Event(
+                    "stayway_transfers_changed"
+                )
+            );
+        } catch (error) {
+            console.error(
+                "Could not cancel the transfer booking through the backend.",
+                error
+            );
+
+            window.alert(
+                "Could not cancel the transfer booking. Please try again."
+            );
+        }
     };
 
     if (!isLoaded) {
@@ -4027,14 +4124,24 @@ function BookingsContent() {
                                                 getTranslation(language, "passengers");
 
                                             const transferVehicle = booking.vehicleId
-                                                ? getTransferVehicleById(booking.vehicleId)
+                                                ? allTransferVehicles.find(
+                                                    (vehicle) =>
+                                                        vehicle.id ===
+                                                        booking.vehicleId
+                                                )
                                                 : undefined;
 
-                                            const transferDriver = booking.driverId
-                                                ? getTransferDriverById(booking.driverId)
-                                                : transferVehicle?.driverId
-                                                    ? getTransferDriverById(transferVehicle.driverId)
-                                                    : undefined;
+                                            const driverId =
+                                                booking.driverId ||
+                                                transferVehicle?.driverId;
+
+                                            const transferDriver = driverId
+                                                ? allTransferDrivers.find(
+                                                    (driver) =>
+                                                        driver.id ===
+                                                        driverId
+                                                )
+                                                : undefined;
 
                                             const vehicleImage =
                                                 (booking as TransferBooking & {

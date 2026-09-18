@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {
+    Suspense,
+    useEffect,
+    useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 
 import { useSettings } from "@/context/SettingsContext";
@@ -9,22 +13,29 @@ import { currencyInfo } from "@/data/currency";
 import { getTranslation } from "@/data/translations";
 
 import {
-    getTransferBookings,
+    createTransferBookingInApi,
+    getCanonicalTransferOptionTitle,
+    getTransferBookingsFromApi,
     getTransferDuration,
-    saveTransferBooking,
+    type TransferBooking,
 } from "@/services/transferService";
 
 import {
-    getTransferDriversByCity,
+    getTransferDriversFromApi,
+    type TransferDriver,
 } from "@/services/transferDriverService";
 
 import {
-    getTransferLocations,
+    getTransferLocationsFromApi,
 } from "@/services/transferLocationService";
 
 import {
-    getTransferVehiclesByCity,
+    getTransferVehiclesFromApi,
 } from "@/services/transferVehicleService";
+
+import type {
+    TransferVehicle,
+} from "@/data/transferVehicles";
 
 import {
     isAuthenticated,
@@ -1396,7 +1407,7 @@ function getTransferCheckoutText(
     return text;
 }
 
-export default function TransferCheckoutPage() {
+function TransferCheckoutContent() {
     const searchParams =
         useSearchParams();
 
@@ -1472,6 +1483,12 @@ export default function TransferCheckoutPage() {
         searchParams.get(
             "optionTitle"
         ) || "Private transfer";
+
+    const canonicalOptionTitle =
+        getCanonicalTransferOptionTitle(
+            optionId,
+            optionTitle
+        );
 
     const displayOptionTitle =
         optionId === "1"
@@ -1689,35 +1706,41 @@ export default function TransferCheckoutPage() {
      *   of every active existing booking.
      */
 
-    const getActiveTransferBookings = () => {
-        return getTransferBookings().filter(
+    const getActiveTransferBookings = (
+        bookings: TransferBooking[]
+    ) => {
+        return bookings.filter(
             (booking) =>
                 isActiveTransferBooking(booking)
         );
     };
 
     const getTransferBookingsForVehicle = (
-        vehicleId: string
+        vehicleId: string,
+        bookings: TransferBooking[]
     ) => {
-        return getActiveTransferBookings().filter(
+        return getActiveTransferBookings(
+            bookings
+        ).filter(
             (booking) =>
                 booking.vehicleId === vehicleId
         );
     };
 
     const getTransferBookingsForDriver = (
-        driverId: string
+        driverId: string,
+        bookings: TransferBooking[]
     ) => {
-        return getActiveTransferBookings().filter(
+        return getActiveTransferBookings(
+            bookings
+        ).filter(
             (booking) =>
                 booking.driverId === driverId
         );
     };
 
     const isLegAvailable = (
-        bookings: ReturnType<
-            typeof getActiveTransferBookings
-        >,
+        bookings: TransferBooking[],
         requestedDate: string,
         requestedTime: string,
         requestedDuration: number
@@ -1795,22 +1818,14 @@ export default function TransferCheckoutPage() {
         requestedTime: string,
         requestedReturnDate: string,
         requestedReturnTime: string,
-        city: string
+        cityVehicles: TransferVehicle[],
+        cityDrivers: TransferDriver[],
+        existingBookings: TransferBooking[]
     ) => {
         /*
-         * Always read the current vehicle/driver data
-         * for this exact city.
+         * Vehicles and drivers are supplied from the backend.
+         * No localStorage lookup is used here.
          */
-        const cityVehicles =
-            getTransferVehiclesByCity(
-                city
-            );
-
-        const cityDrivers =
-            getTransferDriversByCity(
-                city
-            );
-
         const vehicle =
             cityVehicles.find(
                 (item) =>
@@ -1875,12 +1890,14 @@ export default function TransferCheckoutPage() {
          */
         const vehicleBookings =
             getTransferBookingsForVehicle(
-                vehicle.id
+                vehicle.id,
+                existingBookings
             );
 
         const driverBookings =
             getTransferBookingsForDriver(
-                driver.id
+                driver.id,
+                existingBookings
             );
 
         /*
@@ -1949,7 +1966,7 @@ export default function TransferCheckoutPage() {
      */
 
     const handleConfirmTransfer =
-        () => {
+        async () => {
 
             setAvailabilityError("");
 
@@ -2030,15 +2047,36 @@ export default function TransferCheckoutPage() {
              * FIND TRANSFER CITY
              */
 
-            const transferLocations =
-                getTransferLocations();
+            let transferLocations;
+
+            try {
+                transferLocations =
+                    await getTransferLocationsFromApi();
+            } catch (error) {
+                console.error(
+                    "Could not load transfer locations from the backend.",
+                    error
+                );
+
+                setAvailabilityError(
+                    "Could not load transfer locations. Please try again."
+                );
+
+                return;
+            }
+
+            const normalizedPickup =
+                pickup
+                    .trim()
+                    .toLowerCase();
 
             const pickupLocation =
                 transferLocations.find(
                     (location) =>
                         location.name
+                            .trim()
                             .toLowerCase() ===
-                        pickup.toLowerCase()
+                        normalizedPickup
                 );
 
             const city =
@@ -2069,11 +2107,11 @@ export default function TransferCheckoutPage() {
              */
 
             const requiredCategory =
-                optionTitle
+                canonicalOptionTitle
                     .toLowerCase()
                     .includes("family")
                     ? "Family"
-                    : optionTitle
+                    : canonicalOptionTitle
                         .toLowerCase()
                         .includes(
                             "comfort"
@@ -2083,17 +2121,52 @@ export default function TransferCheckoutPage() {
 
 
             /*
-             * VEHICLES + DRIVERS
+             * CURRENT AVAILABILITY DATA FROM BACKEND
+             *
+             * Bookings, vehicles and drivers are loaded directly
+             * from the API. The checkout no longer uses localStorage
+             * to decide which vehicle/driver pair is available.
              */
 
+            let existingBookings:
+                TransferBooking[];
+
+            let allVehicles:
+                TransferVehicle[];
+
+            let allDrivers:
+                TransferDriver[];
+
+            try {
+                [
+                    existingBookings,
+                    allVehicles,
+                    allDrivers,
+                ] = await Promise.all([
+                    getTransferBookingsFromApi(),
+                    getTransferVehiclesFromApi(),
+                    getTransferDriversFromApi(),
+                ]);
+            } catch {
+                setAvailabilityError(
+                    "Could not load transfer availability. Please try again."
+                );
+
+                return;
+            }
+
             const vehicles =
-                getTransferVehiclesByCity(
-                    city
+                allVehicles.filter(
+                    (vehicle) =>
+                        vehicle.city.toLowerCase() ===
+                        city.toLowerCase()
                 );
 
             const drivers =
-                getTransferDriversByCity(
-                    city
+                allDrivers.filter(
+                    (driver) =>
+                        driver.city.toLowerCase() ===
+                        city.toLowerCase()
                 );
 
 
@@ -2173,7 +2246,9 @@ export default function TransferCheckoutPage() {
                             time,
                             returnDate,
                             returnTime,
-                            city
+                            vehicles,
+                            drivers,
+                            existingBookings
                         );
                     }
                 );
@@ -2232,7 +2307,9 @@ export default function TransferCheckoutPage() {
                                 time,
                                 "—",
                                 "—",
-                                city
+                                vehicles,
+                                drivers,
+                                existingBookings
                             );
                         }
                     );
@@ -2279,7 +2356,9 @@ export default function TransferCheckoutPage() {
                                     returnTime,
                                     "—",
                                     "—",
-                                    city
+                                    vehicles,
+                                    drivers,
+                                    existingBookings
                                 );
                             }
                         );
@@ -2372,20 +2451,81 @@ export default function TransferCheckoutPage() {
             /*
              * FINAL CHECK
              *
-             * Re-read bookings immediately before saving.
-             * This prevents the pair from being reused if
-             * another booking was created after the first check.
+             * Re-read bookings, vehicles and drivers immediately
+             * before saving. This makes the final decision from the
+             * latest backend state, including assignment/status changes.
              */
-            /*
-             * isPairAvailable() reads localStorage again here,
-             * so this is the final availability check immediately
-             * before the booking is saved.
-             */
+
+            let latestBookings:
+                TransferBooking[];
+
+            let latestAllVehicles:
+                TransferVehicle[];
+
+            let latestAllDrivers:
+                TransferDriver[];
+
+            try {
+                [
+                    latestBookings,
+                    latestAllVehicles,
+                    latestAllDrivers,
+                ] = await Promise.all([
+                    getTransferBookingsFromApi(),
+                    getTransferVehiclesFromApi(),
+                    getTransferDriversFromApi(),
+                ]);
+            } catch {
+                setAvailabilityError(
+                    "Could not refresh transfer availability. Please try again."
+                );
+
+                return;
+            }
+
+            const latestVehicles =
+                latestAllVehicles.filter(
+                    (vehicle) =>
+                        vehicle.city.toLowerCase() ===
+                        city.toLowerCase()
+                );
+
+            const latestDrivers =
+                latestAllDrivers.filter(
+                    (driver) =>
+                        driver.city.toLowerCase() ===
+                        city.toLowerCase()
+                );
+
+            const latestSelectedVehicle =
+                latestVehicles.find(
+                    (vehicle) =>
+                        vehicle.id ===
+                        availableVehicle.id
+                );
+
+            const latestSelectedDriver =
+                latestDrivers.find(
+                    (driver) =>
+                        driver.id ===
+                        availableDriver.id
+                );
+
+            if (
+                !latestSelectedVehicle ||
+                !latestSelectedDriver
+            ) {
+                setAvailabilityError(
+                    t("noLongerAvailable")
+                );
+
+                return;
+            }
 
             const stillAvailable =
                 isPairAvailable(
-                    availableVehicle.id,
-                    availableDriver.id,
+                    latestSelectedVehicle.id,
+                    latestSelectedDriver.id,
                     requiredCategory,
                     duration,
                     Number(passengers),
@@ -2397,7 +2537,9 @@ export default function TransferCheckoutPage() {
                     time,
                     returnDate,
                     returnTime,
-                    city
+                    latestVehicles,
+                    latestDrivers,
+                    latestBookings
                 );
 
             if (!stillAvailable) {
@@ -2412,7 +2554,7 @@ export default function TransferCheckoutPage() {
              * CREATE BOOKING
              */
 
-            const booking = {
+            const booking: TransferBooking = {
                 id:
                     `transfer-${Date.now()}`,
 
@@ -2424,28 +2566,29 @@ export default function TransferCheckoutPage() {
 
                 optionId,
 
-                optionTitle,
+                optionTitle:
+                canonicalOptionTitle,
 
                 price:
                     Number(totalPrice),
 
                 vehicleId:
-                availableVehicle.id,
+                latestSelectedVehicle.id,
 
                 vehicleName:
-                availableVehicle.name,
+                latestSelectedVehicle.name,
 
                 licensePlate:
-                availableVehicle.licensePlate,
+                latestSelectedVehicle.licensePlate,
 
                 vehicleImage:
-                availableVehicle.image,
+                latestSelectedVehicle.image,
 
                 driverId:
-                availableDriver.id,
+                latestSelectedDriver.id,
 
                 driverName:
-                availableDriver.name,
+                latestSelectedDriver.name,
 
                 pickup,
 
@@ -2494,17 +2637,21 @@ export default function TransferCheckoutPage() {
              * SAVE
              */
 
-            saveTransferBooking(
-                booking
-            );
+            try {
+                await createTransferBookingInApi(
+                    booking
+                );
 
-
-            /*
-             * CONFIRMATION
-             */
-
-            window.location.href =
-                "/transfers/confirmation";
+                /*
+                 * CONFIRMATION
+                 */
+                window.location.href =
+                    "/transfers/confirmation";
+            } catch {
+                setAvailabilityError(
+                    "Could not save the transfer booking. Please try again."
+                );
+            }
         };
 
 
@@ -3175,5 +3322,13 @@ export default function TransferCheckoutPage() {
             `}</style>
 
         </main>
+    );
+}
+
+export default function TransferCheckoutPage() {
+    return (
+        <Suspense fallback={null}>
+            <TransferCheckoutContent />
+        </Suspense>
     );
 }

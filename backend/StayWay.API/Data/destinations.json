@@ -25,21 +25,21 @@
     "name": "Nice",
     "country": "France",
     "image": "/Paris.jpg",
-    "countryImage": "/Paris.jpg"
+    "countryImage": "/France.jpg"
   },
   {
     "id": 1788770149504,
     "name": "Hamburg",
     "country": "Germany",
     "image": "/Paris.jpg",
-    "countryImage": "/Paris.jpg"
+    "countryImage": "/Germany.jpg"
   },
   {
     "id": 1788771598126,
     "name": "Berlin",
     "country": "Germany",
     "image": "/Paris.jpg",
-    "countryImage": "/Paris.jpg"
+    "countryImage": "/Germany.jpg"
   },
   {
     "id": 1788799667033,
@@ -66,7 +66,7 @@
     "id": 1789380690713,
     "name": "London",
     "country": "United Kingdom",
-    "image": "/United-Kingdom.jpg",
-    "countryImage": "/London.jpg"
+    "image": "/London.jpg",
+    "countryImage": "/United-Kingdom.jpg"
   }
 ]

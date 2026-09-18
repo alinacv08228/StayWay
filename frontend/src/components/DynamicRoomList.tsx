@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import { useSettings } from "../context/SettingsContext";
 import { currencyInfo } from "../data/currency";
+
 import {
     getTranslation,
     getLocalizedRoomFeature,
@@ -12,7 +12,6 @@ import {
 } from "../data/translations";
 
 import RoomImageViewer from "./RoomImageViewer";
-import { getRoomsByPropertyId } from "../services/roomService";
 import { Room } from "../types/types";
 
 type DynamicRoomListProps = {
@@ -24,20 +23,22 @@ export default function DynamicRoomList({
                                             propertyId,
                                             initialRooms,
                                         }: DynamicRoomListProps) {
-    const { currency, language } = useSettings();
+    const { currency, language } =
+        useSettings();
 
     const selectedCurrency =
         currencyInfo[currency] ??
         currencyInfo["Euro"];
 
-    const [propertyRooms, setPropertyRooms] =
-        useState<Room[]>(initialRooms);
-
-    useEffect(() => {
-        setPropertyRooms(
-            getRoomsByPropertyId(propertyId)
-        );
-    }, [propertyId]);
+    /*
+     * Rooms are already loaded from the backend
+     * by StayPageClient and passed through initialRooms.
+     *
+     * This component only renders them and therefore
+     * does not need another API request or localStorage.
+     */
+    const propertyRooms =
+        initialRooms;
 
     if (propertyRooms.length === 0) {
         return (
@@ -66,11 +67,18 @@ export default function DynamicRoomList({
                     room.size !== undefined &&
                     room.size !== null &&
                     room.size !== ""
-                        ? typeof room.size === "number"
+                        ? typeof room.size ===
+                        "number"
                             ? `${room.size} m²`
-                            : String(room.size).trim().endsWith("m²")
-                                ? String(room.size).trim()
-                                : `${String(room.size).trim()} m²`
+                            : String(room.size)
+                                .trim()
+                                .endsWith("m²")
+                                ? String(
+                                    room.size
+                                ).trim()
+                                : `${String(
+                                    room.size
+                                ).trim()} m²`
                         : "";
 
                 return (
@@ -86,30 +94,34 @@ export default function DynamicRoomList({
                         </div>
 
                         <div className="room-details">
-                            <h3>{room.name}</h3>
+                            <h3>
+                                {room.name}
+                            </h3>
 
                             <p className="room-description">
                                 {room.description}
                             </p>
 
                             <div className="room-meta">
-                               <span>
-    👤{" "}
-                                   {getTranslation(
-                                       language,
-                                       "upToGuests"
-                                   )}{" "}
-                                   {room.guests}{" "}
-                                   {getTranslation(
-                                       language,
-                                       "guests"
-                                   ).toLowerCase()}
-</span>
+                                <span>
+                                    👤{" "}
+                                    {getTranslation(
+                                        language,
+                                        "upToGuests"
+                                    )}{" "}
+                                    {room.guests}{" "}
+                                    {getTranslation(
+                                        language,
+                                        "guests"
+                                    ).toLowerCase()}
+                                </span>
 
                                 {formattedRoomSize && (
                                     <span>
                                         📐{" "}
-                                        {formattedRoomSize}
+                                        {
+                                            formattedRoomSize
+                                        }
                                     </span>
                                 )}
 
@@ -123,19 +135,26 @@ export default function DynamicRoomList({
                             </div>
 
                             <div className="room-features">
-                                {(room.features ?? [])
+                                {(room.features ??
+                                    [])
                                     .slice(0, 3)
-                                    .map((feature) => (
-                                        <span
-                                            key={feature}
-                                        >
-                                            ✓{" "}
-                                            {getLocalizedRoomFeature(
-                                                feature,
-                                                language
-                                            )}
-                                        </span>
-                                    ))}
+                                    .map(
+                                        (
+                                            feature
+                                        ) => (
+                                            <span
+                                                key={
+                                                    feature
+                                                }
+                                            >
+                                                ✓{" "}
+                                                {getLocalizedRoomFeature(
+                                                    feature,
+                                                    language
+                                                )}
+                                            </span>
+                                        )
+                                    )}
                             </div>
 
                             <div className="room-policies">
@@ -165,7 +184,9 @@ export default function DynamicRoomList({
 
                         <div className="room-price">
                             <strong>
-                                {selectedCurrency.symbol}
+                                {
+                                    selectedCurrency.symbol
+                                }
                                 {Math.round(
                                     room.pricePerNight *
                                     selectedCurrency.rate

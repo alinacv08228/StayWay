@@ -1,0 +1,254 @@
+[
+  {
+    "id": "driver-athens-1",
+    "city": "Athens",
+    "name": "Nikos Papadopoulos",
+    "phone": "\u002B30 690 123 4567",
+    "status": "available"
+  },
+  {
+    "id": "driver-athens-2",
+    "city": "Athens",
+    "name": "Georgios Nikolaou",
+    "phone": "\u002B30 691 234 5678",
+    "status": "available"
+  },
+  {
+    "id": "driver-athens-3",
+    "city": "Athens",
+    "name": "Dimitris Georgiou",
+    "phone": "\u002B30 692 345 6789",
+    "status": "available"
+  },
+  {
+    "id": "driver-athens-4",
+    "city": "Athens",
+    "name": "Konstantinos Alexiou",
+    "phone": "\u002B30 693 456 7890",
+    "status": "available"
+  },
+  {
+    "id": "driver-athens-5",
+    "city": "Athens",
+    "name": "Panagiotis Dimitriou",
+    "phone": "\u002B30 694 567 8901",
+    "status": "available"
+  },
+  {
+    "id": "driver-athens-6",
+    "city": "Athens",
+    "name": "Andreas Nikolaidis",
+    "phone": "\u002B30 695 678 9012",
+    "status": "available"
+  },
+  {
+    "id": "driver-barcelona-1",
+    "city": "Barcelona",
+    "name": "Carlos Martinez",
+    "phone": "\u002B34 612 345 678",
+    "status": "available"
+  },
+  {
+    "id": "driver-barcelona-2",
+    "city": "Barcelona",
+    "name": "Javier Garcia",
+    "phone": "\u002B34 613 456 789",
+    "status": "available"
+  },
+  {
+    "id": "driver-barcelona-3",
+    "city": "Barcelona",
+    "name": "Miguel Fernandez",
+    "phone": "\u002B34 614 567 890",
+    "status": "available"
+  },
+  {
+    "id": "driver-barcelona-4",
+    "city": "Barcelona",
+    "name": "Alejandro Ruiz",
+    "phone": "\u002B34 615 678 901",
+    "status": "available"
+  },
+  {
+    "id": "driver-barcelona-5",
+    "city": "Barcelona",
+    "name": "Daniel Navarro",
+    "phone": "\u002B34 616 789 012",
+    "status": "available"
+  },
+  {
+    "id": "driver-barcelona-6",
+    "city": "Barcelona",
+    "name": "Sergio Moreno",
+    "phone": "\u002B34 617 890 123",
+    "status": "available"
+  },
+  {
+    "id": "driver-lisbon-1",
+    "city": "Lisbon",
+    "name": "Jo\u00E3o Silva",
+    "phone": "\u002B351 910 123 456",
+    "status": "available"
+  },
+  {
+    "id": "driver-lisbon-2",
+    "city": "Lisbon",
+    "name": "Miguel Santos",
+    "phone": "\u002B351 911 234 567",
+    "status": "available"
+  },
+  {
+    "id": "driver-lisbon-3",
+    "city": "Lisbon",
+    "name": "Pedro Costa",
+    "phone": "\u002B351 912 345 678",
+    "status": "available"
+  },
+  {
+    "id": "driver-lisbon-4",
+    "city": "Lisbon",
+    "name": "Rui Ferreira",
+    "phone": "\u002B351 913 456 789",
+    "status": "available"
+  },
+  {
+    "id": "driver-lisbon-5",
+    "city": "Lisbon",
+    "name": "Tiago Rodrigues",
+    "phone": "\u002B351 914 567 890",
+    "status": "available"
+  },
+  {
+    "id": "driver-lisbon-6",
+    "city": "Lisbon",
+    "name": "Bruno Almeida",
+    "phone": "\u002B351 915 678 901",
+    "status": "available"
+  },
+  {
+    "id": "driver-munich-1",
+    "city": "Munich",
+    "name": "Thomas M\u00FCller",
+    "phone": "\u002B49 170 1234567",
+    "status": "available"
+  },
+  {
+    "id": "driver-munich-2",
+    "city": "Munich",
+    "name": "Michael Schneider",
+    "phone": "\u002B49 171 2345678",
+    "status": "available"
+  },
+  {
+    "id": "driver-munich-3",
+    "city": "Munich",
+    "name": "Daniel Weber",
+    "phone": "\u002B49 172 3456789",
+    "status": "available"
+  },
+  {
+    "id": "driver-munich-4",
+    "city": "Munich",
+    "name": "Andreas Fischer",
+    "phone": "\u002B49 173 4567890",
+    "status": "available"
+  },
+  {
+    "id": "driver-munich-5",
+    "city": "Munich",
+    "name": "Stefan Wagner",
+    "phone": "\u002B49 174 5678901",
+    "status": "available"
+  },
+  {
+    "id": "driver-munich-6",
+    "city": "Munich",
+    "name": "Markus Hoffmann",
+    "phone": "\u002B49 175 6789012",
+    "status": "available"
+  },
+  {
+    "id": "driver-paris-1",
+    "city": "Paris",
+    "name": "Pierre Martin",
+    "phone": "\u002B33 6 12 34 56 78",
+    "status": "available"
+  },
+  {
+    "id": "driver-paris-2",
+    "city": "Paris",
+    "name": "Thomas Bernard",
+    "phone": "\u002B33 6 23 45 67 89",
+    "status": "available"
+  },
+  {
+    "id": "driver-paris-3",
+    "city": "Paris",
+    "name": "Julien Dubois",
+    "phone": "\u002B33 6 34 56 78 90",
+    "status": "available"
+  },
+  {
+    "id": "driver-paris-4",
+    "city": "Paris",
+    "name": "Antoine Moreau",
+    "phone": "\u002B33 6 45 67 89 01",
+    "status": "available"
+  },
+  {
+    "id": "driver-paris-5",
+    "city": "Paris",
+    "name": "Lucas Laurent",
+    "phone": "\u002B33 6 56 78 90 12",
+    "status": "available"
+  },
+  {
+    "id": "driver-paris-6",
+    "city": "Paris",
+    "name": "Nicolas Lefevre",
+    "phone": "\u002B33 6 67 89 01 23",
+    "status": "available"
+  },
+  {
+    "id": "driver-rome-1",
+    "city": "Rome",
+    "name": "Marco Rossi",
+    "phone": "\u002B39 333 123 4567",
+    "status": "available"
+  },
+  {
+    "id": "driver-rome-2",
+    "city": "Rome",
+    "name": "Luca Bianchi",
+    "phone": "\u002B39 334 234 5678",
+    "status": "available"
+  },
+  {
+    "id": "driver-rome-3",
+    "city": "Rome",
+    "name": "Matteo Romano",
+    "phone": "\u002B39 335 345 6789",
+    "status": "available"
+  },
+  {
+    "id": "driver-rome-4",
+    "city": "Rome",
+    "name": "Andrea Conti",
+    "phone": "\u002B39 336 456 7890",
+    "status": "available"
+  },
+  {
+    "id": "driver-rome-5",
+    "city": "Rome",
+    "name": "Francesco Ricci",
+    "phone": "\u002B39 337 567 8901",
+    "status": "available"
+  },
+  {
+    "id": "driver-rome-6",
+    "city": "Rome",
+    "name": "Stefano Esposito",
+    "phone": "\u002B39 338 678 9012",
+    "status": "available"
+  }
+]

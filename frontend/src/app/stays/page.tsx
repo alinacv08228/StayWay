@@ -24,16 +24,11 @@ import {
 import { currencyInfo } from "../../data/currency";
 
 import {
-    properties as mockProperties,
-} from "../../data/mockData";
-
-import {
-    getProperties,
     getPropertiesFromApi,
 } from "../../services/propertyService";
 
 import {
-    getDestinations,
+    getDestinationsFromApi,
 } from "../../services/destinationService";
 
 import { Property } from "../../types/types";
@@ -476,16 +471,10 @@ export default function StaysPage() {
     // =========================================
 
     const [allProperties, setAllProperties] =
-        useState<Property[]>(mockProperties);
+        useState<Property[]>([]);
 
     const [availableDestinations, setAvailableDestinations] =
-        useState(() => {
-            try {
-                return getDestinations();
-            } catch {
-                return [];
-            }
-        });
+        useState<Awaited<ReturnType<typeof getDestinationsFromApi>>>([]);
 
     const [isLoading, setIsLoading] =
         useState(false);
@@ -521,15 +510,17 @@ export default function StaysPage() {
     useEffect(() => {
         let mounted = true;
 
-        const loadProperties = async () => {
+        const loadStaysData = async () => {
             setIsLoading(true);
 
             try {
-                const loadedProperties =
-                    await getPropertiesFromApi();
-
-                const loadedDestinations =
-                    getDestinations();
+                const [
+                    loadedProperties,
+                    loadedDestinations,
+                ] = await Promise.all([
+                    getPropertiesFromApi(),
+                    getDestinationsFromApi(),
+                ]);
 
                 if (!mounted) {
                     return;
@@ -544,25 +535,19 @@ export default function StaysPage() {
                 );
 
                 setHasError(false);
-            } catch {
+            } catch (error) {
+                console.error(
+                    "Could not load stays data from the backend.",
+                    error
+                );
+
                 if (!mounted) {
                     return;
                 }
 
-                /*
-                 * Keep the last local copy as a fallback so the page
-                 * remains usable if the API is temporarily unavailable.
-                 */
-                const fallbackProperties =
-                    getProperties();
-
-                setAllProperties(
-                    fallbackProperties.length > 0
-                        ? fallbackProperties
-                        : mockProperties
-                );
-
-                setHasError(false);
+                setAllProperties([]);
+                setAvailableDestinations([]);
+                setHasError(true);
             } finally {
                 if (mounted) {
                     setIsLoading(false);
@@ -570,7 +555,7 @@ export default function StaysPage() {
             }
         };
 
-        void loadProperties();
+        void loadStaysData();
 
         return () => {
             mounted = false;

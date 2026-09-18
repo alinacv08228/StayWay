@@ -14,7 +14,9 @@ import {
     getLocalizedBedType,
 } from "../data/translations";
 
-import { getRoomsByPropertyId } from "../services/roomService";
+import {
+    getRoomsByPropertyIdFromApi,
+} from "../services/roomService";
 
 type PropertyCardProps = {
     property: Property;
@@ -252,11 +254,38 @@ export default function PropertyCard({
     ] = useState<Room[]>([]);
 
     useEffect(() => {
-        setPropertyRooms(
-            getRoomsByPropertyId(
-                property.id
-            )
-        );
+        let mounted = true;
+
+        const loadPropertyRooms =
+            async () => {
+                try {
+                    const rooms =
+                        await getRoomsByPropertyIdFromApi(
+                            property.id
+                        );
+
+                    if (mounted) {
+                        setPropertyRooms(
+                            rooms
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        `Could not load rooms for property ${property.id} from the backend.`,
+                        error
+                    );
+
+                    if (mounted) {
+                        setPropertyRooms([]);
+                    }
+                }
+            };
+
+        void loadPropertyRooms();
+
+        return () => {
+            mounted = false;
+        };
     }, [property.id]);
 
     const firstRoom =
