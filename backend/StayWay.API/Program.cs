@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using StayWay.BusinessLayer;
 using StayWay.BusinessLayer.Services;
+using StayWay.DataAccessLayer.Context;
+using StayWay.DataAccessLayer.Seeding;
 using StayWay.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,121 +10,46 @@ var builder = WebApplication.CreateBuilder(args);
 // Controllers
 builder.Services.AddControllers();
 
-var propertyDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "properties.json"
+// Entity Framework Core + SQLite
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' was not found."
+    );
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(connectionString)
 );
 
-var roomDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "rooms.json"
-);
+// Temporary JSON persistence.
+// These services will be migrated to AppDbContext next.
+builder.Services.AddScoped<IPropertyService, PropertyService>();
 
-var destinationDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "destinations.json"
-);
+builder.Services.AddScoped<IRoomService, RoomService>();
 
-var bookingDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "bookings.json"
-);
+builder.Services.AddScoped<IDestinationService, DestinationService>();
 
-var reviewDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "reviews.json"
-);
+builder.Services.AddScoped<IBookingService, BookingService>();
 
-var userDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "users.json"
-);
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
-var transferVehicleDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "transferVehicles.json"
-);
+builder.Services.AddScoped<BusinessLogic>();
 
-var transferDriverDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "transferDrivers.json"
-);
+builder.Services.AddScoped<IUserService, UserService>();
 
-var transferBookingDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "transferBookings.json"
-);
+builder.Services.AddScoped<ITransferVehicleService, TransferVehicleService>();
 
-var supportMessageDataPath = Path.Combine(
-    builder.Environment.ContentRootPath,
-    "Data",
-    "supportMessages.json"
-);
+builder.Services.AddScoped<ITransferDriverService, TransferDriverService>();
 
-builder.Services.AddSingleton<IPropertyService>(
-    _ => new PropertyService(propertyDataPath)
-);
+builder.Services.AddScoped<ITransferBookingService, TransferBookingService>();
 
-builder.Services.AddSingleton<IRoomService>(
-    _ => new RoomService(roomDataPath)
-);
-
-builder.Services.AddSingleton<IDestinationService>(
-    _ => new DestinationService(destinationDataPath)
-);
-
-builder.Services.AddSingleton<IBookingService>(
-    _ => new BookingService(bookingDataPath)
-);
-
-builder.Services.AddSingleton<IReviewService>(
-    _ => new ReviewService(reviewDataPath)
-);
-
-builder.Services.AddSingleton<BusinessLogic>();
-
-builder.Services.AddSingleton<IUserService>(
-    _ => new UserService(userDataPath)
-);
-
-builder.Services.AddSingleton<ITransferVehicleService>(
-    _ => new TransferVehicleService(
-        transferVehicleDataPath
-    )
-);
-
-builder.Services.AddSingleton<ITransferDriverService>(
-    _ => new TransferDriverService(
-        transferDriverDataPath
-    )
-);
-
-builder.Services.AddSingleton<ITransferBookingService>(
-    _ => new TransferBookingService(
-        transferBookingDataPath
-    )
-);
-
-builder.Services.AddSingleton<ISupportMessageService>(
-    _ => new SupportMessageService(
-        supportMessageDataPath
-    )
-);
+builder.Services.AddScoped<ISupportMessageService, SupportMessageService>();
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS pentru frontend-ul StayWay
+// CORS for StayWay frontend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("StayWayFrontend", policy =>
@@ -134,6 +62,30 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+/*
+ * Apply existing EF Core migrations
+ * and import the old JSON data once
+ * when the database is empty.
+ */
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext =
+        scope.ServiceProvider
+            .GetRequiredService<AppDbContext>();
+
+    await dbContext.Database.MigrateAsync();
+
+    var dataDirectory = Path.Combine(
+        app.Environment.ContentRootPath,
+        "Data"
+    );
+
+    await DatabaseSeeder.SeedAsync(
+        dbContext,
+        dataDirectory
+    );
+}
 
 if (app.Environment.IsDevelopment())
 {

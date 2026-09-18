@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -12,63 +13,60 @@ public class UserService : IUserService
     private const int HashSize = 32;
     private const int Iterations = 100_000;
 
-    private readonly string _dataPath;
-    private readonly object _fileLock = new();
+    private readonly AppDbContext _context;
 
-    private readonly JsonSerializerOptions _jsonOptions =
-        new()
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-
-    public UserService(string dataPath)
+    public UserService(
+        AppDbContext context
+    )
     {
-        _dataPath = dataPath;
-
-        var directory = Path.GetDirectoryName(_dataPath);
-
-        if (!string.IsNullOrWhiteSpace(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        if (!File.Exists(_dataPath))
-        {
-            File.WriteAllText(_dataPath, "[]");
-        }
+        _context = context;
     }
 
     public List<UserDto> GetAll()
     {
-        lock (_fileLock)
-        {
-            return LoadUsers()
-                .Select(ToDto)
-                .ToList();
-        }
+        return _context.Users
+            .AsNoTracking()
+            .OrderBy(user => user.Id)
+            .Select(user =>
+                new UserDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Role = user.Role
+                }
+            )
+            .ToList();
     }
 
-    public UserDto? GetById(string id)
+    public UserDto? GetById(
+        string id
+    )
     {
-        lock (_fileLock)
-        {
-            var user = LoadUsers()
+        var user =
+            _context.Users
+                .AsNoTracking()
                 .FirstOrDefault(
                     item => item.Id == id
                 );
 
-            return user is null
-                ? null
-                : ToDto(user);
-        }
+        return user is null
+            ? null
+            : ToDto(user);
     }
 
-    public UserDto? Login(LoginRequestDto request)
+    public UserDto? Login(
+        LoginRequestDto request
+    )
     {
-        if (string.IsNullOrWhiteSpace(request.Email) ||
-            string.IsNullOrEmpty(request.Password))
+        if (
+            string.IsNullOrWhiteSpace(
+                request.Email
+            ) ||
+            string.IsNullOrEmpty(
+                request.Password
+            )
+        )
         {
             return null;
         }
@@ -78,33 +76,32 @@ public class UserService : IUserService
                 .Trim()
                 .ToLowerInvariant();
 
-        lock (_fileLock)
-        {
-            var user = LoadUsers()
+        var user =
+            _context.Users
+                .AsNoTracking()
                 .FirstOrDefault(
                     item =>
-                        item.Email
-                            .Trim()
-                            .ToLowerInvariant() ==
+                        item.Email.ToLower() ==
                         normalizedEmail
                 );
 
-            if (user is null)
-            {
-                return null;
-            }
-
-            if (!VerifyPassword(
-                    request.Password,
-                    user.PasswordHash,
-                    user.PasswordSalt
-                ))
-            {
-                return null;
-            }
-
-            return ToDto(user);
+        if (user is null)
+        {
+            return null;
         }
+
+        if (
+            !VerifyPassword(
+                request.Password,
+                user.PasswordHash,
+                user.PasswordSalt
+            )
+        )
+        {
+            return null;
+        }
+
+        return ToDto(user);
     }
 
     public UserDto? Register(
@@ -122,9 +119,17 @@ public class UserService : IUserService
                 .Trim()
                 .ToLowerInvariant();
 
-        if (string.IsNullOrWhiteSpace(firstName) ||
-            string.IsNullOrWhiteSpace(lastName) ||
-            string.IsNullOrWhiteSpace(normalizedEmail))
+        if (
+            string.IsNullOrWhiteSpace(
+                firstName
+            ) ||
+            string.IsNullOrWhiteSpace(
+                lastName
+            ) ||
+            string.IsNullOrWhiteSpace(
+                normalizedEmail
+            )
+        )
         {
             return null;
         }
@@ -134,38 +139,35 @@ public class UserService : IUserService
             return null;
         }
 
-        lock (_fileLock)
+        var emailAlreadyExists =
+            _context.Users.Any(
+                item =>
+                    item.Email.ToLower() ==
+                    normalizedEmail
+            );
+
+        if (emailAlreadyExists)
         {
-            var users = LoadUsers();
+            throw new InvalidOperationException(
+                "An account with this email already exists."
+            );
+        }
 
-            var emailAlreadyExists =
-                users.Any(
-                    item =>
-                        item.Email
-                            .Trim()
-                            .ToLowerInvariant() ==
-                        normalizedEmail
-                );
+        var salt =
+            RandomNumberGenerator.GetBytes(
+                SaltSize
+            );
 
-            if (emailAlreadyExists)
+        var hash =
+            HashPassword(
+                request.Password,
+                salt
+            );
+
+        var newUser =
+            new UserEntity
             {
-                return null;
-            }
-
-            var salt =
-                RandomNumberGenerator.GetBytes(
-                    SaltSize
-                );
-
-            var hash =
-                HashPassword(
-                    request.Password,
-                    salt
-                );
-
-            var newUser = new UserEntity
-            {
-                Id = GenerateUserId(users),
+                Id = GenerateUserId(),
 
                 Name =
                     $"{firstName} {lastName}",
@@ -182,76 +184,60 @@ public class UserService : IUserService
                     Convert.ToBase64String(salt)
             };
 
-            users.Add(newUser);
+        _context.Users.Add(newUser);
 
-            SaveUsers(users);
-
-            return ToDto(newUser);
+        try
+        {
+            _context.SaveChanges();
         }
+        catch (DbUpdateException exception)
+        {
+            throw new InvalidOperationException(
+                "An account with this email already exists.",
+                exception
+            );
+        }
+
+        return ToDto(newUser);
     }
 
-    public bool Delete(string id)
+    public bool Delete(
+        string id
+    )
     {
-        lock (_fileLock)
-        {
-            var users = LoadUsers();
-
-            var user =
-                users.FirstOrDefault(
+        var user =
+            _context.Users
+                .FirstOrDefault(
                     item => item.Id == id
                 );
 
-            if (user is null)
-            {
-                return false;
-            }
-
-            users.Remove(user);
-
-            SaveUsers(users);
-
-            return true;
+        if (user is null)
+        {
+            return false;
         }
+
+        _context.Users.Remove(user);
+        _context.SaveChanges();
+
+        return true;
     }
 
-    private List<UserEntity> LoadUsers()
+    private string GenerateUserId()
     {
-        if (!File.Exists(_dataPath))
+        string id;
+
+        do
         {
-            return [];
+            id =
+                $"user-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
         }
-
-        var json =
-            File.ReadAllText(_dataPath);
-
-        if (string.IsNullOrWhiteSpace(json))
-        {
-            return [];
-        }
-
-        return JsonSerializer.Deserialize<
-                   List<UserEntity>
-               >(
-                   json,
-                   _jsonOptions
-               )
-               ?? [];
-    }
-
-    private void SaveUsers(
-        List<UserEntity> users
-    )
-    {
-        var json =
-            JsonSerializer.Serialize(
-                users,
-                _jsonOptions
-            );
-
-        File.WriteAllText(
-            _dataPath,
-            json
+        while (
+            _context.Users.Any(
+                user => user.Id == id
+            )
         );
+
+        return id;
     }
 
     private static UserDto ToDto(
@@ -265,26 +251,6 @@ public class UserService : IUserService
             Email = user.Email,
             Role = user.Role
         };
-    }
-
-    private static string GenerateUserId(
-        List<UserEntity> users
-    )
-    {
-        string id;
-
-        do
-        {
-            id =
-                $"user-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
-        }
-        while (
-            users.Any(
-                user => user.Id == id
-            )
-        );
-
-        return id;
     }
 
     private static byte[] HashPassword(

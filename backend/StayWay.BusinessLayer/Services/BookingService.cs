@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,49 +8,102 @@ namespace StayWay.BusinessLayer.Services;
 
 public class BookingService : IBookingService
 {
-    private readonly string _filePath;
+    private readonly AppDbContext _context;
 
-    private readonly JsonSerializerOptions _jsonOptions = new()
+    public BookingService(
+        AppDbContext context
+    )
     {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
-
-    public BookingService(string filePath)
-    {
-        _filePath = filePath;
+        _context = context;
     }
 
     public List<BookingDto> GetAll()
     {
-        return LoadBookings()
-            .Select(ToDto)
+        return _context.Bookings
+            .AsNoTracking()
+            .OrderBy(booking => booking.Id)
+            .Select(booking =>
+                new BookingDto
+                {
+                    Id = booking.Id,
+                    UserId = booking.UserId,
+                    PropertyId = booking.PropertyId,
+                    RoomId = booking.RoomId,
+                    CheckIn = booking.CheckIn,
+                    CheckOut = booking.CheckOut,
+                    Adults = booking.Adults,
+                    Children = booking.Children,
+                    Infants = booking.Infants,
+                    Guests = booking.Guests,
+                    TotalPrice = booking.TotalPrice,
+                    Status = booking.Status,
+                    FirstName = booking.FirstName,
+                    LastName = booking.LastName,
+                    Email = booking.Email,
+                    Phone = booking.Phone,
+                    SpecialRequests =
+                        booking.SpecialRequests
+                }
+            )
             .ToList();
     }
 
-    public BookingDto? GetById(long id)
+    public BookingDto? GetById(
+        long id
+    )
     {
-        var booking = LoadBookings()
-            .FirstOrDefault(item => item.Id == id);
+        var booking =
+            _context.Bookings
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         return booking is null
             ? null
             : ToDto(booking);
     }
 
-    public List<BookingDto> GetByUserId(string userId)
+    public List<BookingDto> GetByUserId(
+        string userId
+    )
     {
-        return LoadBookings()
-            .Where(item => item.UserId == userId)
-            .Select(ToDto)
+        return _context.Bookings
+            .AsNoTracking()
+            .Where(booking =>
+                booking.UserId == userId
+            )
+            .OrderBy(booking => booking.Id)
+            .Select(booking =>
+                new BookingDto
+                {
+                    Id = booking.Id,
+                    UserId = booking.UserId,
+                    PropertyId = booking.PropertyId,
+                    RoomId = booking.RoomId,
+                    CheckIn = booking.CheckIn,
+                    CheckOut = booking.CheckOut,
+                    Adults = booking.Adults,
+                    Children = booking.Children,
+                    Infants = booking.Infants,
+                    Guests = booking.Guests,
+                    TotalPrice = booking.TotalPrice,
+                    Status = booking.Status,
+                    FirstName = booking.FirstName,
+                    LastName = booking.LastName,
+                    Email = booking.Email,
+                    Phone = booking.Phone,
+                    SpecialRequests =
+                        booking.SpecialRequests
+                }
+            )
             .ToList();
     }
 
-    public BookingDto Create(BookingDto booking)
+    public BookingDto Create(
+        BookingDto booking
+    )
     {
-        var bookings = LoadBookings();
-
         if (booking.RoomId.HasValue &&
             !IsRoomAvailable(
                 booking.PropertyId,
@@ -62,48 +116,49 @@ public class BookingService : IBookingService
             );
         }
 
-        var nextId = bookings.Count == 0
-            ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            : Math.Max(
-                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                bookings.Max(item => item.Id) + 1
-            );
+        var entity =
+            new BookingEntity
+            {
+                UserId = booking.UserId,
+                PropertyId = booking.PropertyId,
+                RoomId = booking.RoomId,
+                CheckIn = booking.CheckIn,
+                CheckOut = booking.CheckOut,
+                Adults = booking.Adults,
+                Children = booking.Children,
+                Infants = booking.Infants,
+                Guests = booking.Guests,
+                TotalPrice = booking.TotalPrice,
+                Status =
+                    string.IsNullOrWhiteSpace(
+                        booking.Status
+                    )
+                        ? "pending"
+                        : booking.Status,
+                FirstName = booking.FirstName,
+                LastName = booking.LastName,
+                Email = booking.Email,
+                Phone = booking.Phone,
+                SpecialRequests =
+                    booking.SpecialRequests
+            };
 
-        var entity = new BookingEntity
-        {
-            Id = nextId,
-            UserId = booking.UserId,
-            PropertyId = booking.PropertyId,
-            RoomId = booking.RoomId,
-            CheckIn = booking.CheckIn,
-            CheckOut = booking.CheckOut,
-            Adults = booking.Adults,
-            Children = booking.Children,
-            Infants = booking.Infants,
-            Guests = booking.Guests,
-            TotalPrice = booking.TotalPrice,
-            Status = string.IsNullOrWhiteSpace(booking.Status)
-                ? "pending"
-                : booking.Status,
-            FirstName = booking.FirstName,
-            LastName = booking.LastName,
-            Email = booking.Email,
-            Phone = booking.Phone,
-            SpecialRequests = booking.SpecialRequests
-        };
-
-        bookings.Add(entity);
-        SaveBookings(bookings);
+        _context.Bookings.Add(entity);
+        _context.SaveChanges();
 
         return ToDto(entity);
     }
 
-    public BookingDto? Update(long id, BookingDto booking)
+    public BookingDto? Update(
+        long id,
+        BookingDto booking
+    )
     {
-        var bookings = LoadBookings();
-
-        var existing = bookings
-            .FirstOrDefault(item => item.Id == id);
+        var existing =
+            _context.Bookings
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (existing is null)
         {
@@ -123,42 +178,76 @@ public class BookingService : IBookingService
             );
         }
 
-        existing.UserId = booking.UserId;
-        existing.PropertyId = booking.PropertyId;
-        existing.RoomId = booking.RoomId;
-        existing.CheckIn = booking.CheckIn;
-        existing.CheckOut = booking.CheckOut;
-        existing.Adults = booking.Adults;
-        existing.Children = booking.Children;
-        existing.Infants = booking.Infants;
-        existing.Guests = booking.Guests;
-        existing.TotalPrice = booking.TotalPrice;
-        existing.Status = booking.Status;
-        existing.FirstName = booking.FirstName;
-        existing.LastName = booking.LastName;
-        existing.Email = booking.Email;
-        existing.Phone = booking.Phone;
-        existing.SpecialRequests = booking.SpecialRequests;
+        existing.UserId =
+            booking.UserId;
 
-        SaveBookings(bookings);
+        existing.PropertyId =
+            booking.PropertyId;
+
+        existing.RoomId =
+            booking.RoomId;
+
+        existing.CheckIn =
+            booking.CheckIn;
+
+        existing.CheckOut =
+            booking.CheckOut;
+
+        existing.Adults =
+            booking.Adults;
+
+        existing.Children =
+            booking.Children;
+
+        existing.Infants =
+            booking.Infants;
+
+        existing.Guests =
+            booking.Guests;
+
+        existing.TotalPrice =
+            booking.TotalPrice;
+
+        existing.Status =
+            booking.Status;
+
+        existing.FirstName =
+            booking.FirstName;
+
+        existing.LastName =
+            booking.LastName;
+
+        existing.Email =
+            booking.Email;
+
+        existing.Phone =
+            booking.Phone;
+
+        existing.SpecialRequests =
+            booking.SpecialRequests;
+
+        _context.SaveChanges();
 
         return ToDto(existing);
     }
 
-    public bool Delete(long id)
+    public bool Delete(
+        long id
+    )
     {
-        var bookings = LoadBookings();
-
-        var booking = bookings
-            .FirstOrDefault(item => item.Id == id);
+        var booking =
+            _context.Bookings
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (booking is null)
         {
             return false;
         }
 
-        bookings.Remove(booking);
-        SaveBookings(bookings);
+        _context.Bookings.Remove(booking);
+        _context.SaveChanges();
 
         return true;
     }
@@ -168,10 +257,17 @@ public class BookingService : IBookingService
         int roomId,
         string checkIn,
         string checkOut,
-        long? excludeBookingId = null)
+        long? excludeBookingId = null
+    )
     {
-        if (!DateOnly.TryParse(checkIn, out var requestedCheckIn) ||
-            !DateOnly.TryParse(checkOut, out var requestedCheckOut))
+        if (!DateOnly.TryParse(
+                checkIn,
+                out var requestedCheckIn
+            ) ||
+            !DateOnly.TryParse(
+                checkOut,
+                out var requestedCheckOut
+            ))
         {
             return false;
         }
@@ -181,78 +277,53 @@ public class BookingService : IBookingService
             return false;
         }
 
-        return !LoadBookings().Any(booking =>
+        var bookings =
+            _context.Bookings
+                .AsNoTracking()
+                .Where(booking =>
+                    booking.PropertyId == propertyId &&
+                    booking.RoomId == roomId &&
+                    booking.Status != "cancelled"
+                )
+                .ToList();
+
+        foreach (var booking in bookings)
         {
-            if (booking.Id == excludeBookingId)
+            if (excludeBookingId.HasValue &&
+                booking.Id ==
+                excludeBookingId.Value)
             {
-                return false;
-            }
-
-            if (booking.Status == "cancelled")
-            {
-                return false;
-            }
-
-            if (booking.PropertyId != propertyId ||
-                booking.RoomId != roomId)
-            {
-                return false;
+                continue;
             }
 
             if (!DateOnly.TryParse(
                     booking.CheckIn,
-                    out var existingCheckIn) ||
+                    out var existingCheckIn
+                ) ||
                 !DateOnly.TryParse(
                     booking.CheckOut,
-                    out var existingCheckOut))
+                    out var existingCheckOut
+                ))
+            {
+                continue;
+            }
+
+            var overlaps =
+                existingCheckIn < requestedCheckOut &&
+                existingCheckOut > requestedCheckIn;
+
+            if (overlaps)
             {
                 return false;
             }
-
-            return existingCheckIn < requestedCheckOut &&
-                   existingCheckOut > requestedCheckIn;
-        });
-    }
-
-    private List<BookingEntity> LoadBookings()
-    {
-        if (!File.Exists(_filePath))
-        {
-            return new List<BookingEntity>();
         }
 
-        var json = File.ReadAllText(_filePath);
-
-        if (string.IsNullOrWhiteSpace(json))
-        {
-            return new List<BookingEntity>();
-        }
-
-        return JsonSerializer.Deserialize<List<BookingEntity>>(
-                   json,
-                   _jsonOptions
-               )
-               ?? new List<BookingEntity>();
+        return true;
     }
 
-    private void SaveBookings(List<BookingEntity> bookings)
-    {
-        var directory = Path.GetDirectoryName(_filePath);
-
-        if (!string.IsNullOrWhiteSpace(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        var json = JsonSerializer.Serialize(
-            bookings,
-            _jsonOptions
-        );
-
-        File.WriteAllText(_filePath, json);
-    }
-
-    private static BookingDto ToDto(BookingEntity booking)
+    private static BookingDto ToDto(
+        BookingEntity booking
+    )
     {
         return new BookingDto
         {
@@ -272,7 +343,8 @@ public class BookingService : IBookingService
             LastName = booking.LastName,
             Email = booking.Email,
             Phone = booking.Phone,
-            SpecialRequests = booking.SpecialRequests
+            SpecialRequests =
+                booking.SpecialRequests
         };
     }
 }

@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,56 +8,86 @@ namespace StayWay.BusinessLayer.Services;
 
 public class TransferVehicleService : ITransferVehicleService
 {
-    private readonly string _dataPath;
+    private readonly AppDbContext _context;
 
-    private readonly JsonSerializerOptions _jsonOptions = new()
+    public TransferVehicleService(
+        AppDbContext context
+    )
     {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
-
-    public TransferVehicleService(string dataPath)
-    {
-        _dataPath = dataPath;
-
-        EnsureDataFileExists();
+        _context = context;
     }
 
     public List<TransferVehicleDto> GetAll()
     {
-        return LoadVehicles()
-            .Select(ToDto)
+        return _context.TransferVehicles
+            .AsNoTracking()
+            .OrderBy(vehicle => vehicle.Id)
+            .Select(vehicle =>
+                new TransferVehicleDto
+                {
+                    Id = vehicle.Id,
+                    City = vehicle.City,
+                    Name = vehicle.Name,
+                    LicensePlate = vehicle.LicensePlate,
+                    Category = vehicle.Category,
+                    Passengers = vehicle.Passengers,
+                    Luggage = vehicle.Luggage,
+                    Image = vehicle.Image,
+                    DriverId = vehicle.DriverId
+                }
+            )
             .ToList();
     }
 
-    public TransferVehicleDto? GetById(string id)
+    public TransferVehicleDto? GetById(
+        string id
+    )
     {
-        var vehicle = LoadVehicles()
-            .FirstOrDefault(vehicle =>
-                string.Equals(
-                    vehicle.Id,
-                    id,
-                    StringComparison.OrdinalIgnoreCase
-                )
-            );
+        var normalizedId =
+            id.Trim().ToLower();
+
+        var vehicle =
+            _context.TransferVehicles
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
         return vehicle is null
             ? null
             : ToDto(vehicle);
     }
 
-    public List<TransferVehicleDto> GetByCity(string city)
+    public List<TransferVehicleDto> GetByCity(
+        string city
+    )
     {
-        return LoadVehicles()
+        var normalizedCity =
+            city.Trim().ToLower();
+
+        return _context.TransferVehicles
+            .AsNoTracking()
             .Where(vehicle =>
-                string.Equals(
-                    vehicle.City,
-                    city,
-                    StringComparison.OrdinalIgnoreCase
-                )
+                vehicle.City.ToLower() ==
+                normalizedCity
             )
-            .Select(ToDto)
+            .OrderBy(vehicle => vehicle.Id)
+            .Select(vehicle =>
+                new TransferVehicleDto
+                {
+                    Id = vehicle.Id,
+                    City = vehicle.City,
+                    Name = vehicle.Name,
+                    LicensePlate = vehicle.LicensePlate,
+                    Category = vehicle.Category,
+                    Passengers = vehicle.Passengers,
+                    Luggage = vehicle.Luggage,
+                    Image = vehicle.Image,
+                    DriverId = vehicle.DriverId
+                }
+            )
             .ToList();
     }
 
@@ -64,31 +95,44 @@ public class TransferVehicleService : ITransferVehicleService
         TransferVehicleDto vehicle
     )
     {
-        var vehicles = LoadVehicles();
+        var entity =
+            new TransferVehicleEntity
+            {
+                Id =
+                    string.IsNullOrWhiteSpace(vehicle.Id)
+                        ? GenerateVehicleId()
+                        : vehicle.Id.Trim(),
 
-        var newVehicle = new TransferVehicleEntity
-        {
-            Id = string.IsNullOrWhiteSpace(vehicle.Id)
-                ? $"vehicle-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}"
-                : vehicle.Id.Trim(),
+                City = vehicle.City.Trim(),
+                Name = vehicle.Name.Trim(),
 
-            City = vehicle.City.Trim(),
-            Name = vehicle.Name.Trim(),
-            LicensePlate = vehicle.LicensePlate.Trim(),
-            Category = vehicle.Category.Trim(),
-            Passengers = vehicle.Passengers,
-            Luggage = vehicle.Luggage,
-            Image = vehicle.Image.Trim(),
-            DriverId = string.IsNullOrWhiteSpace(vehicle.DriverId)
-                ? null
-                : vehicle.DriverId.Trim()
-        };
+                LicensePlate =
+                    vehicle.LicensePlate.Trim(),
 
-        vehicles.Add(newVehicle);
+                Category =
+                    vehicle.Category.Trim(),
 
-        SaveVehicles(vehicles);
+                Passengers =
+                    vehicle.Passengers,
 
-        return ToDto(newVehicle);
+                Luggage =
+                    vehicle.Luggage,
+
+                Image =
+                    vehicle.Image.Trim(),
+
+                DriverId =
+                    string.IsNullOrWhiteSpace(
+                        vehicle.DriverId
+                    )
+                        ? null
+                        : vehicle.DriverId.Trim()
+            };
+
+        _context.TransferVehicles.Add(entity);
+        _context.SaveChanges();
+
+        return ToDto(entity);
     }
 
     public TransferVehicleDto? Update(
@@ -96,124 +140,100 @@ public class TransferVehicleService : ITransferVehicleService
         TransferVehicleDto vehicle
     )
     {
-        var vehicles = LoadVehicles();
+        var normalizedId =
+            id.Trim().ToLower();
 
-        var existingVehicle = vehicles
-            .FirstOrDefault(item =>
-                string.Equals(
-                    item.Id,
-                    id,
-                    StringComparison.OrdinalIgnoreCase
-                )
-            );
+        var existing =
+            _context.TransferVehicles
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
-        if (existingVehicle is null)
+        if (existing is null)
         {
             return null;
         }
 
-        existingVehicle.City = vehicle.City.Trim();
-        existingVehicle.Name = vehicle.Name.Trim();
-        existingVehicle.LicensePlate =
+        existing.City =
+            vehicle.City.Trim();
+
+        existing.Name =
+            vehicle.Name.Trim();
+
+        existing.LicensePlate =
             vehicle.LicensePlate.Trim();
-        existingVehicle.Category =
+
+        existing.Category =
             vehicle.Category.Trim();
-        existingVehicle.Passengers =
+
+        existing.Passengers =
             vehicle.Passengers;
-        existingVehicle.Luggage =
+
+        existing.Luggage =
             vehicle.Luggage;
-        existingVehicle.Image =
+
+        existing.Image =
             vehicle.Image.Trim();
-        existingVehicle.DriverId =
-            string.IsNullOrWhiteSpace(vehicle.DriverId)
+
+        existing.DriverId =
+            string.IsNullOrWhiteSpace(
+                vehicle.DriverId
+            )
                 ? null
                 : vehicle.DriverId.Trim();
 
-        SaveVehicles(vehicles);
+        _context.SaveChanges();
 
-        return ToDto(existingVehicle);
+        return ToDto(existing);
     }
 
-    public bool Delete(string id)
+    public bool Delete(
+        string id
+    )
     {
-        var vehicles = LoadVehicles();
+        var normalizedId =
+            id.Trim().ToLower();
 
-        var vehicle = vehicles
-            .FirstOrDefault(item =>
-                string.Equals(
-                    item.Id,
-                    id,
-                    StringComparison.OrdinalIgnoreCase
-                )
-            );
+        var vehicle =
+            _context.TransferVehicles
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
         if (vehicle is null)
         {
             return false;
         }
 
-        vehicles.Remove(vehicle);
+        _context.TransferVehicles.Remove(
+            vehicle
+        );
 
-        SaveVehicles(vehicles);
+        _context.SaveChanges();
 
         return true;
     }
 
-    private List<TransferVehicleEntity> LoadVehicles()
+    private string GenerateVehicleId()
     {
-        EnsureDataFileExists();
+        string id;
 
-        var json = File.ReadAllText(_dataPath);
-
-        if (string.IsNullOrWhiteSpace(json))
+        do
         {
-            return new List<TransferVehicleEntity>();
+            id =
+                $"vehicle-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
         }
-
-        return JsonSerializer.Deserialize<
-                   List<TransferVehicleEntity>
-               >(
-                   json,
-                   _jsonOptions
-               )
-               ?? new List<TransferVehicleEntity>();
-    }
-
-    private void SaveVehicles(
-        List<TransferVehicleEntity> vehicles
-    )
-    {
-        var json = JsonSerializer.Serialize(
-            vehicles,
-            _jsonOptions
+        while (
+            _context.TransferVehicles.Any(
+                vehicle => vehicle.Id == id
+            )
         );
 
-        File.WriteAllText(
-            _dataPath,
-            json
-        );
-    }
-
-    private void EnsureDataFileExists()
-    {
-        var directory =
-            Path.GetDirectoryName(_dataPath);
-
-        if (
-            !string.IsNullOrWhiteSpace(directory) &&
-            !Directory.Exists(directory)
-        )
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        if (!File.Exists(_dataPath))
-        {
-            File.WriteAllText(
-                _dataPath,
-                "[]"
-            );
-        }
+        return id;
     }
 
     private static TransferVehicleDto ToDto(

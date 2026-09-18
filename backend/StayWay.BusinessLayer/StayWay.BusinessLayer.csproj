@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StayWay.Domain\StayWay.Domain.csproj" />
+    <ProjectReference Include="..\StayWay.DataAccessLayer\StayWay.DataAccessLayer.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

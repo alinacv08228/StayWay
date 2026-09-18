@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,43 +8,44 @@ namespace StayWay.BusinessLayer.Services;
 
 public class DestinationService : IDestinationService
 {
-    private readonly string _filePath;
-    private readonly List<DestinationEntity> _destinations;
+    private readonly AppDbContext _context;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public DestinationService(
+        AppDbContext context
+    )
     {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
-
-    public DestinationService(string filePath)
-    {
-        _filePath = filePath;
-
-        var directory = Path.GetDirectoryName(_filePath);
-
-        if (!string.IsNullOrWhiteSpace(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        _destinations = LoadDestinations();
+        _context = context;
     }
 
     public List<DestinationDto> GetAll()
     {
-        return _destinations
-            .Select(ToDto)
+        return _context.Destinations
+            .AsNoTracking()
+            .OrderBy(destination => destination.Id)
+            .Select(destination =>
+                new DestinationDto
+                {
+                    Id = destination.Id,
+                    Name = destination.Name,
+                    Country = destination.Country,
+                    Image = destination.Image,
+                    CountryImage =
+                        destination.CountryImage
+                }
+            )
             .ToList();
     }
 
-    public DestinationDto? GetById(long id)
+    public DestinationDto? GetById(
+        long id
+    )
     {
         var destination =
-            _destinations.FirstOrDefault(
-                item => item.Id == id
-            );
+            _context.Destinations
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         return destination is null
             ? null
@@ -54,15 +56,9 @@ public class DestinationService : IDestinationService
         DestinationDto destination
     )
     {
-        var nextId =
-            destination.Id > 0
-                ? destination.Id
-                : GetNextId();
-
         var entity =
             new DestinationEntity
             {
-                Id = nextId,
                 Name = destination.Name,
                 Country = destination.Country,
                 Image = destination.Image,
@@ -70,8 +66,13 @@ public class DestinationService : IDestinationService
                     destination.CountryImage
             };
 
-        _destinations.Add(entity);
-        SaveDestinations();
+        if (destination.Id > 0)
+        {
+            entity.Id = destination.Id;
+        }
+
+        _context.Destinations.Add(entity);
+        _context.SaveChanges();
 
         return ToDto(entity);
     }
@@ -82,9 +83,10 @@ public class DestinationService : IDestinationService
     )
     {
         var existing =
-            _destinations.FirstOrDefault(
-                item => item.Id == id
-            );
+            _context.Destinations
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (existing is null)
         {
@@ -103,82 +105,56 @@ public class DestinationService : IDestinationService
         existing.CountryImage =
             destination.CountryImage;
 
-        SaveDestinations();
+        _context.SaveChanges();
 
         return ToDto(existing);
     }
 
-    public bool Delete(long id)
+    public bool Delete(
+        long id
+    )
     {
         var destination =
-            _destinations.FirstOrDefault(
-                item => item.Id == id
-            );
+            _context.Destinations
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (destination is null)
         {
             return false;
         }
 
-        _destinations.Remove(destination);
-        SaveDestinations();
+        var hasProperties =
+            _context.Properties.Any(
+                property =>
+                    property.DestinationId == id
+            );
 
-        return true;
-    }
-
-    private long GetNextId()
-    {
-        if (_destinations.Count == 0)
+        if (hasProperties)
         {
-            return 1;
+            throw new InvalidOperationException(
+                "This destination cannot be deleted because it still has properties assigned to it."
+            );
         }
 
-        return _destinations.Max(
-            item => item.Id
-        ) + 1;
-    }
-
-    private List<DestinationEntity>
-        LoadDestinations()
-    {
-        if (!File.Exists(_filePath))
-        {
-            return [];
-        }
+        _context.Destinations.Remove(
+            destination
+        );
 
         try
         {
-            var json =
-                File.ReadAllText(
-                    _filePath
-                );
-
-            return JsonSerializer
-                .Deserialize<
-                    List<DestinationEntity>
-                >(
-                    json,
-                    JsonOptions
-                ) ?? [];
+            _context.SaveChanges();
         }
-        catch
+        catch (DbUpdateException exception)
         {
-            return [];
-        }
-    }
-
-    private void SaveDestinations()
-    {
-        var json =
-            JsonSerializer.Serialize(
-                _destinations,
-                JsonOptions
+            throw new InvalidOperationException(
+                "This destination cannot be deleted because it is referenced by other data.",
+                exception
             );
+        }
 
-        File.WriteAllText(
-            _filePath,
-            json
-        );
+        return true;
     }
 
     private static DestinationDto ToDto(

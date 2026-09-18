@@ -7,12 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.20">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\StayWay.BusinessLayer\StayWay.BusinessLayer.csproj" />
     <ProjectReference Include="..\StayWay.Domain\StayWay.Domain.csproj" />
+    <ProjectReference Include="..\StayWay.DataAccessLayer\StayWay.DataAccessLayer.csproj" />
   </ItemGroup>
 
 </Project>

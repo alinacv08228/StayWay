@@ -1673,7 +1673,7 @@ function BookingsContent() {
         const uniqueUsers = new Map<
             string,
             {
-                userId: string;
+                value: string;
                 name: string;
                 email: string;
             }
@@ -1692,11 +1692,20 @@ function BookingsContent() {
             const email =
                 booking.email ?? "";
 
-            const key = String(booking.userId);
+            const value = [
+                String(booking.userId),
+                booking.firstName ?? "",
+                booking.lastName ?? "",
+                email,
+            ]
+                .map((item) =>
+                    item.trim().toLowerCase()
+                )
+                .join("|");
 
-            if (!uniqueUsers.has(key)) {
-                uniqueUsers.set(key, {
-                    userId: booking.userId,
+            if (!uniqueUsers.has(value)) {
+                uniqueUsers.set(value, {
+                    value,
                     name,
                     email,
                 });
@@ -1739,9 +1748,20 @@ function BookingsContent() {
                             booking.propertyId
                     );
 
+                const bookingUserValue = [
+                    String(booking.userId),
+                    booking.firstName ?? "",
+                    booking.lastName ?? "",
+                    booking.email ?? "",
+                ]
+                    .map((item) =>
+                        item.trim().toLowerCase()
+                    )
+                    .join("|");
+
                 const matchesUser =
                     userFilter === "All" ||
-                    String(booking.userId) ===
+                    bookingUserValue ===
                     userFilter;
 
                 const searchableText = [
@@ -2749,10 +2769,8 @@ function BookingsContent() {
                                                 {bookingUserOptions.map(
                                                     (user) => (
                                                         <option
-                                                            key={user.userId}
-                                                            value={String(
-                                                                user.userId
-                                                            )}
+                                                            key={user.value}
+                                                            value={user.value}
                                                         >
                                                             {user.name}
                                                             {user.email

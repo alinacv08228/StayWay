@@ -10,3 +10,13 @@ riderModule.iml
 frontend/node_modules/
 frontend/.next/
 frontend/.env.local
+
+# SQLite local database
+StayWay.API/Data/*.db
+StayWay.API/Data/*.db-shm
+StayWay.API/Data/*.db-wal
+
+# StayWay local SQLite database
+backend/StayWay.API/Data/*.db
+backend/StayWay.API/Data/*.db-shm
+backend/StayWay.API/Data/*.db-wal

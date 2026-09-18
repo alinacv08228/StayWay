@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,33 +8,52 @@ namespace StayWay.BusinessLayer.Services;
 
 public class TransferBookingService : ITransferBookingService
 {
-    private readonly string _dataPath;
-
-    private readonly JsonSerializerOptions _jsonOptions =
-        new()
-        {
-            PropertyNamingPolicy =
-                JsonNamingPolicy.CamelCase,
-
-            PropertyNameCaseInsensitive = true,
-
-            WriteIndented = true
-        };
+    private readonly AppDbContext _context;
 
     public TransferBookingService(
-        string dataPath
+        AppDbContext context
     )
     {
-        _dataPath = dataPath;
+        _context = context;
     }
 
     public List<TransferBookingDto> GetAll()
     {
-        return LoadBookings()
+        return _context.TransferBookings
+            .AsNoTracking()
             .OrderByDescending(
                 booking => booking.CreatedAt
             )
-            .Select(ToDto)
+            .Select(booking =>
+                new TransferBookingDto
+                {
+                    Id = booking.Id,
+                    TransferType = booking.TransferType,
+                    OptionId = booking.OptionId,
+                    OptionTitle = booking.OptionTitle,
+                    Price = booking.Price,
+                    VehicleId = booking.VehicleId,
+                    VehicleName = booking.VehicleName,
+                    LicensePlate = booking.LicensePlate,
+                    DriverId = booking.DriverId,
+                    DriverName = booking.DriverName,
+                    Pickup = booking.Pickup,
+                    Destination = booking.Destination,
+                    Date = booking.Date,
+                    Time = booking.Time,
+                    Passengers = booking.Passengers,
+                    ReturnDate = booking.ReturnDate,
+                    ReturnTime = booking.ReturnTime,
+                    FirstName = booking.FirstName,
+                    LastName = booking.LastName,
+                    Email = booking.Email,
+                    Phone = booking.Phone,
+                    SpecialRequests =
+                        booking.SpecialRequests,
+                    Status = booking.Status,
+                    CreatedAt = booking.CreatedAt
+                }
+            )
             .ToList();
     }
 
@@ -41,14 +61,17 @@ public class TransferBookingService : ITransferBookingService
         string id
     )
     {
-        var booking = LoadBookings()
-            .FirstOrDefault(
-                item =>
-                    item.Id.Equals(
-                        id,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-            );
+        var normalizedId =
+            id.Trim().ToLower();
+
+        var booking =
+            _context.TransferBookings
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
         return booking is null
             ? null
@@ -59,19 +82,49 @@ public class TransferBookingService : ITransferBookingService
         string driverId
     )
     {
-        return LoadBookings()
-            .Where(
-                booking =>
-                    booking.DriverId != null &&
-                    booking.DriverId.Equals(
-                        driverId,
-                        StringComparison.OrdinalIgnoreCase
-                    )
+        var normalizedDriverId =
+            driverId.Trim().ToLower();
+
+        return _context.TransferBookings
+            .AsNoTracking()
+            .Where(booking =>
+                booking.DriverId != null &&
+                booking.DriverId.ToLower() ==
+                normalizedDriverId
             )
             .OrderByDescending(
                 booking => booking.CreatedAt
             )
-            .Select(ToDto)
+            .Select(booking =>
+                new TransferBookingDto
+                {
+                    Id = booking.Id,
+                    TransferType = booking.TransferType,
+                    OptionId = booking.OptionId,
+                    OptionTitle = booking.OptionTitle,
+                    Price = booking.Price,
+                    VehicleId = booking.VehicleId,
+                    VehicleName = booking.VehicleName,
+                    LicensePlate = booking.LicensePlate,
+                    DriverId = booking.DriverId,
+                    DriverName = booking.DriverName,
+                    Pickup = booking.Pickup,
+                    Destination = booking.Destination,
+                    Date = booking.Date,
+                    Time = booking.Time,
+                    Passengers = booking.Passengers,
+                    ReturnDate = booking.ReturnDate,
+                    ReturnTime = booking.ReturnTime,
+                    FirstName = booking.FirstName,
+                    LastName = booking.LastName,
+                    Email = booking.Email,
+                    Phone = booking.Phone,
+                    SpecialRequests =
+                        booking.SpecialRequests,
+                    Status = booking.Status,
+                    CreatedAt = booking.CreatedAt
+                }
+            )
             .ToList();
     }
 
@@ -79,16 +132,15 @@ public class TransferBookingService : ITransferBookingService
         TransferBookingDto booking
     )
     {
-        var bookings = LoadBookings();
-
-        var newBooking =
+        var entity =
             new TransferBookingEntity
             {
-                Id = string.IsNullOrWhiteSpace(
-                    booking.Id
-                )
-                    ? $"transfer-booking-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}"
-                    : booking.Id,
+                Id =
+                    string.IsNullOrWhiteSpace(
+                        booking.Id
+                    )
+                        ? GenerateBookingId()
+                        : booking.Id.Trim(),
 
                 TransferType =
                     booking.TransferType,
@@ -103,7 +155,11 @@ public class TransferBookingService : ITransferBookingService
                     booking.Price,
 
                 VehicleId =
-                    booking.VehicleId,
+                    string.IsNullOrWhiteSpace(
+                        booking.VehicleId
+                    )
+                        ? null
+                        : booking.VehicleId.Trim(),
 
                 VehicleName =
                     booking.VehicleName,
@@ -112,7 +168,11 @@ public class TransferBookingService : ITransferBookingService
                     booking.LicensePlate,
 
                 DriverId =
-                    booking.DriverId,
+                    string.IsNullOrWhiteSpace(
+                        booking.DriverId
+                    )
+                        ? null
+                        : booking.DriverId.Trim(),
 
                 DriverName =
                     booking.DriverName,
@@ -168,14 +228,10 @@ public class TransferBookingService : ITransferBookingService
                         : booking.CreatedAt
             };
 
-        bookings.Insert(
-            0,
-            newBooking
-        );
+        _context.TransferBookings.Add(entity);
+        _context.SaveChanges();
 
-        SaveBookings(bookings);
-
-        return ToDto(newBooking);
+        return ToDto(entity);
     }
 
     public TransferBookingDto? Update(
@@ -183,168 +239,154 @@ public class TransferBookingService : ITransferBookingService
         TransferBookingDto booking
     )
     {
-        var bookings = LoadBookings();
+        var normalizedId =
+            id.Trim().ToLower();
 
-        var existingBooking =
-            bookings.FirstOrDefault(
-                item =>
-                    item.Id.Equals(
-                        id,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-            );
+        var existing =
+            _context.TransferBookings
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
-        if (existingBooking is null)
+        if (existing is null)
         {
             return null;
         }
 
-        existingBooking.TransferType =
+        existing.TransferType =
             booking.TransferType;
 
-        existingBooking.OptionId =
+        existing.OptionId =
             booking.OptionId;
 
-        existingBooking.OptionTitle =
+        existing.OptionTitle =
             booking.OptionTitle;
 
-        existingBooking.Price =
+        existing.Price =
             booking.Price;
 
-        existingBooking.VehicleId =
-            booking.VehicleId;
+        existing.VehicleId =
+            string.IsNullOrWhiteSpace(
+                booking.VehicleId
+            )
+                ? null
+                : booking.VehicleId.Trim();
 
-        existingBooking.VehicleName =
+        existing.VehicleName =
             booking.VehicleName;
 
-        existingBooking.LicensePlate =
+        existing.LicensePlate =
             booking.LicensePlate;
 
-        existingBooking.DriverId =
-            booking.DriverId;
+        existing.DriverId =
+            string.IsNullOrWhiteSpace(
+                booking.DriverId
+            )
+                ? null
+                : booking.DriverId.Trim();
 
-        existingBooking.DriverName =
+        existing.DriverName =
             booking.DriverName;
 
-        existingBooking.Pickup =
+        existing.Pickup =
             booking.Pickup;
 
-        existingBooking.Destination =
+        existing.Destination =
             booking.Destination;
 
-        existingBooking.Date =
+        existing.Date =
             booking.Date;
 
-        existingBooking.Time =
+        existing.Time =
             booking.Time;
 
-        existingBooking.Passengers =
+        existing.Passengers =
             booking.Passengers;
 
-        existingBooking.ReturnDate =
+        existing.ReturnDate =
             booking.ReturnDate;
 
-        existingBooking.ReturnTime =
+        existing.ReturnTime =
             booking.ReturnTime;
 
-        existingBooking.FirstName =
+        existing.FirstName =
             booking.FirstName;
 
-        existingBooking.LastName =
+        existing.LastName =
             booking.LastName;
 
-        existingBooking.Email =
+        existing.Email =
             booking.Email;
 
-        existingBooking.Phone =
+        existing.Phone =
             booking.Phone;
 
-        existingBooking.SpecialRequests =
+        existing.SpecialRequests =
             booking.SpecialRequests;
 
-        existingBooking.Status =
+        existing.Status =
             booking.Status;
 
-        if (
-            !string.IsNullOrWhiteSpace(
+        if (!string.IsNullOrWhiteSpace(
                 booking.CreatedAt
-            )
-        )
+            ))
         {
-            existingBooking.CreatedAt =
+            existing.CreatedAt =
                 booking.CreatedAt;
         }
 
-        SaveBookings(bookings);
+        _context.SaveChanges();
 
-        return ToDto(existingBooking);
+        return ToDto(existing);
     }
 
     public bool Delete(
         string id
     )
     {
-        var bookings = LoadBookings();
+        var normalizedId =
+            id.Trim().ToLower();
 
         var booking =
-            bookings.FirstOrDefault(
-                item =>
-                    item.Id.Equals(
-                        id,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-            );
+            _context.TransferBookings
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
         if (booking is null)
         {
             return false;
         }
 
-        bookings.Remove(booking);
+        _context.TransferBookings.Remove(
+            booking
+        );
 
-        SaveBookings(bookings);
+        _context.SaveChanges();
 
         return true;
     }
 
-    private List<TransferBookingEntity> LoadBookings()
+    private string GenerateBookingId()
     {
-        if (!File.Exists(_dataPath))
+        string id;
+
+        do
         {
-            return new List<TransferBookingEntity>();
+            id =
+                $"transfer-booking-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
         }
-
-        var json =
-            File.ReadAllText(_dataPath);
-
-        if (string.IsNullOrWhiteSpace(json))
-        {
-            return new List<TransferBookingEntity>();
-        }
-
-        return JsonSerializer.Deserialize<
-                   List<TransferBookingEntity>
-               >(
-                   json,
-                   _jsonOptions
-               )
-               ?? new List<TransferBookingEntity>();
-    }
-
-    private void SaveBookings(
-        List<TransferBookingEntity> bookings
-    )
-    {
-        var json =
-            JsonSerializer.Serialize(
-                bookings,
-                _jsonOptions
-            );
-
-        File.WriteAllText(
-            _dataPath,
-            json
+        while (
+            _context.TransferBookings.Any(
+                booking => booking.Id == id
+            )
         );
+
+        return id;
     }
 
     private static TransferBookingDto ToDto(
@@ -354,75 +396,30 @@ public class TransferBookingService : ITransferBookingService
         return new TransferBookingDto
         {
             Id = booking.Id,
-
-            TransferType =
-                booking.TransferType,
-
-            OptionId =
-                booking.OptionId,
-
-            OptionTitle =
-                booking.OptionTitle,
-
-            Price =
-                booking.Price,
-
-            VehicleId =
-                booking.VehicleId,
-
-            VehicleName =
-                booking.VehicleName,
-
-            LicensePlate =
-                booking.LicensePlate,
-
-            DriverId =
-                booking.DriverId,
-
-            DriverName =
-                booking.DriverName,
-
-            Pickup =
-                booking.Pickup,
-
-            Destination =
-                booking.Destination,
-
-            Date =
-                booking.Date,
-
-            Time =
-                booking.Time,
-
-            Passengers =
-                booking.Passengers,
-
-            ReturnDate =
-                booking.ReturnDate,
-
-            ReturnTime =
-                booking.ReturnTime,
-
-            FirstName =
-                booking.FirstName,
-
-            LastName =
-                booking.LastName,
-
-            Email =
-                booking.Email,
-
-            Phone =
-                booking.Phone,
-
+            TransferType = booking.TransferType,
+            OptionId = booking.OptionId,
+            OptionTitle = booking.OptionTitle,
+            Price = booking.Price,
+            VehicleId = booking.VehicleId,
+            VehicleName = booking.VehicleName,
+            LicensePlate = booking.LicensePlate,
+            DriverId = booking.DriverId,
+            DriverName = booking.DriverName,
+            Pickup = booking.Pickup,
+            Destination = booking.Destination,
+            Date = booking.Date,
+            Time = booking.Time,
+            Passengers = booking.Passengers,
+            ReturnDate = booking.ReturnDate,
+            ReturnTime = booking.ReturnTime,
+            FirstName = booking.FirstName,
+            LastName = booking.LastName,
+            Email = booking.Email,
+            Phone = booking.Phone,
             SpecialRequests =
                 booking.SpecialRequests,
-
-            Status =
-                booking.Status,
-
-            CreatedAt =
-                booking.CreatedAt
+            Status = booking.Status,
+            CreatedAt = booking.CreatedAt
         };
     }
 }

@@ -8,7 +8,8 @@ namespace StayWay.API.Controllers;
 [Route("api/[controller]")]
 public class DestinationsController : ControllerBase
 {
-    private readonly IDestinationService _destinationService;
+    private readonly IDestinationService
+        _destinationService;
 
     public DestinationsController(
         IDestinationService destinationService
@@ -19,7 +20,8 @@ public class DestinationsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<DestinationDto>> GetAll()
+    public ActionResult<List<DestinationDto>>
+        GetAll()
     {
         return Ok(
             _destinationService.GetAll()
@@ -27,9 +29,10 @@ public class DestinationsController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public ActionResult<DestinationDto> GetById(
-        long id
-    )
+    public ActionResult<DestinationDto>
+        GetById(
+            long id
+        )
     {
         var destination =
             _destinationService.GetById(id);
@@ -43,9 +46,10 @@ public class DestinationsController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<DestinationDto> Create(
-        DestinationDto destination
-    )
+    public ActionResult<DestinationDto>
+        Create(
+            DestinationDto destination
+        )
     {
         var createdDestination =
             _destinationService.Create(
@@ -64,10 +68,11 @@ public class DestinationsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
-    public ActionResult<DestinationDto> Update(
-        long id,
-        DestinationDto destination
-    )
+    public ActionResult<DestinationDto>
+        Update(
+            long id,
+            DestinationDto destination
+        )
     {
         var updatedDestination =
             _destinationService.Update(
@@ -90,14 +95,27 @@ public class DestinationsController : ControllerBase
         long id
     )
     {
-        var deleted =
-            _destinationService.Delete(id);
-
-        if (!deleted)
+        try
         {
-            return NotFound();
-        }
+            var deleted =
+                _destinationService.Delete(id);
 
-        return NoContent();
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(
+                new
+                {
+                    message =
+                        exception.Message
+                }
+            );
+        }
     }
 }

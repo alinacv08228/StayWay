@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayWay.BusinessLayer", "St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayWay.Domain", "StayWay.Domain\StayWay.Domain.csproj", "{A8DBD11D-CEBE-45B0-8DFF-DE1DB4CD6F6E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayWay.DataAccessLayer", "StayWay.DataAccessLayer\StayWay.DataAccessLayer.csproj", "{7D38B158-6128-4879-B9F4-539863A3100F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{A8DBD11D-CEBE-45B0-8DFF-DE1DB4CD6F6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8DBD11D-CEBE-45B0-8DFF-DE1DB4CD6F6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8DBD11D-CEBE-45B0-8DFF-DE1DB4CD6F6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D38B158-6128-4879-B9F4-539863A3100F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D38B158-6128-4879-B9F4-539863A3100F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D38B158-6128-4879-B9F4-539863A3100F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D38B158-6128-4879-B9F4-539863A3100F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

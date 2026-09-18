@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,69 +8,99 @@ namespace StayWay.BusinessLayer.Services;
 
 public class ReviewService : IReviewService
 {
-    private readonly string _dataPath;
+    private readonly AppDbContext _context;
 
-    private readonly JsonSerializerOptions _jsonOptions =
-        new()
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-
-    public ReviewService(string dataPath)
+    public ReviewService(
+        AppDbContext context
+    )
     {
-        _dataPath = dataPath;
-        EnsureDataFileExists();
+        _context = context;
     }
 
     public List<ReviewDto> GetAll()
     {
-        return LoadReviews()
-            .Select(ToDto)
+        return _context.Reviews
+            .AsNoTracking()
+            .OrderBy(review => review.Id)
+            .Select(review =>
+                new ReviewDto
+                {
+                    Id = review.Id,
+                    PropertyId = review.PropertyId,
+                    UserId = review.UserId,
+                    UserName = review.UserName,
+                    Rating = review.Rating,
+                    Comment = review.Comment,
+                    CreatedAt = review.CreatedAt,
+                    IsMock = review.IsMock
+                }
+            )
             .ToList();
     }
 
-    public ReviewDto? GetById(int id)
+    public ReviewDto? GetById(
+        int id
+    )
     {
-        var review = LoadReviews()
-            .FirstOrDefault(item => item.Id == id);
+        var review =
+            _context.Reviews
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         return review is null
             ? null
             : ToDto(review);
     }
 
-    public List<ReviewDto> GetByPropertyId(int propertyId)
+    public List<ReviewDto> GetByPropertyId(
+        int propertyId
+    )
     {
-        return LoadReviews()
-            .Where(item => item.PropertyId == propertyId)
-            .Select(ToDto)
+        return _context.Reviews
+            .AsNoTracking()
+            .Where(review =>
+                review.PropertyId == propertyId
+            )
+            .OrderBy(review => review.Id)
+            .Select(review =>
+                new ReviewDto
+                {
+                    Id = review.Id,
+                    PropertyId = review.PropertyId,
+                    UserId = review.UserId,
+                    UserName = review.UserName,
+                    Rating = review.Rating,
+                    Comment = review.Comment,
+                    CreatedAt = review.CreatedAt,
+                    IsMock = review.IsMock
+                }
+            )
             .ToList();
     }
 
-    public ReviewDto Create(ReviewDto review)
+    public ReviewDto Create(
+        ReviewDto review
+    )
     {
-        var reviews = LoadReviews();
+        var entity =
+            new ReviewEntity
+            {
+                PropertyId = review.PropertyId,
+                UserId = review.UserId,
+                UserName = review.UserName,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedAt =
+                    DateTime.UtcNow.ToString("O"),
+                IsMock = false
+            };
 
-        var newReview = new ReviewEntity
-        {
-            Id = reviews.Count == 0
-                ? 1
-                : reviews.Max(item => item.Id) + 1,
-            PropertyId = review.PropertyId,
-            UserId = review.UserId,
-            UserName = review.UserName,
-            Rating = review.Rating,
-            Comment = review.Comment,
-            CreatedAt = DateTime.UtcNow.ToString("O"),
-            IsMock = false
-        };
+        _context.Reviews.Add(entity);
+        _context.SaveChanges();
 
-        reviews.Add(newReview);
-        SaveReviews(reviews);
-
-        return ToDto(newReview);
+        return ToDto(entity);
     }
 
     public bool Delete(
@@ -77,10 +108,11 @@ public class ReviewService : IReviewService
         string userId
     )
     {
-        var reviews = LoadReviews();
-
-        var review = reviews
-            .FirstOrDefault(item => item.Id == id);
+        var review =
+            _context.Reviews
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (review is null)
         {
@@ -92,18 +124,16 @@ public class ReviewService : IReviewService
             return false;
         }
 
-        if (
-            string.IsNullOrWhiteSpace(
+        if (string.IsNullOrWhiteSpace(
                 review.UserId
             ) ||
-            review.UserId != userId
-        )
+            review.UserId != userId)
         {
             return false;
         }
 
-        reviews.Remove(review);
-        SaveReviews(reviews);
+        _context.Reviews.Remove(review);
+        _context.SaveChanges();
 
         return true;
     }
@@ -112,96 +142,21 @@ public class ReviewService : IReviewService
         int propertyId
     )
     {
-        var propertyReviews = LoadReviews()
-            .Where(
-                item =>
-                    item.PropertyId ==
+        var average =
+            _context.Reviews
+                .AsNoTracking()
+                .Where(review =>
+                    review.PropertyId ==
                     propertyId
-            )
-            .ToList();
+                )
+                .Select(review =>
+                    (double?)review.Rating
+                )
+                .Average();
 
-        if (propertyReviews.Count == 0)
-        {
-            return 0;
-        }
-
-        return Math.Round(
-            propertyReviews.Average(
-                item => item.Rating
-            ),
-            1
-        );
-    }
-
-    private List<ReviewEntity> LoadReviews()
-    {
-        EnsureDataFileExists();
-
-        var json =
-            File.ReadAllText(
-                _dataPath
-            );
-
-        if (
-            string.IsNullOrWhiteSpace(
-                json
-            )
-        )
-        {
-            return new List<ReviewEntity>();
-        }
-
-        return JsonSerializer.Deserialize<
-                   List<ReviewEntity>
-               >(
-                   json,
-                   _jsonOptions
-               )
-               ??
-               new List<ReviewEntity>();
-    }
-
-    private void SaveReviews(
-        List<ReviewEntity> reviews
-    )
-    {
-        var json =
-            JsonSerializer.Serialize(
-                reviews,
-                _jsonOptions
-            );
-
-        File.WriteAllText(
-            _dataPath,
-            json
-        );
-    }
-
-    private void EnsureDataFileExists()
-    {
-        var directory =
-            Path.GetDirectoryName(
-                _dataPath
-            );
-
-        if (
-            !string.IsNullOrWhiteSpace(
-                directory
-            )
-        )
-        {
-            Directory.CreateDirectory(
-                directory
-            );
-        }
-
-        if (!File.Exists(_dataPath))
-        {
-            File.WriteAllText(
-                _dataPath,
-                "[]"
-            );
-        }
+        return average.HasValue
+            ? Math.Round(average.Value, 1)
+            : 0;
     }
 
     private static ReviewDto ToDto(

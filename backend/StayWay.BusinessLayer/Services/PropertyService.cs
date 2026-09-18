@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,69 +8,72 @@ namespace StayWay.BusinessLayer.Services;
 
 public class PropertyService : IPropertyService
 {
-    private readonly string _filePath;
-    private readonly List<PropertyEntity> _properties;
+    private readonly AppDbContext _context;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public PropertyService(
+        AppDbContext context
+    )
     {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
-
-    public PropertyService(string filePath)
-    {
-        _filePath = filePath;
-
-        var directory = Path.GetDirectoryName(_filePath);
-
-        if (!string.IsNullOrWhiteSpace(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        _properties = LoadProperties();
+        _context = context;
     }
 
     public List<PropertyDto> GetAll()
     {
-        return _properties
-            .Select(ToDto)
+        return _context.Properties
+            .AsNoTracking()
+            .OrderBy(property => property.Id)
+            .Select(property =>
+                new PropertyDto
+                {
+                    Id = property.Id,
+                    Name = property.Name,
+                    Description = property.Description,
+                    DestinationId = property.DestinationId,
+                    Address = property.Address,
+                    Stars = property.Stars,
+                    Rating = property.Rating,
+                    PricePerNight = property.PricePerNight,
+                    Image = property.Image
+                }
+            )
             .ToList();
     }
 
-    public PropertyDto? GetById(int id)
+    public PropertyDto? GetById(
+        int id
+    )
     {
-        var property = _properties
-            .FirstOrDefault(item => item.Id == id);
+        var property =
+            _context.Properties
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         return property is null
             ? null
             : ToDto(property);
     }
 
-    public PropertyDto Create(PropertyDto property)
+    public PropertyDto Create(
+        PropertyDto property
+    )
     {
-        var nextId =
-            _properties.Count == 0
-                ? 1
-                : _properties.Max(item => item.Id) + 1;
+        var entity =
+            new PropertyEntity
+            {
+                Name = property.Name,
+                Description = property.Description,
+                DestinationId = property.DestinationId,
+                Address = property.Address,
+                Stars = property.Stars,
+                Rating = property.Rating,
+                PricePerNight = property.PricePerNight,
+                Image = property.Image
+            };
 
-        var entity = new PropertyEntity
-        {
-            Id = nextId,
-            Name = property.Name,
-            Description = property.Description,
-            DestinationId = property.DestinationId,
-            Address = property.Address,
-            Stars = property.Stars,
-            Rating = property.Rating,
-            PricePerNight = property.PricePerNight,
-            Image = property.Image,
-        };
-
-        _properties.Add(entity);
-        SaveProperties();
+        _context.Properties.Add(entity);
+        _context.SaveChanges();
 
         return ToDto(entity);
     }
@@ -79,74 +83,68 @@ public class PropertyService : IPropertyService
         PropertyDto property
     )
     {
-        var existing = _properties
-            .FirstOrDefault(item => item.Id == id);
+        var existing =
+            _context.Properties
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (existing is null)
         {
             return null;
         }
 
-        existing.Name = property.Name;
-        existing.Description = property.Description;
-        existing.DestinationId = property.DestinationId;
-        existing.Address = property.Address;
-        existing.Stars = property.Stars;
-        existing.Rating = property.Rating;
-        existing.PricePerNight = property.PricePerNight;
-        existing.Image = property.Image;
+        existing.Name =
+            property.Name;
 
-        SaveProperties();
+        existing.Description =
+            property.Description;
+
+        existing.DestinationId =
+            property.DestinationId;
+
+        existing.Address =
+            property.Address;
+
+        existing.Stars =
+            property.Stars;
+
+        existing.Rating =
+            property.Rating;
+
+        existing.PricePerNight =
+            property.PricePerNight;
+
+        existing.Image =
+            property.Image;
+
+        _context.SaveChanges();
 
         return ToDto(existing);
     }
 
-    public bool Delete(int id)
+    public bool Delete(
+        int id
+    )
     {
-        var property = _properties
-            .FirstOrDefault(item => item.Id == id);
+        var property =
+            _context.Properties
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
 
         if (property is null)
         {
             return false;
         }
 
-        _properties.Remove(property);
-        SaveProperties();
-
-        return true;
-    }
-
-    private List<PropertyEntity> LoadProperties()
-    {
-        if (!File.Exists(_filePath))
-        {
-            return [];
-        }
-
-        try
-        {
-            var json = File.ReadAllText(_filePath);
-
-            return JsonSerializer.Deserialize<List<PropertyEntity>>(
-                       json,
-                       JsonOptions
-                   ) ?? [];
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    private void SaveProperties()
-    {
-        var json = JsonSerializer.Serialize(
-            _properties,
-            JsonOptions
+        _context.Properties.Remove(
+            property
         );
 
-        File.WriteAllText(_filePath, json);
+        _context.SaveChanges();
+
+        return true;
     }
 
     private static PropertyDto ToDto(
@@ -163,7 +161,7 @@ public class PropertyService : IPropertyService
             Stars = property.Stars,
             Rating = property.Rating,
             PricePerNight = property.PricePerNight,
-            Image = property.Image,
+            Image = property.Image
         };
     }
 }

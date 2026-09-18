@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using StayWay.DataAccessLayer.Context;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Entities;
 using StayWay.Domain.Interfaces;
@@ -7,30 +8,30 @@ namespace StayWay.BusinessLayer.Services;
 
 public class TransferDriverService : ITransferDriverService
 {
-    private readonly string _dataPath;
-
-    private readonly JsonSerializerOptions _jsonOptions =
-        new()
-        {
-            PropertyNamingPolicy =
-                JsonNamingPolicy.CamelCase,
-
-            PropertyNameCaseInsensitive = true,
-
-            WriteIndented = true
-        };
+    private readonly AppDbContext _context;
 
     public TransferDriverService(
-        string dataPath
+        AppDbContext context
     )
     {
-        _dataPath = dataPath;
+        _context = context;
     }
 
     public List<TransferDriverDto> GetAll()
     {
-        return LoadDrivers()
-            .Select(ToDto)
+        return _context.TransferDrivers
+            .AsNoTracking()
+            .OrderBy(driver => driver.Id)
+            .Select(driver =>
+                new TransferDriverDto
+                {
+                    Id = driver.Id,
+                    City = driver.City,
+                    Name = driver.Name,
+                    Phone = driver.Phone,
+                    Status = driver.Status
+                }
+            )
             .ToList();
     }
 
@@ -38,14 +39,17 @@ public class TransferDriverService : ITransferDriverService
         string id
     )
     {
-        var driver = LoadDrivers()
-            .FirstOrDefault(
-                item =>
-                    item.Id.Equals(
-                        id,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-            );
+        var normalizedId =
+            id.Trim().ToLower();
+
+        var driver =
+            _context.TransferDrivers
+                .AsNoTracking()
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
         return driver is null
             ? null
@@ -56,15 +60,26 @@ public class TransferDriverService : ITransferDriverService
         string city
     )
     {
-        return LoadDrivers()
-            .Where(
-                driver =>
-                    driver.City.Equals(
-                        city,
-                        StringComparison.OrdinalIgnoreCase
-                    )
+        var normalizedCity =
+            city.Trim().ToLower();
+
+        return _context.TransferDrivers
+            .AsNoTracking()
+            .Where(driver =>
+                driver.City.ToLower() ==
+                normalizedCity
             )
-            .Select(ToDto)
+            .OrderBy(driver => driver.Id)
+            .Select(driver =>
+                new TransferDriverDto
+                {
+                    Id = driver.Id,
+                    City = driver.City,
+                    Name = driver.Name,
+                    Phone = driver.Phone,
+                    Status = driver.Status
+                }
+            )
             .ToList();
     }
 
@@ -72,28 +87,25 @@ public class TransferDriverService : ITransferDriverService
         TransferDriverDto driver
     )
     {
-        var drivers = LoadDrivers();
+        var id =
+            string.IsNullOrWhiteSpace(driver.Id)
+                ? GenerateDriverId()
+                : driver.Id.Trim();
 
-        var newDriver =
+        var entity =
             new TransferDriverEntity
             {
-                Id = string.IsNullOrWhiteSpace(
-                    driver.Id
-                )
-                    ? $"driver-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}"
-                    : driver.Id,
-
+                Id = id,
                 City = driver.City,
                 Name = driver.Name,
                 Phone = driver.Phone,
                 Status = driver.Status
             };
 
-        drivers.Add(newDriver);
+        _context.TransferDrivers.Add(entity);
+        _context.SaveChanges();
 
-        SaveDrivers(drivers);
-
-        return ToDto(newDriver);
+        return ToDto(entity);
     }
 
     public TransferDriverDto? Update(
@@ -101,104 +113,81 @@ public class TransferDriverService : ITransferDriverService
         TransferDriverDto driver
     )
     {
-        var drivers = LoadDrivers();
+        var normalizedId =
+            id.Trim().ToLower();
 
-        var existingDriver =
-            drivers.FirstOrDefault(
-                item =>
-                    item.Id.Equals(
-                        id,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-            );
+        var existing =
+            _context.TransferDrivers
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
-        if (existingDriver is null)
+        if (existing is null)
         {
             return null;
         }
 
-        existingDriver.City =
+        existing.City =
             driver.City;
 
-        existingDriver.Name =
+        existing.Name =
             driver.Name;
 
-        existingDriver.Phone =
+        existing.Phone =
             driver.Phone;
 
-        existingDriver.Status =
+        existing.Status =
             driver.Status;
 
-        SaveDrivers(drivers);
+        _context.SaveChanges();
 
-        return ToDto(existingDriver);
+        return ToDto(existing);
     }
 
     public bool Delete(
         string id
     )
     {
-        var drivers = LoadDrivers();
+        var normalizedId =
+            id.Trim().ToLower();
 
         var driver =
-            drivers.FirstOrDefault(
-                item =>
-                    item.Id.Equals(
-                        id,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-            );
+            _context.TransferDrivers
+                .FirstOrDefault(
+                    item =>
+                        item.Id.ToLower() ==
+                        normalizedId
+                );
 
         if (driver is null)
         {
             return false;
         }
 
-        drivers.Remove(driver);
-
-        SaveDrivers(drivers);
+        _context.TransferDrivers.Remove(driver);
+        _context.SaveChanges();
 
         return true;
     }
 
-    private List<TransferDriverEntity> LoadDrivers()
+    private string GenerateDriverId()
     {
-        if (!File.Exists(_dataPath))
+        string id;
+
+        do
         {
-            return new List<TransferDriverEntity>();
+            id =
+                $"driver-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
         }
-
-        var json =
-            File.ReadAllText(_dataPath);
-
-        if (string.IsNullOrWhiteSpace(json))
-        {
-            return new List<TransferDriverEntity>();
-        }
-
-        return JsonSerializer.Deserialize<
-                   List<TransferDriverEntity>
-               >(
-                   json,
-                   _jsonOptions
-               )
-               ?? new List<TransferDriverEntity>();
-    }
-
-    private void SaveDrivers(
-        List<TransferDriverEntity> drivers
-    )
-    {
-        var json =
-            JsonSerializer.Serialize(
-                drivers,
-                _jsonOptions
-            );
-
-        File.WriteAllText(
-            _dataPath,
-            json
+        while (
+            _context.TransferDrivers.Any(
+                driver => driver.Id == id
+            )
         );
+
+        return id;
     }
 
     private static TransferDriverDto ToDto(
