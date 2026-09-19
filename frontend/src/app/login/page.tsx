@@ -365,12 +365,13 @@ export default function LoginPage() {
         <main className="login-page">
             <div className="login-card">
 
-                <div className="login-header stayway-load-in stayway-load-1">
-                    <span className="login-logo">
+                <div className="login-header">
+                    <span className="login-logo stayway-load-in stayway-load-1">
                         ✦
                     </span>
 
                     <h1
+                        className="stayway-load-in stayway-load-2"
                         style={{
                             fontWeight: 800,
                             letterSpacing: "-0.02em",
@@ -379,17 +380,17 @@ export default function LoginPage() {
                         {text.welcome}
                     </h1>
 
-                    <p>
+                    <p className="stayway-load-in stayway-load-3">
                         {text.continueText}
                     </p>
                 </div>
 
                 <form
-                    className="login-form stayway-load-in stayway-load-2"
+                    className="login-form"
                     onSubmit={handleSubmit}
                     noValidate
                 >
-                    <div className="form-field">
+                    <div className="form-field stayway-load-in stayway-load-4">
                         <label htmlFor="login-email">
                             {text.email}
                         </label>
@@ -407,7 +408,7 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <div className="form-field">
+                    <div className="form-field stayway-load-in stayway-load-5">
                         <label htmlFor="login-password">
                             {text.password}
                         </label>
@@ -433,7 +434,7 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        className="login-button"
+                        className="login-button stayway-load-in stayway-load-6"
                         disabled={isLoading}
                     >
                         {isLoading

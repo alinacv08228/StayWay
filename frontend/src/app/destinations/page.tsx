@@ -355,37 +355,19 @@ export default function DestinationsPage() {
         setSortBy("az");
     };
 
+    /*
+     * Do not render a temporary loading page.
+     * The API-backed page is mounted only after the data is ready,
+     * preventing the visible flash/jump that appeared after backend integration.
+     */
     if (isLoading) {
         return (
-            <main>
+            <main aria-busy="true">
                 <section className="section">
-                    <div className="container">
-                        <p className="admin-label">
-                            STAYWAY
-                        </p>
-
-                        <h1
-                            style={{
-                                fontSize: "42px",
-                                lineHeight: 1.1,
-                                fontWeight: 700,
-                                letterSpacing: "-0.02em",
-                                margin: 0,
-                            }}
-                        >
-                            {getTranslation(
-                                language,
-                                "destinations"
-                            )}
-                        </h1>
-
-                        <p className="admin-description">
-                            {getDestinationUiTranslation(
-                                language,
-                                "loadingDestinations"
-                            )}
-                        </p>
-                    </div>
+                    <div
+                        className="container"
+                        style={{ minHeight: "100dvh" }}
+                    />
                 </section>
             </main>
         );
@@ -396,7 +378,7 @@ export default function DestinationsPage() {
             <main>
                 <section className="section">
                     <div className="container">
-                        <div className="error-page-card">
+                        <div className="error-page-card stayway-load-in stayway-load-1">
                             <p className="admin-label">
                                 ERROR 500
                             </p>
@@ -430,19 +412,19 @@ export default function DestinationsPage() {
 
                     {/* HEADER */}
 
-                    <div className="destinations-page-header stayway-load-in stayway-load-1">
-                        <p className="admin-label">
+                    <div className="destinations-page-header">
+                        <p className="admin-label stayway-load-in stayway-load-1">
                             STAYWAY
                         </p>
 
-                        <h1>
+                        <h1 className="stayway-load-in stayway-load-2">
                             {getTranslation(
                                 language,
                                 "destinations"
                             )}
                         </h1>
 
-                        <p className="admin-description">
+                        <p className="admin-description stayway-load-in stayway-load-3">
                             {getDestinationUiTranslation(
                                 language,
                                 "exploreCities"
@@ -452,7 +434,7 @@ export default function DestinationsPage() {
 
                     {availableDestinations.length ===
                     0 ? (
-                        <div className="empty-state stayway-load-in stayway-load-2">
+                        <div className="empty-state stayway-load-in stayway-load-4">
                             <h2>
                                 {getDestinationUiTranslation(
                                     language,
@@ -472,7 +454,7 @@ export default function DestinationsPage() {
                             {/* SEARCH + FILTERS */}
 
                             <div
-                                className="destinations-filters stayway-load-in stayway-load-2"
+                                className="destinations-filters stayway-load-in stayway-load-4"
                                 style={{
                                     display:
                                         "grid",
@@ -868,7 +850,7 @@ export default function DestinationsPage() {
                             {/* RESULTS COUNT */}
 
                             <div
-                                className="destinations-results-count stayway-load-in stayway-load-3"
+                                className="destinations-results-count stayway-load-in stayway-load-5"
                                 style={{
                                     display:
                                         "flex",
@@ -922,7 +904,7 @@ export default function DestinationsPage() {
 
                             {filteredDestinations.length ===
                             0 ? (
-                                <div className="empty-state stayway-load-in stayway-load-4">
+                                <div className="empty-state stayway-load-in stayway-load-6">
                                     <h2>
                                         {getDestinationUiTranslation(
                                             language,
@@ -938,7 +920,7 @@ export default function DestinationsPage() {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="destination-grid stayway-load-in stayway-load-4">
+                                <div className="destination-grid stayway-load-in stayway-load-6">
                                     {filteredDestinations.map(
                                         (
                                             destination

@@ -368,40 +368,18 @@ export default function Home() {
     // LOADING
     // =========================================
 
+    /*
+     * Keep the page visually stable while backend data is loading.
+     * We intentionally render no temporary text/content here, so the
+     * real Home page appears only once and runs the StayWay animation once.
+     */
     if (isLoading) {
         return (
-            <main className="home-page cherry-olive-home page-enter home-animated">
-
-                <section className="home-hero">
-                    <div
-                        className="container home-hero-inner"
-                        style={heroLanguageStyle}
-                    >
-
-                        <div className="hero-content">
-
-                            <div className="hero-badge">
-                                ✦ {homeT("journeyStartsHere")}
-                            </div>
-
-                            <h1>
-                                {homeT("findYour")}
-                                <br />
-                                <span>
-                                    {homeT("perfectStay")}
-                                </span>
-                            </h1>
-
-                            <p className="hero-subtitle home-hero-subtitle-animated">
-                                {homeT("loadingStayWay")}
-                            </p>
-
-                        </div>
-
-                    </div>
-                </section>
-
-            </main>
+            <main
+                className="home-page cherry-olive-home"
+                aria-busy="true"
+                style={{ minHeight: "100vh" }}
+            />
         );
     }
 
@@ -414,9 +392,9 @@ export default function Home() {
         availableProperties.length === 0
     ) {
         return (
-            <main className="home-page cherry-olive-home page-enter">
+            <main className="home-page cherry-olive-home">
 
-                <section className="home-hero">
+                <section className="home-hero stayway-load-in stayway-load-1">
                     <div
                         className="container home-hero-inner"
                         style={heroLanguageStyle}
@@ -454,14 +432,14 @@ export default function Home() {
     }
 
     return (
-        <main className="home-page cherry-olive-home page-enter home-animated">
+        <main className="home-page cherry-olive-home">
 
 
             {/* =================================================
     HERO
 ================================================= */}
 
-            <section className="home-hero home-animate home-animate-1">
+            <section className="home-hero stayway-load-in stayway-load-1">
 
                 <div className="hero-glow hero-glow-one"></div>
 
@@ -476,11 +454,11 @@ export default function Home() {
 
                     <div className="hero-content">
 
-                        <div className="hero-badge home-hero-item home-hero-item-1">
+                        <div className="hero-badge">
                             ✦ {homeT("journeyStartsHere")}
                         </div>
 
-                        <h1 className="home-hero-item home-hero-item-2">
+                        <h1>
                             {homeT("findYour")}
                             <br />
                             <span>
@@ -488,11 +466,11 @@ export default function Home() {
                             </span>
                         </h1>
 
-                        <p className="hero-subtitle home-hero-subtitle-animated">
+                        <p className="hero-subtitle">
                             {homeT("heroDescription")}
                         </p>
 
-                        <div className="hero-stats home-hero-item home-hero-item-4">
+                        <div className="hero-stats">
 
                             {/* UNIQUE STAYS */}
 
@@ -570,7 +548,7 @@ export default function Home() {
             ================================================= */}
 
             <section
-                className="home-carousel home-animate home-animate-2"
+                className="home-carousel stayway-load-in stayway-load-2"
             >
 
                 <div className="container">
@@ -699,7 +677,7 @@ export default function Home() {
                 COUNTRIES
             ================================================= */}
 
-            <section className="home-destinations home-animate home-animate-3">
+            <section className="home-destinations stayway-load-in stayway-load-3">
 
                 <div className="container">
 
@@ -756,9 +734,6 @@ export default function Home() {
                                         className={`home-destination-card destination-card-${
                                             index + 1
                                         }`}
-                                        style={{
-                                            "--card-index": index,
-                                        } as CSSProperties}
                                         key={
                                             destination.country
                                         }
@@ -832,7 +807,7 @@ export default function Home() {
                 FEATURED STAYS
             ================================================= */}
 
-            <section className="home-stays home-animate home-animate-4">
+            <section className="home-stays stayway-load-in stayway-load-4">
                 <div className="container">
                     <div className="home-section-heading stays-heading">
                         <div>
@@ -870,13 +845,10 @@ export default function Home() {
                     ) : (
                         <div className="home-property-grid">
                             {featuredProperties.map(
-                                (property, index) => (
+                                (property) => (
                                     <Link
                                         href={`/stays/${property.id}`}
                                         className="home-property-card"
-                                        style={{
-                                            "--card-index": index,
-                                        } as CSSProperties}
                                         key={property.id}
                                     >
                                         <div className="home-property-image">
@@ -953,7 +925,7 @@ export default function Home() {
                 CTA
             ================================================= */}
 
-            <section className="home-cta home-animate home-animate-5">
+            <section className="home-cta stayway-load-in stayway-load-5">
                 <div
                     className="home-cta-shape home-cta-shape-one"
                     aria-hidden="true"
@@ -1477,87 +1449,6 @@ export default function Home() {
     }
 }
 
-.home-animated .home-animate {
-    opacity: 0;
-    animation: homeFadeUp 0.8s ease both;
-}
-
-.home-animated .home-animate-1 {
-    animation-delay: 0s;
-}
-
-.home-animated .home-animate-2 {
-    animation-delay: 0.12s;
-}
-
-.home-animated .home-animate-3 {
-    animation-delay: 0.18s;
-}
-
-.home-animated .home-animate-4 {
-    animation-delay: 0.24s;
-}
-
-.home-animated .home-animate-5 {
-    animation-delay: 0.30s;
-}
-
-.home-animated .home-destination-card,
-.home-animated .home-property-card {
-    opacity: 0;
-    animation: homeFadeUp 0.7s ease both;
-}
-
-.home-animated .home-destination-card {
-    animation-delay: calc(0.22s + (var(--card-index, 0) * 0.08s));
-}
-
-.home-animated .home-property-card {
-    animation-delay: calc(0.22s + (var(--card-index, 0) * 0.08s));
-}
-
-@keyframes homeFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(22px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.home-animated .home-hero-item {
-    opacity: 0;
-    animation: homeFadeUp 0.8s ease both;
-}
-
-.home-animated .home-hero-item-1 {
-    animation-delay: 0.04s;
-}
-
-.home-animated .home-hero-item-2 {
-    animation-delay: 0.08s;
-}
-
-.home-animated .home-hero-subtitle-animated {
-    opacity: 0;
-    animation: homeFadeUp 0.8s ease both;
-    animation-delay: 0.12s;
-}
-
-.home-animated .home-hero-item-4 {
-    animation-delay: 0.16s;
-}
-
-.home-animated .home-hero-item-5 {
-    animation-delay: 0.20s;
-}
-
-.home-animated .home-hero-item-6 {
-    animation-delay: 0.24s;
-}
-
 .home-cta {
     position: relative;
     overflow: visible;
@@ -1825,16 +1716,6 @@ export default function Home() {
     background: #0d1729;
 }
 
-@media (prefers-reduced-motion: reduce) {
-.home-animated .home-hero-subtitle-animated,
-.home-animated .home-animate,
-.home-animated .home-destination-card,
-.home-animated .home-property-card,
-.home-animated .home-hero-item {
-        opacity: 1;
-        animation: none;
-    }
-}
 `}</style>
 
         </main>

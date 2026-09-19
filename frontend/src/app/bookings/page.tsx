@@ -1447,142 +1447,93 @@ function BookingsContent() {
             setIsLoaded(false);
 
             /*
-             * Property and room information is loaded from
-             * the ASP.NET Core backend.
+             * Load independent backend resources in parallel.
+             * This keeps My Bookings responsive and avoids waiting for
+             * six API calls one after another before the page can appear.
              */
-            try {
-                const loadedProperties =
-                    await getPropertiesFromApi();
-
-                if (isActive) {
-                    setAllProperties(
-                        loadedProperties
+            const [
+                loadedProperties,
+                loadedRooms,
+                loadedVehicles,
+                loadedDrivers,
+                visibleBookings,
+                allTransferBookings,
+            ] = await Promise.all([
+                getPropertiesFromApi().catch((error) => {
+                    console.error(
+                        "Could not load properties from the backend.",
+                        error
                     );
-                }
-            } catch (error) {
-                console.error(
-                    "Could not load properties from the backend.",
-                    error
-                );
+                    return [] as Property[];
+                }),
 
-                if (isActive) {
-                    setAllProperties([]);
-                }
-            }
-
-            try {
-                const loadedRooms =
-                    await getRoomsFromApi();
-
-                if (isActive) {
-                    setAllRooms(
-                        loadedRooms
+                getRoomsFromApi().catch((error) => {
+                    console.error(
+                        "Could not load rooms from the backend.",
+                        error
                     );
-                }
-            } catch (error) {
-                console.error(
-                    "Could not load rooms from the backend.",
-                    error
-                );
+                    return [] as Room[];
+                }),
 
-                if (isActive) {
-                    setAllRooms([]);
-                }
-            }
-
-            try {
-                const loadedVehicles =
-                    await getTransferVehiclesFromApi();
-
-                if (isActive) {
-                    setAllTransferVehicles(
-                        loadedVehicles
+                getTransferVehiclesFromApi().catch((error) => {
+                    console.error(
+                        "Could not load transfer vehicles from the backend.",
+                        error
                     );
-                }
-            } catch (error) {
-                console.error(
-                    "Could not load transfer vehicles from the backend.",
-                    error
-                );
+                    return [] as TransferVehicle[];
+                }),
 
-                if (isActive) {
-                    setAllTransferVehicles([]);
-                }
-            }
-
-            try {
-                const loadedDrivers =
-                    await getTransferDriversFromApi();
-
-                if (isActive) {
-                    setAllTransferDrivers(
-                        loadedDrivers
+                getTransferDriversFromApi().catch((error) => {
+                    console.error(
+                        "Could not load transfer drivers from the backend.",
+                        error
                     );
-                }
-            } catch (error) {
-                console.error(
-                    "Could not load transfer drivers from the backend.",
-                    error
-                );
+                    return [] as TransferDriver[];
+                }),
 
-                if (isActive) {
-                    setAllTransferDrivers([]);
-                }
-            }
-
-            try {
-                const visibleBookings =
+                (
                     currentUser.role === "admin"
-                        ? await getBookingsFromApi()
-                        : await getBookingsByUserIdFromApi(
+                        ? getBookingsFromApi()
+                        : getBookingsByUserIdFromApi(
                             currentUser.id
-                        );
-
-                if (isActive) {
-                    setUserBookings(visibleBookings);
-                }
-            } catch (error) {
-                console.error(
-                    "Could not load stay bookings from the backend.",
-                    error
-                );
-
-                if (isActive) {
-                    setUserBookings([]);
-                }
-            }
-
-            try {
-                const allTransferBookings =
-                    await getTransferBookingsFromApi();
-
-                const visibleTransferBookings =
-                    currentUser.role === "admin"
-                        ? allTransferBookings
-                        : allTransferBookings.filter(
-                            (booking) =>
-                                booking.email === currentUser.email
-                        );
-
-                if (isActive) {
-                    setTransferBookings(
-                        visibleTransferBookings
+                        )
+                ).catch((error) => {
+                    console.error(
+                        "Could not load stay bookings from the backend.",
+                        error
                     );
-                }
-            } catch (error) {
-                console.error(
-                    "Could not load transfer bookings from the backend.",
-                    error
-                );
+                    return [] as Booking[];
+                }),
 
-                if (isActive) {
-                    setTransferBookings([]);
-                }
+                getTransferBookingsFromApi().catch((error) => {
+                    console.error(
+                        "Could not load transfer bookings from the backend.",
+                        error
+                    );
+                    return [] as TransferBooking[];
+                }),
+            ]);
+
+            if (!isActive) {
+                return;
             }
 
-            if (isActive) {
-                setIsLoaded(true);
-            }
+            const visibleTransferBookings =
+                currentUser.role === "admin"
+                    ? allTransferBookings
+                    : allTransferBookings.filter(
+                        (booking) =>
+                            booking.email ===
+                            currentUser.email
+                    );
+
+            setAllProperties(loadedProperties);
+            setAllRooms(loadedRooms);
+            setAllTransferVehicles(loadedVehicles);
+            setAllTransferDrivers(loadedDrivers);
+            setUserBookings(visibleBookings);
+            setTransferBookings(visibleTransferBookings);
+            setIsLoaded(true);
         };
 
         void loadPageData();
@@ -2162,18 +2113,22 @@ function BookingsContent() {
         }
     };
 
+    /*
+     * Do not mount a temporary "Loading..." page.
+     * Once all backend data is ready, the real page mounts once and
+     * its StayWay stagger animation runs without a visible flash.
+     */
     if (!isLoaded) {
         return (
-            <main className="bookings-loading-page">
+            <main
+                className="bookings-root"
+                aria-busy="true"
+            >
                 <section className="section">
-                    <div className="container bookings-page">
-                        <p>
-                            {getTranslation(
-                                language,
-                                "loading"
-                            )}
-                        </p>
-                    </div>
+                    <div
+                        className="container bookings-page"
+                        style={{ minHeight: "100dvh" }}
+                    />
                 </section>
             </main>
         );

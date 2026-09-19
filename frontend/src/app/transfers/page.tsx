@@ -1819,10 +1819,10 @@ export default function TransfersPage() {
 
             {/* HERO */}
 
-            <section className="transfers-hero">
+            <section className="transfers-hero stayway-load-in stayway-load-1">
                 <div className="transfers-container">
 
-                    <div className="transfers-hero-content stayway-load-in stayway-load-1">
+                    <div className="transfers-hero-content">
 
                         <span className="transfers-eyebrow">
                             {t("staywayTransfers")}
@@ -1842,7 +1842,7 @@ export default function TransfersPage() {
 
                     </div>
 
-                    <div className="transfers-hero-image stayway-load-in stayway-load-2">
+                    <div className="transfers-hero-image">
 
                         <img
                             src="/transfers/transfer1.png"
@@ -1853,7 +1853,7 @@ export default function TransfersPage() {
 
                     {/* SEARCH CARD */}
 
-                    <div className="transfers-search-card stayway-load-in stayway-load-3">
+                    <div className="transfers-search-card">
 
                         <div className="transfers-type-switch">
 
@@ -2224,11 +2224,11 @@ export default function TransfersPage() {
 
             {/* BENEFITS */}
 
-            <section className="transfers-benefits">
+            <section className="transfers-benefits stayway-load-in stayway-load-2">
 
                 <div className="transfers-container">
 
-                    <div className="transfers-section-heading stayway-load-in stayway-load-4">
+                    <div className="transfers-section-heading">
 
                         <span className="transfers-eyebrow">
                             {t("whyStayWay")}
@@ -2246,7 +2246,7 @@ export default function TransfersPage() {
 
                     </div>
 
-                    <div className="transfers-benefits-grid stayway-load-in stayway-load-5">
+                    <div className="transfers-benefits-grid">
 
                         <article className="transfer-benefit-card">
 
@@ -2318,14 +2318,14 @@ export default function TransfersPage() {
                 id="transfer-options"
                 className={`transfers-options ${
                     searched
-                        ? "is-visible"
+                        ? "is-visible stayway-load-in stayway-load-3"
                         : ""
                 }`}
             >
 
                 <div className="transfers-container">
 
-                    <div className="transfers-section-heading centered stayway-load-in stayway-load-6">
+                    <div className="transfers-section-heading centered">
 
                         <span className="transfers-eyebrow">
                             {t(
@@ -2355,7 +2355,7 @@ export default function TransfersPage() {
 
                     </div>
 
-                    <div className="transfers-options-grid stayway-load-in stayway-load-7">
+                    <div className="transfers-options-grid">
 
                         {transferOptions.map(
                             (option) => (
@@ -2562,19 +2562,13 @@ export default function TransfersPage() {
 
             {/* HOW IT WORKS */}
 
-            <section className="transfers-how-it-works">
+            <section className="transfers-how-it-works stayway-load-in stayway-load-3">
 
                 <div className="transfers-container">
 
                     <div className="transfers-how-grid">
 
-                        <div
-                            className="transfers-section-heading stayway-load-in stayway-load-8"
-                            style={{
-                                transform:
-                                    "translateY(70px)",
-                            }}
-                        >
+                        <div className="transfers-section-heading">
 
                             <span className="transfers-eyebrow">
                                 {t(
@@ -2600,7 +2594,7 @@ export default function TransfersPage() {
 
                         </div>
 
-                        <div className="transfer-steps stayway-load-in stayway-load-1">
+                        <div className="transfer-steps">
 
                             <div className="transfer-step">
 
@@ -2684,11 +2678,11 @@ export default function TransfersPage() {
 
             {/* CTA */}
 
-            <section className="transfers-cta">
+            <section className="transfers-cta stayway-load-in stayway-load-4">
 
                 <div className="transfers-container">
 
-                    <div className="transfers-cta-card stayway-load-in stayway-load-2">
+                    <div className="transfers-cta-card">
 
                         <div>
 

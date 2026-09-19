@@ -873,16 +873,16 @@ export default function StayPageClient({
     if (loading) {
 
         return (
-            <main className="container">
-
-                <div className="home-loading-state">
-
-                    <p>
-                        {text.loading}
-                    </p>
-
-                </div>
-
+            <main
+                className="stay-details-page"
+                aria-busy="true"
+            >
+                <section className="section">
+                    <div
+                        className="container"
+                        style={{ minHeight: "100dvh" }}
+                    />
+                </section>
             </main>
         );
     }
@@ -929,19 +929,19 @@ export default function StayPageClient({
 
             {/* HEADER */}
 
-            <section className="stay-details-header stayway-load-in stayway-load-1">
+            <section className="stay-details-header">
 
                 <div className="container">
 
                     <Link
                         href={`/destinations/${property.destinationId}`}
-                        className="back-link"
+                        className="back-link stayway-load-in stayway-load-1"
                     >
                         ← {text.backToDestination}
                     </Link>
 
 
-                    <div className="stay-title-row">
+                    <div className="stay-title-row stayway-load-in stayway-load-2">
 
                         <div>
 
@@ -989,7 +989,7 @@ export default function StayPageClient({
 
             {/* GALLERY */}
 
-            <section className="stay-gallery-section stayway-load-in stayway-load-2">
+            <section className="stay-gallery-section stayway-load-in stayway-load-3">
 
                 <div className="container">
 
@@ -1022,7 +1022,7 @@ export default function StayPageClient({
 
                         {/* ABOUT */}
 
-                        <div className="stay-info-block stayway-load-in stayway-load-3">
+                        <div className="stay-info-block stayway-load-in stayway-load-4">
 
                             <h2>
                                 {text.aboutProperty}
@@ -1070,7 +1070,7 @@ export default function StayPageClient({
 
                         {/* FACILITIES */}
 
-                        <div className="stay-info-block stayway-load-in stayway-load-4">
+                        <div className="stay-info-block stayway-load-in stayway-load-5">
 
                             <div className="rooms-heading">
 
@@ -1231,7 +1231,7 @@ export default function StayPageClient({
                         {propertyRooms.length > 0 && (
 
                             <div
-                                className="stay-info-block stayway-load-in stayway-load-5"
+                                className="stay-info-block stayway-load-in stayway-load-6"
                                 id="rooms"
                             >
 
@@ -1268,7 +1268,7 @@ export default function StayPageClient({
 
                         {/* REVIEWS */}
 
-                        <div className="stay-info-block stayway-load-in stayway-load-6">
+                        <div className="stay-info-block stayway-load-in stayway-load-7">
 
                             <ReviewSection
                                 propertyId={

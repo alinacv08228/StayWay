@@ -6,7 +6,7 @@ import {
     useEffect,
     useState,
 } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { useSettings } from "@/context/SettingsContext";
 import { currencyInfo } from "@/data/currency";
@@ -1411,6 +1411,9 @@ function TransferCheckoutContent() {
     const searchParams =
         useSearchParams();
 
+    const router =
+        useRouter();
+
     const { currency, language } = useSettings();
 
     const t = (
@@ -2645,8 +2648,9 @@ function TransferCheckoutContent() {
                 /*
                  * CONFIRMATION
                  */
-                window.location.href =
-                    "/transfers/confirmation";
+                router.push(
+                    "/transfers/confirmation"
+                );
             } catch {
                 setAvailabilityError(
                     "Could not save the transfer booking. Please try again."

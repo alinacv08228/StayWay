@@ -2906,17 +2906,17 @@ function NewBookingForm() {
 
         return (
 
-            <main className="bookings-loading-page">
+            <main
+                className="bookings-loading-page"
+                aria-busy="true"
+            >
 
                 <section className="section">
 
-                    <div className="container booking-page">
-
-                        <p>
-                            {getBookingText(language, "loading")}
-                        </p>
-
-                    </div>
+                    <div
+                        className="container booking-page"
+                        style={{ minHeight: "100dvh" }}
+                    />
 
                 </section>
 
@@ -3637,11 +3637,16 @@ export default function NewBookingPage() {
         <Suspense
             fallback={
 
-                <main className="container">
+                <main aria-busy="true">
 
-                    <p>
-                        {getBookingText(language, "loading")}
-                    </p>
+                    <section className="section">
+
+                        <div
+                            className="container booking-page"
+                            style={{ minHeight: "100dvh" }}
+                        />
+
+                    </section>
 
                 </main>
             }
