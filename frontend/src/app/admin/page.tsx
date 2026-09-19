@@ -6467,7 +6467,7 @@ export default function AdminPage() {
                                                                         fontWeight: 800,
                                                                     }}
                                                                 >
-                                                                    Plecare:
+                                                                    Departure:
                                                                 </strong>
                                                                 <span>📅 {formatTransferDate(booking.date)}</span>
                                                                 <span>·</span>

@@ -53,7 +53,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contact Support",
         contactIntro:
             "Can't find what you're looking for? Send us a message and our support team will help you.",
-        success: "✓ Your message has been sent successfully!",
+        success: "Your message has been sent successfully!",
         name: "Name",
         email: "Email",
         subject: "Subject",
@@ -91,7 +91,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contactează asistența",
         contactIntro:
             "Nu ai găsit ceea ce cauți? Trimite-ne un mesaj, iar echipa noastră de asistență te va ajuta.",
-        success: "✓ Mesajul tău a fost trimis cu succes!",
+        success: "Mesajul tău a fost trimis cu succes!",
         name: "Nume",
         email: "Email",
         subject: "Subiect",
@@ -129,7 +129,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Связаться с поддержкой",
         contactIntro:
             "Не нашли нужную информацию? Отправьте нам сообщение, и наша служба поддержки поможет вам.",
-        success: "✓ Ваше сообщение успешно отправлено!",
+        success: "Ваше сообщение успешно отправлено!",
         name: "Имя",
         email: "Электронная почта",
         subject: "Тема",
@@ -167,7 +167,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Зв’язатися з підтримкою",
         contactIntro:
             "Не знайшли потрібної інформації? Надішліть нам повідомлення, і наша команда допоможе вам.",
-        success: "✓ Ваше повідомлення успішно надіслано!",
+        success: "Ваше повідомлення успішно надіслано!",
         name: "Ім’я",
         email: "Електронна пошта",
         subject: "Тема",
@@ -205,7 +205,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contacter l’assistance",
         contactIntro:
             "Vous ne trouvez pas ce que vous cherchez ? Envoyez-nous un message et notre équipe vous aidera.",
-        success: "✓ Votre message a été envoyé avec succès !",
+        success: "Votre message a été envoyé avec succès !",
         name: "Nom",
         email: "E-mail",
         subject: "Objet",
@@ -243,7 +243,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contactar con soporte",
         contactIntro:
             "¿No encuentras lo que buscas? Envíanos un mensaje y nuestro equipo de soporte te ayudará.",
-        success: "✓ ¡Tu mensaje se ha enviado correctamente!",
+        success: "¡Tu mensaje se ha enviado correctamente!",
         name: "Nombre",
         email: "Correo electrónico",
         subject: "Asunto",
@@ -281,7 +281,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Support kontaktieren",
         contactIntro:
             "Sie finden nicht, was Sie suchen? Senden Sie uns eine Nachricht und unser Support-Team hilft Ihnen.",
-        success: "✓ Ihre Nachricht wurde erfolgreich gesendet!",
+        success: "Ihre Nachricht wurde erfolgreich gesendet!",
         name: "Name",
         email: "E-Mail",
         subject: "Betreff",
@@ -319,7 +319,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contatta l’assistenza",
         contactIntro:
             "Non trovi quello che cerchi? Inviaci un messaggio e il nostro team ti aiuterà.",
-        success: "✓ Il tuo messaggio è stato inviato con successo!",
+        success: "Il tuo messaggio è stato inviato con successo!",
         name: "Nome",
         email: "E-mail",
         subject: "Oggetto",
@@ -357,7 +357,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contactar o suporte",
         contactIntro:
             "Não encontrou o que procura? Envie-nos uma mensagem e a nossa equipa de suporte irá ajudá-lo.",
-        success: "✓ A sua mensagem foi enviada com sucesso!",
+        success: "A sua mensagem foi enviada com sucesso!",
         name: "Nome",
         email: "E-mail",
         subject: "Assunto",
@@ -395,7 +395,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contact opnemen met support",
         contactIntro:
             "Kun je niet vinden wat je zoekt? Stuur ons een bericht en ons supportteam helpt je.",
-        success: "✓ Je bericht is succesvol verzonden!",
+        success: "Je bericht is succesvol verzonden!",
         name: "Naam",
         email: "E-mail",
         subject: "Onderwerp",
@@ -433,7 +433,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontakt support",
         contactIntro:
             "Finner du ikke det du leter etter? Send oss en melding, så hjelper supportteamet vårt deg.",
-        success: "✓ Meldingen din er sendt!",
+        success: "Meldingen din er sendt!",
         name: "Navn",
         email: "E-post",
         subject: "Emne",
@@ -471,7 +471,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontakta support",
         contactIntro:
             "Hittar du inte det du söker? Skicka ett meddelande så hjälper vårt supportteam dig.",
-        success: "✓ Ditt meddelande har skickats!",
+        success: "Ditt meddelande har skickats!",
         name: "Namn",
         email: "E-post",
         subject: "Ämne",
@@ -509,7 +509,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontakt support",
         contactIntro:
             "Kan du ikke finde det, du leder efter? Send os en besked, så hjælper vores supportteam dig.",
-        success: "✓ Din besked er sendt!",
+        success: "Din besked er sendt!",
         name: "Navn",
         email: "E-mail",
         subject: "Emne",
@@ -547,7 +547,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Ota yhteyttä tukeen",
         contactIntro:
             "Etkö löydä etsimääsi? Lähetä meille viesti, niin tukitiimimme auttaa.",
-        success: "✓ Viestisi on lähetetty onnistuneesti!",
+        success: "Viestisi on lähetetty onnistuneesti!",
         name: "Nimi",
         email: "Sähköposti",
         subject: "Aihe",
@@ -585,7 +585,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Skontaktuj się z pomocą",
         contactIntro:
             "Nie możesz znaleźć tego, czego szukasz? Wyślij nam wiadomość, a nasz zespół pomoże.",
-        success: "✓ Twoja wiadomość została wysłana!",
+        success: "Twoja wiadomość została wysłana!",
         name: "Imię",
         email: "E-mail",
         subject: "Temat",
@@ -623,7 +623,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontaktovat podporu",
         contactIntro:
             "Nemůžete najít, co hledáte? Pošlete nám zprávu a náš tým podpory vám pomůže.",
-        success: "✓ Vaše zpráva byla úspěšně odeslána!",
+        success: "Vaše zpráva byla úspěšně odeslána!",
         name: "Jméno",
         email: "E-mail",
         subject: "Předmět",
@@ -661,7 +661,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontaktovať podporu",
         contactIntro:
             "Nenašli ste, čo hľadáte? Pošlite nám správu a náš tím podpory vám pomôže.",
-        success: "✓ Vaša správa bola úspešne odoslaná!",
+        success: "Vaša správa bola úspešne odoslaná!",
         name: "Meno",
         email: "E-mail",
         subject: "Predmet",
@@ -699,7 +699,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kapcsolat az ügyfélszolgálattal",
         contactIntro:
             "Nem találja, amit keres? Küldjön nekünk üzenetet, és csapatunk segít.",
-        success: "✓ Üzenetét sikeresen elküldtük!",
+        success: "Üzenetét sikeresen elküldtük!",
         name: "Név",
         email: "E-mail",
         subject: "Tárgy",
@@ -737,7 +737,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Свържете се с поддръжката",
         contactIntro:
             "Не намирате това, което търсите? Изпратете ни съобщение и нашият екип ще ви помогне.",
-        success: "✓ Вашето съобщение беше изпратено успешно!",
+        success: "Вашето съобщение беше изпратено успешно!",
         name: "Име",
         email: "Имейл",
         subject: "Тема",
@@ -775,7 +775,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontaktirajte podršku",
         contactIntro:
             "Ne možete pronaći ono što tražite? Pošaljite nam poruku i naš tim će vam pomoći.",
-        success: "✓ Vaša je poruka uspješno poslana!",
+        success: "Vaša je poruka uspješno poslana!",
         name: "Ime",
         email: "E-pošta",
         subject: "Predmet",
@@ -813,7 +813,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Stik s podporo",
         contactIntro:
             "Ne najdete, kar iščete? Pošljite nam sporočilo in naša ekipa vam bo pomagala.",
-        success: "✓ Vaše sporočilo je bilo uspešno poslano!",
+        success: "Vaše sporočilo je bilo uspešno poslano!",
         name: "Ime",
         email: "E-pošta",
         subject: "Zadeva",
@@ -851,7 +851,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontaktirajte podršku",
         contactIntro:
             "Ne možete da pronađete ono što tražite? Pošaljite nam poruku i naš tim će vam pomoći.",
-        success: "✓ Vaša poruka je uspešno poslata!",
+        success: "Vaša poruka je uspešno poslata!",
         name: "Ime",
         email: "E-pošta",
         subject: "Naslov",
@@ -889,7 +889,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Kontaktirajte podršku",
         contactIntro:
             "Ne možete pronaći ono što tražite? Pošaljite nam poruku i naš tim će vam pomoći.",
-        success: "✓ Vaša poruka je uspješno poslana!",
+        success: "Vaša poruka je uspješno poslana!",
         name: "Ime",
         email: "E-mail",
         subject: "Naslov",
@@ -927,7 +927,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Επικοινωνία με την υποστήριξη",
         contactIntro:
             "Δεν βρίσκετε αυτό που ψάχνετε; Στείλτε μας μήνυμα και η ομάδα υποστήριξης θα σας βοηθήσει.",
-        success: "✓ Το μήνυμά σας στάλθηκε με επιτυχία!",
+        success: "Το μήνυμά σας στάλθηκε με επιτυχία!",
         name: "Όνομα",
         email: "Email",
         subject: "Θέμα",
@@ -965,7 +965,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Destek ile iletişime geçin",
         contactIntro:
             "Aradığınızı bulamadınız mı? Bize mesaj gönderin, destek ekibimiz size yardımcı olsun.",
-        success: "✓ Mesajınız başarıyla gönderildi!",
+        success: "Mesajınız başarıyla gönderildi!",
         name: "Ad",
         email: "E-posta",
         subject: "Konu",
@@ -1003,7 +1003,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "تواصل مع الدعم",
         contactIntro:
             "لم تجد ما تبحث عنه؟ أرسل لنا رسالة وسيساعدك فريق الدعم.",
-        success: "✓ تم إرسال رسالتك بنجاح!",
+        success: "تم إرسال رسالتك بنجاح!",
         name: "الاسم",
         email: "البريد الإلكتروني",
         subject: "الموضوع",
@@ -1041,7 +1041,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "יצירת קשר עם התמיכה",
         contactIntro:
             "לא מצאתם את מה שחיפשתם? שלחו לנו הודעה וצוות התמיכה שלנו יעזור לכם.",
-        success: "✓ ההודעה שלכם נשלחה בהצלחה!",
+        success: "ההודעה שלכם נשלחה בהצלחה!",
         name: "שם",
         email: "דוא״ל",
         subject: "נושא",
@@ -1079,7 +1079,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "सहायता से संपर्क करें",
         contactIntro:
             "जो आप खोज रहे हैं वह नहीं मिला? हमें संदेश भेजें और हमारी सहायता टीम आपकी मदद करेगी।",
-        success: "✓ आपका संदेश सफलतापूर्वक भेज दिया गया है!",
+        success: "आपका संदेश सफलतापूर्वक भेज दिया गया है!",
         name: "नाम",
         email: "ईमेल",
         subject: "विषय",
@@ -1117,7 +1117,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "ติดต่อฝ่ายสนับสนุน",
         contactIntro:
             "ไม่พบสิ่งที่ต้องการใช่ไหม ส่งข้อความหาเราแล้วทีมสนับสนุนจะช่วยคุณ",
-        success: "✓ ส่งข้อความของคุณเรียบร้อยแล้ว!",
+        success: "ส่งข้อความของคุณเรียบร้อยแล้ว!",
         name: "ชื่อ",
         email: "อีเมล",
         subject: "หัวข้อ",
@@ -1155,7 +1155,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Hubungi Dukungan",
         contactIntro:
             "Tidak menemukan yang Anda cari? Kirim pesan kepada kami dan tim dukungan akan membantu.",
-        success: "✓ Pesan Anda berhasil dikirim!",
+        success: "Pesan Anda berhasil dikirim!",
         name: "Nama",
         email: "Email",
         subject: "Subjek",
@@ -1193,7 +1193,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Liên hệ hỗ trợ",
         contactIntro:
             "Không tìm thấy điều bạn cần? Hãy gửi tin nhắn và đội ngũ hỗ trợ sẽ giúp bạn.",
-        success: "✓ Tin nhắn của bạn đã được gửi thành công!",
+        success: "Tin nhắn của bạn đã được gửi thành công!",
         name: "Tên",
         email: "Email",
         subject: "Chủ đề",
@@ -1231,7 +1231,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "지원팀 문의",
         contactIntro:
             "찾으시는 내용이 없나요? 메시지를 보내주시면 지원팀이 도와드리겠습니다.",
-        success: "✓ 메시지가 성공적으로 전송되었습니다!",
+        success: "메시지가 성공적으로 전송되었습니다!",
         name: "이름",
         email: "이메일",
         subject: "제목",
@@ -1269,7 +1269,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "サポートに問い合わせる",
         contactIntro:
             "お探しの情報が見つかりませんか？メッセージを送信していただければ、サポートチームがお手伝いします。",
-        success: "✓ メッセージが正常に送信されました！",
+        success: "メッセージが正常に送信されました！",
         name: "名前",
         email: "メールアドレス",
         subject: "件名",
@@ -1306,7 +1306,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "联系支持",
         contactIntro:
             "没有找到您要的信息？给我们发送消息，我们的支持团队会帮助您。",
-        success: "✓ 您的消息已成功发送！",
+        success: "您的消息已成功发送！",
         name: "姓名",
         email: "电子邮箱",
         subject: "主题",
@@ -1343,7 +1343,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "聯絡支援",
         contactIntro:
             "找不到您需要的資訊？傳送訊息給我們，我們的支援團隊會協助您。",
-        success: "✓ 您的消息已成功傳送！",
+        success: "您的消息已成功傳送！",
         name: "姓名",
         email: "電子郵件",
         subject: "主旨",
@@ -1381,7 +1381,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Contacta amb el suport",
         contactIntro:
             "No trobes el que busques? Envia'ns un missatge i el nostre equip t'ajudarà.",
-        success: "✓ El teu missatge s'ha enviat correctament!",
+        success: "El teu missatge s'ha enviat correctament!",
         name: "Nom",
         email: "Correu electrònic",
         subject: "Assumpte",
@@ -1419,7 +1419,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Võta ühendust toega",
         contactIntro:
             "Ei leia otsitavat? Saada meile sõnum ja meie tugimeeskond aitab sind.",
-        success: "✓ Sinu sõnum on edukalt saadetud!",
+        success: "Sinu sõnum on edukalt saadetud!",
         name: "Nimi",
         email: "E-post",
         subject: "Teema",
@@ -1457,7 +1457,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Sazinieties ar atbalstu",
         contactIntro:
             "Neatrodat meklēto? Nosūtiet mums ziņu, un mūsu atbalsta komanda palīdzēs.",
-        success: "✓ Jūsu ziņa ir veiksmīgi nosūtīta!",
+        success: "Jūsu ziņa ir veiksmīgi nosūtīta!",
         name: "Vārds",
         email: "E-pasts",
         subject: "Temats",
@@ -1495,7 +1495,7 @@ const helpTranslations: Record<string, HelpTranslation> = {
         contactTitle: "Susisiekti su palaikymo komanda",
         contactIntro:
             "Nerandate to, ko ieškote? Parašykite mums ir mūsų palaikymo komanda jums padės.",
-        success: "✓ Jūsų žinutė sėkmingai išsiųsta!",
+        success: "Jūsų žinutė sėkmingai išsiųsta!",
         name: "Vardas",
         email: "El. paštas",
         subject: "Tema",
@@ -1612,15 +1612,6 @@ export default function HelpPage() {
 
         try {
             await createSupportMessageInApi({
-                userId:
-                    String(currentUser.id),
-
-                name:
-                    name.trim(),
-
-                email:
-                    email.trim(),
-
                 subject:
                     subject.trim(),
 

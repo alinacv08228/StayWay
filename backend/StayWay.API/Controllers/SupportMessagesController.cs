@@ -51,7 +51,7 @@ public class SupportMessagesController
     [HttpPost]
     public async Task<ActionResult<SupportMessageDto>>
         Create(
-            SupportMessageDto message
+            CreateSupportMessageRequestDto request
         )
     {
         var currentUserId =
@@ -83,7 +83,7 @@ public class SupportMessagesController
 
         if (
             string.IsNullOrWhiteSpace(
-                message.Subject
+                request.Subject
             )
         )
         {
@@ -98,7 +98,7 @@ public class SupportMessagesController
 
         if (
             string.IsNullOrWhiteSpace(
-                message.Message
+                request.Message
             )
         )
         {
@@ -111,46 +111,53 @@ public class SupportMessagesController
             );
         }
 
-        message.UserId =
-            currentUserId;
+        var message =
+            new SupportMessageDto
+            {
+                UserId =
+                    currentUserId,
 
-        message.Name =
-            string.IsNullOrWhiteSpace(
-                currentUserName
-            )
-                ? "StayWay user"
-                : currentUserName;
+                Name =
+                    string.IsNullOrWhiteSpace(
+                        currentUserName
+                    )
+                        ? "StayWay user"
+                        : currentUserName,
 
-        message.Email =
-            currentUserEmail;
+                Email =
+                    currentUserEmail,
+
+                Subject =
+                    request.Subject.Trim(),
+
+                Message =
+                    request.Message.Trim()
+            };
+
+        /*
+         * Save the support request first.
+         * A temporary email problem must not
+         * cause the user's message to be lost.
+         */
+        var createdMessage =
+            _supportMessageService
+                .Create(message);
 
         try
         {
             await _emailService
                 .SendSupportMessageAsync(
-                    message
+                    createdMessage
                 );
         }
         catch (Exception exception)
         {
             _logger.LogError(
                 exception,
-                "StayWay support email could not be sent."
-            );
-
-            return StatusCode(
-                StatusCodes.Status502BadGateway,
-                new
-                {
-                    message =
-                        "The support email could not be sent."
-                }
+                "StayWay support email could not be sent for support message {SupportMessageId}.",
+                createdMessage.Id
             );
         }
-
-        var createdMessage =
-            _supportMessageService
-                .Create(message);
 
         return StatusCode(
             StatusCodes.Status201Created,
