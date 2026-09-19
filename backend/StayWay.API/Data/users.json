@@ -12,47 +12,7 @@
     "name": "Admin",
     "email": "admin@stayway.com",
     "role": "admin",
-    "passwordHash": "ZJ2jcckNtiAKP\u002B2n9iDYCFSH3SF53AhQf6q1bS/L\u002BKE=",
-    "passwordSalt": "OUdKhf9KRi\u002B1dnWC6\u002BTCIg=="
-  },
-  {
-    "id": "user-1789376177481",
-    "name": "Maria Popescu",
-    "email": "maria@test.com",
-    "role": "user",
-    "passwordHash": "SWLcMy7lG6KWJM2pjbJHIY67NvDEwLy9EViVRLHIeH8=",
-    "passwordSalt": "p33GiP45NPqZ5KcARAxz8Q=="
-  },
-  {
-    "id": "user-1789377523702",
-    "name": "Ion Popescu",
-    "email": "ion@gmail.com",
-    "role": "user",
-    "passwordHash": "yZn7OXO2WdZpE7d6n94\u002BwY/EJfh8K9cd/9wiJMUEDsY=",
-    "passwordSalt": "Kc8OZQQudacMxFij/dyugA=="
-  },
-  {
-    "id": "user-1789378211855",
-    "name": "Test User",
-    "email": "test@gmail.com",
-    "role": "user",
-    "passwordHash": "JRH94LFhCiX4tHx0fRxlF\u002BpENkBxFLgjJKZoo0wR8AE=",
-    "passwordSalt": "uOUGSnqc9/jLRzR7HEr/fg=="
-  },
-  {
-    "id": "user-1789379803310",
-    "name": "Alina Cv",
-    "email": "alina@gmail.com",
-    "role": "user",
-    "passwordHash": "k5c5oMzgI4pqYcWQCuNazEpSCT\u002BjxkZzQvbShXz4ATo=",
-    "passwordSalt": "StauTHw9xmtS1veHdDHMcA=="
-  },
-  {
-    "id": "user-1789642142613",
-    "name": "Backend Signup",
-    "email": "signup@test.com",
-    "role": "user",
-    "passwordHash": "TKv7cdbi\u002BSLebLFO6t7r3tfpugLyvnZUlcKTXNlf8OQ=",
-    "passwordSalt": "xv8QQ\u002BgltWLZtte/1Z5KRA=="
+    "passwordHash": "ZJ2jcckNtiAKP+2n9iDYCFSH3SF53AhQf6q1bS/L+KE=",
+    "passwordSalt": "OUdKhf9KRi+1dnWC6+TCIg=="
   }
 ]

@@ -3,7 +3,6 @@ import "./globals.css";
 
 import { UserProvider } from "../context/UserContext";
 import { SettingsProvider } from "../context/SettingsContext";
-import { AxiosProvider } from "../context/AxiosContext";
 
 import SiteShell from "../components/SiteShell";
 
@@ -21,15 +20,13 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
-        <AxiosProvider>
-            <UserProvider>
-                <SettingsProvider>
-                    <SiteShell>
-                        {children}
-                    </SiteShell>
-                </SettingsProvider>
-            </UserProvider>
-        </AxiosProvider>
+        <UserProvider>
+            <SettingsProvider>
+                <SiteShell>
+                    {children}
+                </SiteShell>
+            </SettingsProvider>
+        </UserProvider>
         </body>
         </html>
     );
