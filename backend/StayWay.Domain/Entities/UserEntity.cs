@@ -10,6 +10,8 @@ public class UserEntity
 
     public string Role { get; set; } = "user";
 
+    public bool IsActive { get; set; } = true;
+
     public string PasswordHash { get; set; } = string.Empty;
 
     public string PasswordSalt { get; set; } = string.Empty;

@@ -12,5 +12,7 @@ public interface IUserService
 
     UserDto? Register(RegisterRequestDto request);
 
+    bool SetActiveStatus(string id, bool isActive);
+
     bool Delete(string id);
 }

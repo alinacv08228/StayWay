@@ -3,6 +3,7 @@ export interface User {
     name: string;
     email: string;
     role: "user" | "admin";
+    isActive?: boolean;
 }
 
 export interface Country {

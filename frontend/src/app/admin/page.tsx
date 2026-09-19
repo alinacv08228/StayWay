@@ -1057,6 +1057,109 @@ export default function AdminPage() {
         propertySort,
     ]);
 
+    const handleDeleteUser = async (
+        user: User
+    ) => {
+        if (
+            currentUser &&
+            String(user.id) ===
+            String(currentUser.id)
+        ) {
+            window.alert(
+                "You cannot delete the account you are currently signed in with."
+            );
+
+            return;
+        }
+
+        const confirmed =
+            window.confirm(
+                `Are you sure you want to delete "${user.name}"?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await api.delete(
+                `/api/Users/${user.id}`
+            );
+
+            const response =
+                await api.get<User[]>(
+                    "/api/Users"
+                );
+
+            setAdminUsers(
+                response.data
+            );
+        } catch {
+            window.alert(
+                "This user cannot be deleted because the account may be linked to existing bookings or support messages."
+            );
+        }
+    };
+
+    const handleToggleUserStatus = async (
+        user: User
+    ) => {
+        if (
+            currentUser &&
+            String(user.id) ===
+            String(currentUser.id)
+        ) {
+            window.alert(
+                "You cannot deactivate the account you are currently signed in with."
+            );
+
+            return;
+        }
+
+        const isCurrentlyActive =
+            user.isActive !== false;
+
+        const nextIsActive =
+            !isCurrentlyActive;
+
+        const action =
+            nextIsActive
+                ? "activate"
+                : "deactivate";
+
+        const confirmed =
+            window.confirm(
+                `Are you sure you want to ${action} "${user.name}"?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await api.patch(
+                `/api/Users/${user.id}/status`,
+                {
+                    isActive:
+                    nextIsActive,
+                }
+            );
+
+            const response =
+                await api.get<User[]>(
+                    "/api/Users"
+                );
+
+            setAdminUsers(
+                response.data
+            );
+        } catch {
+            window.alert(
+                `Could not ${action} this user. Please try again.`
+            );
+        }
+    };
+
     // =========================================
     // FILTERED USERS
     // =========================================
@@ -4815,7 +4918,7 @@ export default function AdminPage() {
                                         <div className="admin-table-header">
                                             <span>Name</span>
                                             <span>Email</span>
-                                            <span>Role</span>
+                                            <span>Role / Status / Actions</span>
                                         </div>
 
                                         {filteredUsers.length === 0 ? (
@@ -4872,15 +4975,95 @@ export default function AdminPage() {
                                                         {user.email}
                                                     </span>
 
-                                                    <span
-                                                        className={
-                                                            user.role === "admin"
-                                                                ? "role-badge role-admin"
-                                                                : "role-badge"
-                                                        }
+                                                    <div
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "space-between",
+                                                            gap: "10px",
+                                                            flexWrap: "wrap",
+                                                        }}
                                                     >
-                                                        {user.role}
-                                                    </span>
+                                                        <div
+                                                            style={{
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                gap: "8px",
+                                                                flexWrap: "wrap",
+                                                            }}
+                                                        >
+                                                            <span
+                                                                className={
+                                                                    user.role === "admin"
+                                                                        ? "role-badge role-admin"
+                                                                        : "role-badge"
+                                                                }
+                                                            >
+                                                                {user.role}
+                                                            </span>
+
+                                                            <span
+                                                                style={{
+                                                                    display: "inline-flex",
+                                                                    alignItems: "center",
+                                                                    padding: "5px 9px",
+                                                                    borderRadius: "999px",
+                                                                    fontSize: "11px",
+                                                                    fontWeight: 800,
+                                                                    background:
+                                                                        user.isActive !== false
+                                                                            ? "rgba(34, 197, 94, 0.12)"
+                                                                            : "rgba(239, 68, 68, 0.12)",
+                                                                    color:
+                                                                        user.isActive !== false
+                                                                            ? "#15803d"
+                                                                            : "#dc2626",
+                                                                }}
+                                                            >
+                                                                {user.isActive !== false
+                                                                    ? "Active"
+                                                                    : "Inactive"}
+                                                            </span>
+                                                        </div>
+
+                                                        {currentUser &&
+                                                            String(user.id) !==
+                                                            String(currentUser.id) && (
+                                                                <div
+                                                                    style={{
+                                                                        display: "flex",
+                                                                        gap: "7px",
+                                                                        alignItems: "center",
+                                                                    }}
+                                                                >
+                                                                    <button
+                                                                        type="button"
+                                                                        className="admin-cancel-button"
+                                                                        onClick={() =>
+                                                                            handleToggleUserStatus(
+                                                                                user
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {user.isActive !== false
+                                                                            ? "Deactivate"
+                                                                            : "Activate"}
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="admin-delete-button"
+                                                                        onClick={() =>
+                                                                            handleDeleteUser(
+                                                                                user
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                    </div>
                                                 </div>
                                             ))
                                         )}

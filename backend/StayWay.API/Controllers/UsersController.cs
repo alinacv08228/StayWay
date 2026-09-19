@@ -156,19 +156,100 @@ public class UsersController : ControllerBase
     }
 
     [Authorize(Roles = "admin")]
+    [HttpPatch("{id}/status")]
+    public IActionResult SetActiveStatus(
+        string id,
+        UpdateUserStatusDto request
+    )
+    {
+        var currentUserId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+        if (
+            currentUserId == id &&
+            !request.IsActive
+        )
+        {
+            return BadRequest(
+                new
+                {
+                    message =
+                        "You cannot deactivate the account you are currently signed in with."
+                }
+            );
+        }
+
+        var updated =
+            _userService.SetActiveStatus(
+                id,
+                request.IsActive
+            );
+
+        if (!updated)
+        {
+            return NotFound(
+                new
+                {
+                    message = "User not found."
+                }
+            );
+        }
+
+        return NoContent();
+    }
+
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(
         string id
     )
     {
-        var deleted =
-            _userService.Delete(id);
+        var currentUserId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
 
-        if (!deleted)
+        if (
+            !string.IsNullOrWhiteSpace(currentUserId) &&
+            currentUserId == id
+        )
         {
-            return NotFound();
+            return BadRequest(
+                new
+                {
+                    message =
+                        "You cannot delete the account you are currently signed in with."
+                }
+            );
         }
 
-        return NoContent();
+        try
+        {
+            var deleted =
+                _userService.Delete(id);
+
+            if (!deleted)
+            {
+                return NotFound(
+                    new
+                    {
+                        message = "User not found."
+                    }
+                );
+            }
+
+            return NoContent();
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(
+                new
+                {
+                    message = exception.Message
+                }
+            );
+        }
     }
 }

@@ -33,7 +33,8 @@ public class UserService : IUserService
                     Id = user.Id,
                     Name = user.Name,
                     Email = user.Email,
-                    Role = user.Role
+                    Role = user.Role,
+                    IsActive = user.IsActive
                 }
             )
             .ToList();
@@ -86,6 +87,11 @@ public class UserService : IUserService
                 );
 
         if (user is null)
+        {
+            return null;
+        }
+
+        if (!user.IsActive)
         {
             return null;
         }
@@ -177,6 +183,8 @@ public class UserService : IUserService
 
                 Role = "user",
 
+                IsActive = true,
+
                 PasswordHash =
                     Convert.ToBase64String(hash),
 
@@ -201,6 +209,30 @@ public class UserService : IUserService
         return ToDto(newUser);
     }
 
+    public bool SetActiveStatus(
+        string id,
+        bool isActive
+    )
+    {
+        var user =
+            _context.Users
+                .FirstOrDefault(
+                    item => item.Id == id
+                );
+
+        if (user is null)
+        {
+            return false;
+        }
+
+        user.IsActive =
+            isActive;
+
+        _context.SaveChanges();
+
+        return true;
+    }
+
     public bool Delete(
         string id
     )
@@ -217,7 +249,18 @@ public class UserService : IUserService
         }
 
         _context.Users.Remove(user);
-        _context.SaveChanges();
+
+        try
+        {
+            _context.SaveChanges();
+        }
+        catch (DbUpdateException exception)
+        {
+            throw new InvalidOperationException(
+                "This user cannot be deleted because the account is linked to existing bookings or support messages.",
+                exception
+            );
+        }
 
         return true;
     }
@@ -249,7 +292,8 @@ public class UserService : IUserService
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
-            Role = user.Role
+            Role = user.Role,
+            IsActive = user.IsActive
         };
     }
 

@@ -9,4 +9,6 @@ public class UserDto
     public string Email { get; set; } = string.Empty;
 
     public string Role { get; set; } = "user";
+
+    public bool IsActive { get; set; } = true;
 }
