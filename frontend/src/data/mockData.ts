@@ -10,13 +10,13 @@ import {
 
 export const users: User[] = [
     {
-        id: 1,
+        id: "1",
         name: "Alina",
         email: "alina@example.com",
         role: "user",
     },
     {
-        id: 2,
+        id: "2",
         name: "Admin",
         email: "admin@stayway.com",
         role: "admin",

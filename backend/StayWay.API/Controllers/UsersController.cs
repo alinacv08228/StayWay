@@ -99,14 +99,15 @@ public class UsersController : ControllerBase
         }
 
         var response =
-            _jwtTokenService
-                .CreateToken(user);
+            _jwtTokenService.CreateToken(
+                user
+            );
 
         return Ok(response);
     }
 
     [HttpPost("register")]
-    public ActionResult<UserDto>
+    public ActionResult<AuthResponseDto>
         Register(
             RegisterRequestDto request
         )
@@ -129,13 +130,14 @@ public class UsersController : ControllerBase
                 );
             }
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new
-                {
-                    id = user.Id
-                },
-                user
+            var response =
+                _jwtTokenService.CreateToken(
+                    user
+                );
+
+            return StatusCode(
+                StatusCodes.Status201Created,
+                response
             );
         }
         catch (

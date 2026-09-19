@@ -34,7 +34,7 @@ export function AxiosProvider({
                         error.response?.status;
 
                     if (status === 401) {
-                        router.push("/401");
+                        router.push("/login");
                     } else if (status === 403) {
                         router.push("/403");
                     } else if (status === 404) {

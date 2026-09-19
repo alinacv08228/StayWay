@@ -79,6 +79,7 @@ import {
     TransferBooking,
 } from "../../services/transferService";
 
+import { useRouter } from "next/navigation";
 
 type AdminBooking = Booking & {
     firstName?: string;
@@ -89,7 +90,12 @@ type AdminBooking = Booking & {
 
 
 export default function AdminPage() {
-    const { currentUser } = useUser();
+    const {
+        currentUser,
+        isLoading,
+    } = useUser();
+
+    const router = useRouter();
 
     const { currency, language } = useSettings();
 
@@ -1639,6 +1645,14 @@ export default function AdminPage() {
     // =========================================
 
     useEffect(() => {
+        if (
+            isLoading ||
+            !currentUser ||
+            currentUser.role !== "admin"
+        ) {
+            return;
+        }
+
         const loadStayBookingsFromBackend = async () => {
             try {
                 const loadedBookings =
@@ -1886,7 +1900,10 @@ export default function AdminPage() {
                 handleVisibilityChange
             );
         };
-    }, []);
+    }, [
+        currentUser,
+        isLoading,
+    ]);
 
     // =========================================
     // RESET FORM
@@ -2574,78 +2591,35 @@ export default function AdminPage() {
         });
     })();
 
+    useEffect(() => {
+        if (isLoading) {
+            return;
+        }
+
+        if (!currentUser) {
+            router.replace("/login");
+            return;
+        }
+
+        if (currentUser.role !== "admin") {
+            router.replace("/403");
+        }
+    }, [
+        currentUser,
+        isLoading,
+        router,
+    ]);
+
     // =========================================
     // ACCESS CONTROL
     // =========================================
 
-    if (!currentUser) {
-        return (
-            <main>
-                <section className="section">
-                    <div className="container">
-                        <div className="error-page-card">
-                            <p className="admin-label">
-                                ERROR 401
-                            </p>
-
-                            <h1>
-                                Unauthorized
-                            </h1>
-
-                            <p>
-                                You need to log in
-                                to access the
-                                admin dashboard.
-                            </p>
-
-                            <a
-                                href="/login"
-                                className="button"
-                            >
-                                Log in
-                            </a>
-                        </div>
-                    </div>
-                </section>
-            </main>
-        );
-    }
-
     if (
-        currentUser.role !==
-        "admin"
+        isLoading ||
+        !currentUser ||
+        currentUser.role !== "admin"
     ) {
-        return (
-            <main>
-                <section className="section">
-                    <div className="container">
-                        <div className="error-page-card">
-                            <p className="admin-label">
-                                ERROR 403
-                            </p>
-
-                            <h1>
-                                Access denied
-                            </h1>
-
-                            <p>
-                                You do not have
-                                permission to
-                                access the admin
-                                dashboard.
-                            </p>
-
-                            <a
-                                href="/"
-                                className="button"
-                            >
-                                Back to home
-                            </a>
-                        </div>
-                    </div>
-                </section>
-            </main>
-        );
+        return null;
     }
 
     // =========================================

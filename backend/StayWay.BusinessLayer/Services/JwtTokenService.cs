@@ -1,11 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using StayWay.Domain.DTOs;
 using StayWay.Domain.Interfaces;
 
-namespace StayWay.API.Services;
+namespace StayWay.BusinessLayer.Services;
 
 public class JwtTokenService
     : IJwtTokenService
@@ -44,9 +45,14 @@ public class JwtTokenService
             );
 
         var expirationMinutes =
-            _configuration.GetValue<int?>(
-                "Jwt:ExpirationMinutes"
-            ) ?? 120;
+            int.TryParse(
+                _configuration[
+                    "Jwt:ExpirationMinutes"
+                ],
+                out var configuredExpirationMinutes
+            )
+                ? configuredExpirationMinutes
+                : 120;
 
         var expiresAt =
             DateTime.UtcNow.AddMinutes(
@@ -87,8 +93,7 @@ public class JwtTokenService
         var credentials =
             new SigningCredentials(
                 securityKey,
-                SecurityAlgorithms
-                    .HmacSha256
+                SecurityAlgorithms.HmacSha256
             );
 
         var token =
@@ -98,8 +103,7 @@ public class JwtTokenService
                 claims: claims,
                 notBefore: DateTime.UtcNow,
                 expires: expiresAt,
-                signingCredentials:
-                    credentials
+                signingCredentials: credentials
             );
 
         return new AuthResponseDto

@@ -1,15 +1,165 @@
 import api from "../lib/api";
 import { User } from "../types/types";
 
-const SESSION_KEY = "stayway_current_user";
-const TOKEN_KEY = "stayway_auth_token";
-const TOKEN_EXPIRATION_KEY = "stayway_auth_expires_at";
+const SESSION_KEY =
+    "stayway_current_user";
+
+const TOKEN_KEY =
+    "stayway_auth_token";
+
+const TOKEN_EXPIRATION_KEY =
+    "stayway_auth_expires_at";
+
+const USER_ID_CLAIM =
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+
+const NAME_CLAIM =
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
+
+const EMAIL_CLAIM =
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+
+const ROLE_CLAIM =
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
 
 type AuthResponse = {
     token: string;
     expiresAt: string;
     user: User;
 };
+
+type JwtPayload = {
+    [key: string]: unknown;
+    exp?: number;
+};
+
+function decodeJwtPayload(
+    token: string
+): JwtPayload | null {
+    try {
+        const parts =
+            token.split(".");
+
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        const base64Url =
+            parts[1];
+
+        const base64 =
+            base64Url
+                .replace(/-/g, "+")
+                .replace(/_/g, "/")
+                .padEnd(
+                    Math.ceil(
+                        base64Url.length / 4
+                    ) * 4,
+                    "="
+                );
+
+        const binary =
+            atob(base64);
+
+        const bytes =
+            Uint8Array.from(
+                binary,
+                (character) =>
+                    character.charCodeAt(0)
+            );
+
+        const json =
+            new TextDecoder()
+                .decode(bytes);
+
+        return JSON.parse(
+            json
+        ) as JwtPayload;
+    } catch {
+        return null;
+    }
+}
+
+function getUserFromToken(
+    token: string
+): User | null {
+    const payload =
+        decodeJwtPayload(token);
+
+    if (!payload) {
+        return null;
+    }
+
+    const id =
+        payload[USER_ID_CLAIM];
+
+    const name =
+        payload[NAME_CLAIM];
+
+    const email =
+        payload[EMAIL_CLAIM];
+
+    const role =
+        payload[ROLE_CLAIM];
+
+    if (
+        typeof id !== "string" ||
+        typeof name !== "string" ||
+        typeof email !== "string" ||
+        (
+            role !== "user" &&
+            role !== "admin"
+        )
+    ) {
+        return null;
+    }
+
+    return {
+        id,
+        name,
+        email,
+        role,
+    };
+}
+
+function saveAuthentication(
+    response: AuthResponse
+): User | null {
+    if (
+        typeof window ===
+        "undefined"
+    ) {
+        return null;
+    }
+
+    const userFromToken =
+        getUserFromToken(
+            response.token
+        );
+
+    if (!userFromToken) {
+        return null;
+    }
+
+    localStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify(
+            userFromToken
+        )
+    );
+
+    localStorage.setItem(
+        TOKEN_KEY,
+        response.token
+    );
+
+    localStorage.setItem(
+        TOKEN_EXPIRATION_KEY,
+        response.expiresAt
+    );
+
+    return userFromToken;
+}
 
 export async function login(
     email: string,
@@ -24,36 +174,14 @@ export async function login(
                         email
                             .trim()
                             .toLowerCase(),
+
                     password,
                 }
             );
 
-        const {
-            token,
-            expiresAt,
-            user,
-        } = response.data;
-
-        if (
-            typeof window !== "undefined"
-        ) {
-            localStorage.setItem(
-                SESSION_KEY,
-                JSON.stringify(user)
-            );
-
-            localStorage.setItem(
-                TOKEN_KEY,
-                token
-            );
-
-            localStorage.setItem(
-                TOKEN_EXPIRATION_KEY,
-                expiresAt
-            );
-        }
-
-        return user;
+        return saveAuthentication(
+            response.data
+        );
     } catch {
         return null;
     }
@@ -67,7 +195,7 @@ export async function register(
 ): Promise<User | null> {
     try {
         const response =
-            await api.post<User>(
+            await api.post<AuthResponse>(
                 "/api/Users/register",
                 {
                     firstName:
@@ -85,7 +213,7 @@ export async function register(
                 }
             );
 
-        return response.data;
+        return response.data.user;
     } catch {
         return null;
     }
@@ -93,7 +221,8 @@ export async function register(
 
 export function logout(): void {
     if (
-        typeof window === "undefined"
+        typeof window ===
+        "undefined"
     ) {
         return;
     }
@@ -114,7 +243,8 @@ export function logout(): void {
 export function getAuthToken():
     string | null {
     if (
-        typeof window === "undefined"
+        typeof window ===
+        "undefined"
     ) {
         return null;
     }
@@ -124,25 +254,30 @@ export function getAuthToken():
             TOKEN_KEY
         );
 
-    const expiresAt =
-        localStorage.getItem(
-            TOKEN_EXPIRATION_KEY
+    if (!token) {
+        return null;
+    }
+
+    const payload =
+        decodeJwtPayload(
+            token
         );
 
-    if (!token || !expiresAt) {
+    if (
+        !payload ||
+        typeof payload.exp !==
+        "number"
+    ) {
+        logout();
         return null;
     }
 
     const expirationTime =
-        new Date(
-            expiresAt
-        ).getTime();
+        payload.exp * 1000;
 
     if (
-        Number.isNaN(
-            expirationTime
-        ) ||
-        expirationTime <= Date.now()
+        expirationTime <=
+        Date.now()
     ) {
         logout();
         return null;
@@ -154,7 +289,8 @@ export function getAuthToken():
 export function getCurrentUser():
     User | null {
     if (
-        typeof window === "undefined"
+        typeof window ===
+        "undefined"
     ) {
         return null;
     }
@@ -167,24 +303,22 @@ export function getCurrentUser():
         return null;
     }
 
-    const savedUser =
-        localStorage.getItem(
-            SESSION_KEY
+    const user =
+        getUserFromToken(
+            token
         );
 
-    if (!savedUser) {
+    if (!user) {
         logout();
         return null;
     }
 
-    try {
-        return JSON.parse(
-            savedUser
-        ) as User;
-    } catch {
-        logout();
-        return null;
-    }
+    localStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify(user)
+    );
+
+    return user;
 }
 
 export function isAuthenticated():
@@ -201,5 +335,7 @@ export function hasRole(
     const user =
         getCurrentUser();
 
-    return user?.role === role;
+    return (
+        user?.role === role
+    );
 }
