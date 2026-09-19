@@ -5589,6 +5589,7 @@ export default function AdminPage() {
                                                     }
                                                 >
                                                     <option value="all">All statuses</option>
+                                                    <option value="pending">Pending</option>
                                                     <option value="available">Available</option>
                                                     <option value="busy">Busy</option>
                                                     <option value="inactive">Inactive</option>
@@ -6612,6 +6613,7 @@ export default function AdminPage() {
                                             style={{ width: "100%", boxSizing: "border-box" }}
                                         >
                                             <option value="All">All statuses</option>
+                                            <option value="pending">Pending</option>
                                             <option value="confirmed">Confirmed</option>
                                             <option value="cancelled">Cancelled</option>
                                         </select>
