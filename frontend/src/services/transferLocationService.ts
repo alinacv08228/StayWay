@@ -1,19 +1,4 @@
-import {
-    getDestinationsFromApi,
-} from "./destinationService";
-
-import {
-    getPropertiesFromApi,
-} from "./propertyService";
-
-import {
-    getAirportsByCity,
-} from "../data/airports";
-
-import type {
-    Destination,
-    Property,
-} from "../types/types";
+import api from "../lib/api";
 
 export type TransferLocation = {
     id: string;
@@ -25,83 +10,27 @@ export type TransferLocation = {
     searchTerms: string[];
 };
 
-function buildTransferLocations(
-    destinations: Destination[],
-    properties: Property[]
-): TransferLocation[] {
-    const locations: TransferLocation[] = [];
-
-    destinations.forEach((destination) => {
-        const cityName = destination.name;
-
-        /*
-         * Airports are static reference data.
-         */
-        const cityAirports =
-            getAirportsByCity(cityName);
-
-        cityAirports.forEach((airport) => {
-            locations.push({
-                id: airport.id,
-                cityId: destination.id,
-                cityName,
-                type: "airport",
-                name: airport.name,
-                code: airport.code,
-                searchTerms:
-                airport.searchTerms,
-            });
-        });
-
-        /*
-         * Hotels come from backend properties.
-         */
-        const cityHotels =
-            properties.filter(
-                (property) =>
-                    property.destinationId ===
-                    destination.id
-            );
-
-        cityHotels.forEach((hotel) => {
-            locations.push({
-                id: `hotel-${hotel.id}`,
-                cityId: destination.id,
-                cityName,
-                type: "hotel",
-                name: hotel.name,
-                searchTerms: [
-                    hotel.name,
-                    hotel.address,
-                    cityName,
-                    "hotel",
-                ],
-            });
-        });
-    });
-
-    return locations;
-}
-
-/*
- * Transfer locations are derived data.
- * No separate TransferLocations endpoint is needed:
- * backend destinations + backend properties + static airports.
- */
 export async function getTransferLocationsFromApi():
     Promise<TransferLocation[]> {
-    const [
-        destinations,
-        properties,
-    ] = await Promise.all([
-        getDestinationsFromApi(),
-        getPropertiesFromApi(),
-    ]);
+    const response =
+        await api.get<TransferLocation[]>(
+            "/api/TransferLocations"
+        );
 
-    return buildTransferLocations(
-        destinations,
-        properties
-    );
+    return response.data;
+}
+
+export async function getTransferLocationsByCityFromApi(
+    city: string
+): Promise<TransferLocation[]> {
+    const response =
+        await api.get<TransferLocation[]>(
+            `/api/TransferLocations/city/${encodeURIComponent(
+                city
+            )}`
+        );
+
+    return response.data;
 }
 
 export function filterTransferLocationsByCity(

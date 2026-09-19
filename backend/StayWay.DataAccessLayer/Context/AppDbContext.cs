@@ -29,6 +29,9 @@ public class AppDbContext : DbContext
     public DbSet<ReviewEntity> Reviews =>
         Set<ReviewEntity>();
 
+    public DbSet<AirportEntity> Airports =>
+        Set<AirportEntity>();
+
     public DbSet<TransferVehicleEntity> TransferVehicles =>
         Set<TransferVehicleEntity>();
 
@@ -170,6 +173,21 @@ public class AppDbContext : DbContext
             )
             .OnDelete(DeleteBehavior.SetNull);
 
+        /*
+         * =========================================
+         * AIRPORTS
+         * =========================================
+         */
+
+        modelBuilder.Entity<AirportEntity>()
+            .HasKey(airport => airport.Id);
+
+        modelBuilder.Entity<AirportEntity>()
+            .Property(airport => airport.Id)
+            .ValueGeneratedNever();
+
+        modelBuilder.Entity<AirportEntity>()
+            .HasIndex(airport => airport.City);
 
         /*
          * =========================================

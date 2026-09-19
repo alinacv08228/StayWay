@@ -18,9 +18,18 @@ public static class DatabaseSeeder
         string dataDirectory
     )
     {
-        /*
-         * Seed only when the application database is empty.
-         */
+        if (!Directory.Exists(dataDirectory))
+        {
+            throw new DirectoryNotFoundException(
+                $"Seed data directory was not found: {dataDirectory}"
+            );
+        }
+
+/*
+ * Check whether the main StayWay data already exists.
+ * Airports are reference data and are seeded separately,
+ * so they can also be added to an existing database.
+ */
         var databaseHasData =
             await context.Users.AnyAsync() ||
             await context.Destinations.AnyAsync() ||
@@ -33,16 +42,26 @@ public static class DatabaseSeeder
             await context.TransferBookings.AnyAsync() ||
             await context.SupportMessages.AnyAsync();
 
+        var airports =
+            await LoadAsync<AirportEntity>(
+                Path.Combine(
+                    dataDirectory,
+                    "airports.json"
+                )
+            );
+
+        if (!await context.Airports.AnyAsync())
+        {
+            await context.Airports.AddRangeAsync(
+                airports
+            );
+
+            await context.SaveChangesAsync();
+        }
+
         if (databaseHasData)
         {
             return;
-        }
-
-        if (!Directory.Exists(dataDirectory))
-        {
-            throw new DirectoryNotFoundException(
-                $"Seed data directory was not found: {dataDirectory}"
-            );
         }
 
         /*

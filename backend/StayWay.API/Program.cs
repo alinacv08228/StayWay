@@ -74,6 +74,11 @@ builder.Services.AddScoped<
 >();
 
 builder.Services.AddScoped<
+    ITransferLocationService,
+    TransferLocationService
+>();
+
+builder.Services.AddScoped<
     ITransferBookingService,
     TransferBookingService
 >();
@@ -89,6 +94,7 @@ builder.Services.AddScoped<
 >();
 
 builder.Services.AddScoped<EmailService>();
+
 
 // JWT
 var jwtKey =
