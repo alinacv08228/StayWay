@@ -7536,13 +7536,13 @@ html[data-theme="dark"] .error-reset-button:hover {
 }
 
 /* =========================================
-   ERROR PAGE - TEXT ENTRANCE ANIMATION
+   ERROR PAGE - SMOOTH ENTRANCE
    ========================================= */
 
-@keyframes errorTextIn {
+@keyframes errorCardIn {
     from {
         opacity: 0;
-        transform: translateY(18px);
+        transform: translateY(12px);
     }
 
     to {
@@ -7551,24 +7551,16 @@ html[data-theme="dark"] .error-reset-button:hover {
     }
 }
 
-.error-card .error-icon {
-    animation: errorTextIn 0.45s ease-out both;
+.error-card {
+    animation: errorCardIn 0.8s ease both;
 }
 
-.error-card .error-code {
-    animation: errorTextIn 0.45s ease-out 0.08s both;
-}
-
-.error-card h1 {
-    animation: errorTextIn 0.5s ease-out 0.14s both;
-}
-
-.error-card .error-message {
-    animation: errorTextIn 0.5s ease-out 0.20s both;
-}
-
+.error-card .error-icon,
+.error-card .error-code,
+.error-card h1,
+.error-card .error-message,
 .error-card .error-actions {
-    animation: errorTextIn 0.5s ease-out 0.27s both;
+    animation: none !important;
 }
 
 /* =========================================

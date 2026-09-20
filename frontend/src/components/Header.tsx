@@ -298,7 +298,7 @@ export default function Header() {
     const { language, theme, setTheme } =
         useSettings();
 
-    const { currentUser, logout } =
+    const { currentUser, logout, isLoading } =
         useUser();
 
     const router = useRouter();
@@ -334,6 +334,16 @@ export default function Header() {
 
         return pathname.startsWith(path);
     };
+
+    /*
+     * When the auth state is already known and there is no logged-in user,
+     * go directly to the 401 page instead of briefly opening /bookings first.
+     * This removes the visible blank/flash caused by the ProtectedRoute redirect.
+     */
+    const bookingsHref =
+        !isLoading && !currentUser
+            ? "/401?from=%2Fbookings"
+            : "/bookings";
 
     return (
         <header className="header">
@@ -401,7 +411,7 @@ export default function Header() {
                     </Link>
 
                     <Link
-                        href="/bookings"
+                        href={bookingsHref}
                         className={`nav-link ${
                             isActive("/bookings")
                                 ? "active"
