@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -599,14 +600,14 @@ export default function Home() {
                                             )
                                         }
                                         aria-label={`View travel image ${
-                                            index + 1
-                                        }`}
+    index + 1
+}`}
                                     >
                                         <img
                                             src={image}
                                             alt={`StayWay travel ${
-                                                index + 1
-                                            }`}
+    index + 1
+}`}
                                         />
                                     </button>
                                 );
@@ -647,8 +648,8 @@ export default function Home() {
                                             )
                                         }
                                         aria-label={`Go to image ${
-                                            index + 1
-                                        }`}
+    index + 1
+}`}
                                     />
                                 )
                             )}
@@ -732,8 +733,8 @@ export default function Home() {
                                     <Link
                                         href="/destinations"
                                         className={`home-destination-card destination-card-${
-                                            index + 1
-                                        }`}
+    index + 1
+}`}
                                         key={
                                             destination.country
                                         }
@@ -1168,11 +1169,11 @@ export default function Home() {
 
             <style jsx>{`
 
-/* =========================================================
-   FEATURED STAYS — HOME
-========================================================= */
+    /* =========================================================
+       FEATURED STAYS — HOME
+    ========================================================= */
 
-.home-property-grid {
+    .home-property-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 26px;
@@ -1189,12 +1190,12 @@ export default function Home() {
     color: inherit;
     text-decoration: none;
     box-shadow:
-        0 10px 28px rgba(60, 43, 95, 0.07),
+    0 10px 28px rgba(60, 43, 95, 0.07),
         0 2px 8px rgba(60, 43, 95, 0.035);
     transition:
         transform 0.22s ease,
-        box-shadow 0.22s ease,
-        border-color 0.22s ease;
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
 }
 
 .home-property-card::after {
@@ -1210,7 +1211,7 @@ export default function Home() {
         rgba(112, 85, 232, 0),
         rgba(112, 85, 232, 0.72),
         rgba(112, 85, 232, 0)
-    );
+);
     opacity: 0;
     transform: scaleX(0.7);
     transition:
@@ -1222,7 +1223,7 @@ export default function Home() {
     transform: translateY(-6px);
     border-color: rgba(111, 84, 226, 0.24);
     box-shadow:
-        0 22px 46px rgba(60, 43, 95, 0.13),
+    0 22px 46px rgba(60, 43, 95, 0.13),
         0 6px 18px rgba(60, 43, 95, 0.055);
 }
 
@@ -1257,9 +1258,9 @@ export default function Home() {
     background:
         linear-gradient(
             180deg,
-            rgba(24, 18, 40, 0.00) 38%,
-            rgba(24, 18, 40, 0.34) 100%
-        );
+        rgba(24, 18, 40, 0.00) 38%,
+        rgba(24, 18, 40, 0.34) 100%
+);
     pointer-events: none;
 }
 
@@ -1413,38 +1414,38 @@ export default function Home() {
 }
 
 @media (max-width: 1150px) {
-    .home-property-grid {
+.home-property-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 760px) {
-    .home-property-grid {
+.home-property-grid {
         grid-template-columns: 1fr;
     }
 
-    .home-property-image {
+.home-property-image {
         height: 230px;
     }
 
-    .home-property-content {
+.home-property-content {
         padding: 15px 18px 17px;
     }
 }
 
 @media (max-width: 460px) {
-    .home-property-main {
+.home-property-main {
         grid-template-columns: 1fr;
         align-items: start;
     }
 
-    .home-property-price {
+.home-property-price {
         margin-top: 14px;
         align-items: flex-start;
         text-align: left;
     }
 
-    .home-property-price > div {
+.home-property-price > div {
         justify-content: flex-start;
     }
 }
@@ -1452,16 +1453,11 @@ export default function Home() {
 .home-cta {
     position: relative;
     overflow: visible;
-    background:
-        linear-gradient(
-            180deg,
-            #eee8ff 0%,
-            #f4efff 100%
-        );
+    background: #f7f4ff;
     border-top: none;
     border-radius: 0;
     box-shadow: none;
-    padding: 0;
+    padding: 0 0 72px;
     margin-bottom: 0;
 }
 
@@ -1529,7 +1525,7 @@ export default function Home() {
 
 @media (max-width: 600px) {
 .home-cta {
-        padding-bottom: 56px;
+        padding-bottom: 48px;
     }
 
 .home-cta .home-cta-inner {
@@ -1562,17 +1558,12 @@ export default function Home() {
 
 
 /* LIGHT THEME SECTION SEPARATION */
-:global(html:not([data-theme="dark"])) .home-stays {
+:global(html:not([data-theme="dark"])) .home-stays,
+:global(html:not([data-theme="dark"])) .home-cta {
     background: #f7f4ff;
 }
 
 :global(html:not([data-theme="dark"])) .home-cta {
-    background:
-        linear-gradient(
-            180deg,
-            #eee8ff 0%,
-            #f4efff 100%
-        );
     border-top: none;
 }
 
@@ -1592,10 +1583,10 @@ export default function Home() {
 :global(html[data-theme="dark"]) .home-carousel {
     background: linear-gradient(
         180deg,
-        #182342 0%,
-        #202a50 50%,
-        #182342 100%
-    );
+#182342 0%,
+#202a50 50%,
+#182342 100%
+);
     border-top: 1px solid rgba(164, 143, 255, 0.10);
     border-bottom: 1px solid rgba(164, 143, 255, 0.12);
 }
@@ -1653,14 +1644,14 @@ export default function Home() {
     border-color: rgba(152, 130, 255, 0.18);
     background: #1b2940;
     box-shadow:
-        0 12px 34px rgba(0, 0, 0, 0.22),
+    0 12px 34px rgba(0, 0, 0, 0.22),
         0 2px 8px rgba(0, 0, 0, 0.14);
 }
 
 :global(html[data-theme="dark"]) .home-property-card:hover {
     border-color: rgba(171, 151, 255, 0.36);
     box-shadow:
-        0 22px 46px rgba(0, 0, 0, 0.30),
+    0 22px 46px rgba(0, 0, 0, 0.30),
         0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
@@ -1709,11 +1700,11 @@ export default function Home() {
 }
 
 :global(html[data-theme="dark"]) .home-cta {
-    background: #0d1729;
+    background: #101a2d;
 }
 
 :global(html[data-theme="dark"]) .home-cta::after {
-    background: #0d1729;
+    background: #101a2d;
 }
 
 `}</style>

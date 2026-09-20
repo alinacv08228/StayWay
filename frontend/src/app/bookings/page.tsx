@@ -18,6 +18,9 @@ import {
     Phone,
     Clock3,
     Mail,
+    ArrowRight,
+    Check,
+    MapPin,
 } from "lucide-react";
 
 import {
@@ -150,6 +153,13 @@ const bookingPageExtraTranslations: Record<
         noTransfersHint: "Try changing the filters or book a new transfer.",
         findTransfers: "Find transfers",
         basicRoom: "Basic",
+        nextTrip: "Your next trip",
+        tripProgress: "Trip progress",
+        bookingCreated: "Booking created",
+        awaitingConfirmation: "Awaiting confirmation",
+        completeJourney: "Complete your journey",
+        needRide: "Need a ride to your hotel?",
+        bookTransfer: "Book a transfer",
     },
 
     "Română": {
@@ -180,6 +190,13 @@ const bookingPageExtraTranslations: Record<
         noTransfersHint: "Schimbă filtrele sau rezervă un transfer nou.",
         findTransfers: "Caută transferuri",
         basicRoom: "Basică",
+        nextTrip: "Următoarea călătorie",
+        tripProgress: "Progresul călătoriei",
+        bookingCreated: "Rezervare creată",
+        awaitingConfirmation: "În așteptarea confirmării",
+        completeJourney: "Completează călătoria",
+        needRide: "Ai nevoie de transfer până la hotel?",
+        bookTransfer: "Rezervă un transfer",
     },
 
     "Русский": {
@@ -210,6 +227,13 @@ const bookingPageExtraTranslations: Record<
         noTransfersHint: "Измените фильтры или забронируйте новый трансфер.",
         findTransfers: "Найти трансфер",
         basicRoom: "Базовый",
+        nextTrip: "Ваша следующая поездка",
+        tripProgress: "Статус поездки",
+        bookingCreated: "Бронирование создано",
+        awaitingConfirmation: "Ожидает подтверждения",
+        completeJourney: "Дополните поездку",
+        needRide: "Нужен трансфер до отеля?",
+        bookTransfer: "Заказать трансфер",
     },
 
     "Українська": {
@@ -1293,6 +1317,58 @@ const bookingPageExtraTranslations: Record<
     },
 };
 
+const bookingDetailsTitles: Record<string, string> = {
+    English: "Booking details",
+    "Română": "Detaliile rezervării",
+    "Русский": "Детали бронирования",
+    "Українська": "Деталі бронювання",
+    "Français": "Détails de la réservation",
+    "Español": "Detalles de la reserva",
+    "Deutsch": "Buchungsdetails",
+    "Italiano": "Dettagli della prenotazione",
+    "Português": "Detalhes da reserva",
+    "Nederlands": "Boekingsgegevens",
+    "Norsk": "Bestillingsdetaljer",
+    "Svenska": "Bokningsdetaljer",
+    "Dansk": "Reservationsoplysninger",
+    "Suomi": "Varauksen tiedot",
+    "Polski": "Szczegóły rezerwacji",
+    "Čeština": "Podrobnosti rezervace",
+    "Slovenčina": "Podrobnosti rezervácie",
+    "Magyar": "Foglalás részletei",
+    "Български": "Детайли за резервацията",
+    "Hrvatski": "Detalji rezervacije",
+    "Slovenščina": "Podrobnosti rezervacije",
+    "Srpski": "Detalji rezervacije",
+    "Bosanski": "Detalji rezervacije",
+    "Ελληνικά": "Λεπτομέρειες κράτησης",
+    "Türkçe": "Rezervasyon detayları",
+    "العربية": "تفاصيل الحجز",
+    "עברית": "פרטי ההזמנה",
+    "हिन्दी": "बुकिंग विवरण",
+    "ไทย": "รายละเอียดการจอง",
+    "Bahasa Indonesia": "Detail pemesanan",
+    "Tiếng Việt": "Chi tiết đặt phòng",
+    "한국어": "예약 세부정보",
+    "日本語": "予約の詳細",
+    "中文": "预订详情",
+    "繁體中文": "預訂詳情",
+    "Català": "Detalls de la reserva",
+    "Eesti": "Broneeringu üksikasjad",
+    "Latviešu": "Rezervācijas informācija",
+    "Lietuvių": "Rezervacijos informacija",
+};
+
+function getBookingDetailsTitle(language: string): string {
+    const languageName =
+        language.split("|")[0];
+
+    return (
+        bookingDetailsTitles[languageName] ??
+        bookingDetailsTitles.English
+    );
+}
+
 function getBookingPageText(language: string, key: string): string {
     const languageName = language.split("|")[0];
 
@@ -1384,6 +1460,49 @@ function formatTransferDate(date: string) {
     }
 
     return formatDate(date);
+}
+
+function getPublicImagePath(image?: string): string {
+    if (!image) {
+        return "";
+    }
+
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://") ||
+        image.startsWith("data:")
+    ) {
+        return image;
+    }
+
+    const normalizedImage = image
+        .replace(/^\/?public\//, "")
+        .replace(/^\//, "");
+
+    return `/${normalizedImage}`;
+}
+
+function getBookingNightCount(
+    checkIn: string,
+    checkOut: string
+): number {
+    const start = new Date(`${checkIn}T00:00:00`);
+    const end = new Date(`${checkOut}T00:00:00`);
+
+    if (
+        Number.isNaN(start.getTime()) ||
+        Number.isNaN(end.getTime())
+    ) {
+        return 1;
+    }
+
+    return Math.max(
+        1,
+        Math.round(
+            (end.getTime() - start.getTime()) /
+            86_400_000
+        )
+    );
 }
 
 function BookingsContent() {
@@ -1552,35 +1671,43 @@ function BookingsContent() {
         ).toLocaleString()}`;
     };
 
+    const capitalizeFirstLetter = (text: string) => {
+        if (!text) {
+            return text;
+        }
+
+        return (
+            text.charAt(0).toLocaleUpperCase() +
+            text.slice(1)
+        );
+    };
+
     const getStatusText = (status: string) => {
+        let statusText = status;
+
         if (status === "confirmed") {
-            return (
-                getTranslation(
+            statusText =
+                getBookingPageText(
                     language,
                     "confirmed"
-                ) || "confirmed"
-            );
-        }
-
-        if (status === "cancelled") {
-            return (
-                getTranslation(
+                ) || "Confirmed";
+        } else if (status === "cancelled") {
+            statusText =
+                getBookingPageText(
                     language,
                     "cancelled"
-                ) || "cancelled"
-            );
-        }
-
-        if (status === "pending") {
-            return (
+                ) || "Cancelled";
+        } else if (status === "pending") {
+            statusText =
                 getBookingPageText(
                     language,
                     "pending"
-                ) || "pending"
-            );
+                ) || "Pending";
         }
 
-        return status;
+        return capitalizeFirstLetter(
+            statusText
+        );
     };
 
     const getGuestText = (booking: Booking) => {
@@ -2895,11 +3022,11 @@ function BookingsContent() {
                                         }}
                                     >
                                         <option value="newest">
-                                            {getBookingPageText(language, "checkIn")}: newest
+                                            {getBookingPageText(language, "newest")}
                                         </option>
 
                                         <option value="oldest">
-                                            {getBookingPageText(language, "checkIn")}: oldest
+                                            {getBookingPageText(language, "oldest")}
                                         </option>
 
                                         <option value="totalHigh">
@@ -3149,102 +3276,180 @@ function BookingsContent() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="bookings-list stayway-load-in stayway-load-6">
+                                <div className="bookings-stay-layout stayway-load-in stayway-load-6">
+                                    <div className="bookings-list">
 
-                                    {filteredBookings.map(
-                                        (
-                                            booking
-                                        ) => {
+                                        {filteredBookings.map(
+                                            (
+                                                booking
+                                            ) => {
 
-                                            /*
-                                             * IMPORTANT:
-                                             * Dynamic property lookup.
-                                             */
-                                            const property =
-                                                allProperties.find(
-                                                    (
-                                                        item
-                                                    ) =>
-                                                        item.id ===
-                                                        booking.propertyId
+                                                /*
+                                                 * IMPORTANT:
+                                                 * Dynamic property lookup.
+                                                 */
+                                                const property =
+                                                    allProperties.find(
+                                                        (
+                                                            item
+                                                        ) =>
+                                                            item.id ===
+                                                            booking.propertyId
+                                                    );
+
+                                                /*
+                                                 * IMPORTANT:
+                                                 * Dynamic room lookup.
+                                                 */
+                                                const room =
+                                                    allRooms.find(
+                                                        (
+                                                            item
+                                                        ) =>
+                                                            item.id ===
+                                                            booking.roomId &&
+                                                            item.propertyId ===
+                                                            booking.propertyId
+                                                    );
+
+                                                const isConfirmed =
+                                                    booking.status ===
+                                                    "confirmed";
+
+                                                const bookingSidebarImage =
+                                                    getPublicImagePath(
+                                                        room?.image ??
+                                                        property?.image
+                                                    );
+
+                                                const bookingNights =
+                                                    getBookingNightCount(
+                                                        booking.checkIn,
+                                                        booking.checkOut
+                                                    );
+
+                                                const bookingGuests =
+                                                    Math.max(
+                                                        1,
+                                                        booking.guests ||
+                                                        (booking.adults ?? 0) +
+                                                        (booking.children ?? 0) +
+                                                        (booking.infants ?? 0)
+                                                    );
+
+                                                const bookingCheckIn =
+                                                    new Date(
+                                                        `${booking.checkIn}T00:00:00`
+                                                    );
+
+                                                const bookingCheckOut =
+                                                    new Date(
+                                                        `${booking.checkOut}T00:00:00`
+                                                    );
+
+                                                const todayForBookingProgress =
+                                                    new Date();
+
+                                                todayForBookingProgress.setHours(
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0
                                                 );
 
-                                            /*
-                                             * IMPORTANT:
-                                             * Dynamic room lookup.
-                                             */
-                                            const room =
-                                                allRooms.find(
-                                                    (
-                                                        item
-                                                    ) =>
-                                                        item.id ===
-                                                        booking.roomId &&
-                                                        item.propertyId ===
-                                                        booking.propertyId
-                                                );
+                                                const bookingHasCheckedIn =
+                                                    booking.status === "confirmed" &&
+                                                    !Number.isNaN(
+                                                        bookingCheckIn.getTime()
+                                                    ) &&
+                                                    todayForBookingProgress >=
+                                                    bookingCheckIn;
 
-                                            const isConfirmed =
-                                                booking.status ===
-                                                "confirmed";
+                                                const bookingHasCheckedOut =
+                                                    booking.status === "confirmed" &&
+                                                    !Number.isNaN(
+                                                        bookingCheckOut.getTime()
+                                                    ) &&
+                                                    todayForBookingProgress >=
+                                                    bookingCheckOut;
 
-                                            return (
-                                                <div
-                                                    className="booking-card"
-                                                    key={
-                                                        booking.id
-                                                    }
-                                                    style={{}}
-                                                >
-                                                    <div className="booking-content">
+                                                return (
+                                                    <div
+                                                        className="booking-pair"
+                                                        key={booking.id}
+                                                    >
+                                                        <div
+                                                            className="booking-card"
+                                                            style={{}}
+                                                        >
+                                                            <div className="booking-content">
 
-                                                        <h2>
-                                                            {
-                                                                property?.name
-                                                            }
-                                                        </h2>
+                                                                <div className="booking-card-title-row">
+                                                                    <div className="booking-card-heading-copy">
+                                                                        <h2>
+                                                                            {getBookingDetailsTitle(
+                                                                                language
+                                                                            )}
+                                                                        </h2>
+                                                                        <p>
+                                                                            SW-{String(
+                                                                            booking.id
+                                                                        ).slice(-5)}
+                                                                        </p>
+                                                                    </div>
 
-                                                        <div className="booking-info">
+                                                                    {property?.image && (
+                                                                        <img
+                                                                            className="booking-card-property-image"
+                                                                            src={getPublicImagePath(
+                                                                                property.image
+                                                                            )}
+                                                                            alt={property.name}
+                                                                        />
+                                                                    )}
+                                                                </div>
 
-                                                            {/* PROPERTY */}
+                                                                <div className="booking-info">
 
-                                                            <div className="booking-info-row">
-                                                                <Building2 className="booking-info-icon" />
+                                                                    {/* PROPERTY */}
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "property"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                    <div className="booking-info-row">
+                                                                        <Building2 className="booking-info-icon" />
 
-                                                                    <span>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "property"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
+
+                                                                            <span>
                                                                 {
                                                                     property?.name
                                                                 }
                                                             </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* ROOM */}
+                                                                    {/* ROOM */}
 
-                                                            <div className="booking-info-row">
-                                                                <DoorOpen className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <DoorOpen className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "room"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "room"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                 {
                                                                     getLocalizedBookingRoomName(
                                                                         room?.name,
@@ -3252,25 +3457,25 @@ function BookingsContent() {
                                                                     )
                                                                 }
                                                             </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* GUEST */}
+                                                                    {/* GUEST */}
 
-                                                            <div className="booking-info-row">
-                                                                <User className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <User className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "user"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "user"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                         {
                                                                             booking.firstName ||
                                                                             booking.lastName
@@ -3281,217 +3486,221 @@ function BookingsContent() {
                                                                                 )
                                                                         }
                                                                     </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* EMAIL */}
+                                                                    {/* EMAIL */}
 
-                                                            <div className="booking-info-row">
-                                                                <Mail className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <Mail className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {getBookingPageText(language, "email")}
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {getBookingPageText(language, "email")}
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                         {
                                                                             booking.email ??
                                                                             "—"
                                                                         }
                                                                     </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* PHONE */}
+                                                                    {/* PHONE */}
 
-                                                            <div className="booking-info-row">
-                                                                <Phone className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <Phone className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {getBookingPageText(language, "phone")}
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {getBookingPageText(language, "phone")}
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                         {booking.phone ?? "—"}
                                                                     </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* CHECK-IN */}
+                                                                    {/* CHECK-IN */}
 
-                                                            <div className="booking-info-row">
-                                                                <CalendarDays className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <CalendarDays className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "checkIn"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "checkIn"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                 {
                                                                     formatDate(
                                                                         booking.checkIn
                                                                     )
                                                                 }
                                                             </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* CHECK-OUT */}
+                                                                    {/* CHECK-OUT */}
 
-                                                            <div className="booking-info-row">
-                                                                <CalendarDays className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <CalendarDays className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "checkOut"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "checkOut"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                 {
                                                                     formatDate(
                                                                         booking.checkOut
                                                                     )
                                                                 }
                                                             </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* GUESTS */}
+                                                                    {/* GUESTS */}
 
-                                                            <div className="booking-info-row">
-                                                                <Users className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <Users className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "guests"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "guests"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                 {
                                                                     getGuestText(
                                                                         booking
                                                                     )
                                                                 }
                                                             </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* TOTAL */}
+                                                                    {/* TOTAL */}
 
-                                                            <div className="booking-info-row">
-                                                                <Tag className="booking-info-icon" />
+                                                                    <div className="booking-info-row">
+                                                                        <Tag className="booking-info-icon" />
 
-                                                                <div>
-                                                                    <strong>
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "total"
-                                                                            )
-                                                                        }
-                                                                    </strong>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "total"
+                                                                                    )
+                                                                                }
+                                                                            </strong>
 
-                                                                    <span>
+                                                                            <span>
                                                                 {
                                                                     formatPrice(
                                                                         booking.totalPrice
                                                                     )
                                                                 }
                                                             </span>
-                                                                </div>
-                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                            {/* STATUS */}
+                                                                    {/* STATUS */}
 
-                                                            <div
-                                                                className="booking-info-row"
-                                                                style={
-                                                                    booking.status ===
-                                                                    "pending"
-                                                                        ? {
-                                                                            padding:
-                                                                                "14px 16px",
-                                                                            marginTop:
-                                                                                "4px",
-                                                                            border:
-                                                                                "1px solid #f1dfb4",
-                                                                            borderRadius:
-                                                                                "14px",
-                                                                            background:
-                                                                                "#fffaf0",
-                                                                        }
-                                                                        : undefined
-                                                                }
-                                                            >
-                                                                {booking.status ===
-                                                                "pending" ? (
-                                                                    <Clock3
-                                                                        className="booking-info-icon"
-                                                                        style={{
-                                                                            color:
-                                                                                "#d99518",
-                                                                        }}
-                                                                    />
-                                                                ) : (
-                                                                    <Circle className="booking-info-icon status-icon" />
-                                                                )}
-
-                                                                <div
-                                                                    style={{
-                                                                        flex: 1,
-                                                                    }}
-                                                                >
-                                                                    <strong>
-                                                                        {booking.status ===
-                                                                        "pending"
-                                                                            ? getBookingPageText(language, "bookingPending")
-                                                                            : getTranslation(
-                                                                                language,
-                                                                                "status"
-                                                                            )}
-                                                                    </strong>
-
-                                                                    <span
-                                                                        className={
-                                                                            booking.status ===
-                                                                            "pending"
-                                                                                ? undefined
-                                                                                : isConfirmed
-                                                                                    ? "booking-status status-confirmed"
-                                                                                    : "booking-status status-cancelled"
-                                                                        }
+                                                                    <div
+                                                                        className={`booking-info-row ${
+                                                                            booking.status === "pending"
+                                                                                ? "booking-pending-panel"
+                                                                                : ""
+                                                                        }`}
                                                                         style={
                                                                             booking.status ===
                                                                             "pending"
                                                                                 ? {
-                                                                                    display:
-                                                                                        "block",
+                                                                                    padding:
+                                                                                        "14px 16px",
                                                                                     marginTop:
-                                                                                        "3px",
-                                                                                    color:
-                                                                                        "#8a7650",
+                                                                                        "4px",
+                                                                                    border:
+                                                                                        "1px solid #f1dfb4",
+                                                                                    borderRadius:
+                                                                                        "14px",
+                                                                                    background:
+                                                                                        "#fffaf0",
                                                                                 }
                                                                                 : undefined
                                                                         }
                                                                     >
+                                                                        {booking.status ===
+                                                                        "pending" ? (
+                                                                            <Clock3
+                                                                                className="booking-info-icon"
+                                                                                style={{
+                                                                                    color:
+                                                                                        "#d99518",
+                                                                                }}
+                                                                            />
+                                                                        ) : (
+                                                                            <Circle className="booking-info-icon status-icon" />
+                                                                        )}
+
+                                                                        <div
+                                                                            style={{
+                                                                                flex: 1,
+                                                                            }}
+                                                                        >
+                                                                            <strong>
+                                                                                {booking.status ===
+                                                                                "pending"
+                                                                                    ? getBookingPageText(language, "bookingPending")
+                                                                                    : getTranslation(
+                                                                                        language,
+                                                                                        "status"
+                                                                                    )}
+                                                                            </strong>
+
+                                                                            <span
+                                                                                className={
+                                                                                    booking.status ===
+                                                                                    "pending"
+                                                                                        ? "booking-pending-message"
+                                                                                        : isConfirmed
+                                                                                            ? "booking-status status-confirmed"
+                                                                                            : "booking-status status-cancelled"
+                                                                                }
+                                                                                style={
+                                                                                    booking.status ===
+                                                                                    "pending"
+                                                                                        ? {
+                                                                                            display:
+                                                                                                "block",
+                                                                                            marginTop:
+                                                                                                "3px",
+                                                                                            color:
+                                                                                                "#8a7650",
+                                                                                        }
+                                                                                        : undefined
+                                                                                }
+                                                                            >
                                                                         {booking.status ===
                                                                         "pending"
                                                                             ? getBookingPageText(language, "pendingMessage")
@@ -3499,77 +3708,315 @@ function BookingsContent() {
                                                                                 booking.status
                                                                             )}
                                                                     </span>
-                                                                </div>
+                                                                        </div>
 
-                                                                {booking.status ===
-                                                                    "pending" && (
-                                                                        <span
-                                                                            style={{
-                                                                                flexShrink: 0,
-                                                                                padding:
-                                                                                    "6px 10px",
-                                                                                borderRadius:
-                                                                                    "999px",
-                                                                                background:
-                                                                                    "#fff0c9",
-                                                                                color:
-                                                                                    "#a66a00",
-                                                                                fontSize:
-                                                                                    "12px",
-                                                                                fontWeight:
-                                                                                    700,
-                                                                            }}
-                                                                        >
+                                                                        {booking.status ===
+                                                                            "pending" && (
+                                                                                <span
+                                                                                    className="booking-pending-badge"
+                                                                                    style={{
+                                                                                        flexShrink: 0,
+                                                                                        padding:
+                                                                                            "6px 10px",
+                                                                                        borderRadius:
+                                                                                            "999px",
+                                                                                        background:
+                                                                                            "#fff0c9",
+                                                                                        color:
+                                                                                            "#a66a00",
+                                                                                        fontSize:
+                                                                                            "12px",
+                                                                                        fontWeight:
+                                                                                            700,
+                                                                                    }}
+                                                                                >
                                                                         {getBookingPageText(language, "pending")}
                                                                     </span>
-                                                                    )}
-                                                            </div>
+                                                                            )}
+                                                                    </div>
 
+                                                                </div>
+
+                                                                <div className="booking-actions">
+
+                                                                    {property && (
+                                                                        <Link
+                                                                            href={`/stays/${property.id}`}
+                                                                            className="button"
+                                                                        >
+                                                                            {
+                                                                                getTranslation(
+                                                                                    language,
+                                                                                    "viewProperty"
+                                                                                )
+                                                                            }
+                                                                        </Link>
+                                                                    )}
+
+                                                                    {booking.status !==
+                                                                        "cancelled" && (
+                                                                            <button
+                                                                                type="button"
+                                                                                className="cancel-button"
+                                                                                onClick={() =>
+                                                                                    handleCancelBooking(
+                                                                                        booking.id
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    getTranslation(
+                                                                                        language,
+                                                                                        "cancelBooking"
+                                                                                    )
+                                                                                }
+                                                                            </button>
+                                                                        )}
+
+                                                                </div>
+
+                                                            </div>
                                                         </div>
 
-                                                        <div className="booking-actions">
+                                                        <aside className="bookings-trip-sidebar">
+                                                            <article className="bookings-next-trip-card">
+                                                                <div className="bookings-sidebar-heading">
+                                                                    {getBookingPageText(
+                                                                        language,
+                                                                        "nextTrip"
+                                                                    )}
+                                                                </div>
 
-                                                            {property && (
-                                                                <Link
-                                                                    href={`/stays/${property.id}`}
-                                                                    className="button"
-                                                                >
-                                                                    {
-                                                                        getTranslation(
-                                                                            language,
-                                                                            "viewProperty"
-                                                                        )
-                                                                    }
-                                                                </Link>
-                                                            )}
-
-                                                            {booking.status !==
-                                                                "cancelled" && (
-                                                                    <button
-                                                                        type="button"
-                                                                        className="cancel-button"
-                                                                        onClick={() =>
-                                                                            handleCancelBooking(
-                                                                                booking.id
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            getTranslation(
-                                                                                language,
-                                                                                "cancelBooking"
-                                                                            )
-                                                                        }
-                                                                    </button>
+                                                                {bookingSidebarImage ? (
+                                                                    <div className="bookings-next-trip-image-wrap">
+                                                                        <img
+                                                                            className="bookings-next-trip-image"
+                                                                            src={bookingSidebarImage}
+                                                                            alt={`${
+                                                                                getLocalizedBookingRoomName(
+                                                                                    room?.name,
+                                                                                    language
+                                                                                )
+                                                                            } · ${property?.name ?? "StayWay"}`}
+                                                                        />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="bookings-next-trip-image-placeholder">
+                                                                        <DoorOpen size={30} />
+                                                                    </div>
                                                                 )}
 
-                                                        </div>
+                                                                <div className="bookings-next-trip-body">
+                                                                    <h3>
+                                                                        {property?.name ?? "StayWay"}
+                                                                    </h3>
 
+                                                                    <p className="bookings-next-trip-room">
+                                                                        {getLocalizedBookingRoomName(
+                                                                            room?.name,
+                                                                            language
+                                                                        )}
+                                                                    </p>
+
+                                                                    {property?.address && (
+                                                                        <p className="bookings-next-trip-location">
+                                                                            <MapPin size={15} />
+                                                                            <span>
+                                                                        {property.address}
+                                                                    </span>
+                                                                        </p>
+                                                                    )}
+
+                                                                    <div className="bookings-next-trip-dates">
+                                                                        <div>
+                                                                    <span>
+                                                                        {getTranslation(
+                                                                            language,
+                                                                            "checkIn"
+                                                                        )}
+                                                                    </span>
+                                                                            <strong>
+                                                                                {formatDate(
+                                                                                    booking.checkIn
+                                                                                )}
+                                                                            </strong>
+                                                                        </div>
+
+                                                                        <ArrowRight
+                                                                            size={17}
+                                                                            aria-hidden="true"
+                                                                        />
+
+                                                                        <div>
+                                                                    <span>
+                                                                        {getTranslation(
+                                                                            language,
+                                                                            "checkOut"
+                                                                        )}
+                                                                    </span>
+                                                                            <strong>
+                                                                                {formatDate(
+                                                                                    booking.checkOut
+                                                                                )}
+                                                                            </strong>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="bookings-next-trip-meta">
+                                                                <span>
+                                                                    {bookingNights}{" "}
+                                                                    {getBookingPageText(
+                                                                        language,
+                                                                        bookingNights === 1
+                                                                            ? "night"
+                                                                            : "nights"
+                                                                    )}
+                                                                </span>
+                                                                        <span aria-hidden="true">·</span>
+                                                                        <span>
+                                                                    {bookingGuests}{" "}
+                                                                            {getBookingPageText(
+                                                                                language,
+                                                                                bookingGuests === 1
+                                                                                    ? "guest"
+                                                                                    : "guestsWord"
+                                                                            )}
+                                                                </span>
+                                                                    </div>
+
+                                                                    <span
+                                                                        className={`bookings-trip-status status-${booking.status}`}
+                                                                    >
+                                                                {getStatusText(
+                                                                    booking.status
+                                                                )}
+                                                            </span>
+                                                                </div>
+                                                            </article>
+
+                                                            <article className="bookings-progress-card">
+                                                                <div className="bookings-sidebar-heading">
+                                                                    {getBookingPageText(
+                                                                        language,
+                                                                        "tripProgress"
+                                                                    )}
+                                                                </div>
+
+                                                                <div className="bookings-progress-list">
+                                                                    <div className="bookings-progress-item is-complete">
+                                                                <span className="bookings-progress-dot">
+                                                                    <Check size={14} />
+                                                                </span>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {getBookingPageText(
+                                                                                    language,
+                                                                                    "bookingCreated"
+                                                                                )}
+                                                                            </strong>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div
+                                                                        className={`bookings-progress-item ${
+                                                                            booking.status === "cancelled"
+                                                                                ? "is-cancelled"
+                                                                                : booking.status === "confirmed"
+                                                                                    ? "is-complete"
+                                                                                    : "is-current"
+                                                                        }`}
+                                                                    >
+                                                                <span className="bookings-progress-dot">
+                                                                    {booking.status === "confirmed" ? (
+                                                                        <Check size={14} />
+                                                                    ) : booking.status === "cancelled" ? (
+                                                                        <X size={14} />
+                                                                    ) : (
+                                                                        <Clock3 size={14} />
+                                                                    )}
+                                                                </span>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {booking.status === "pending"
+                                                                                    ? getBookingPageText(
+                                                                                        language,
+                                                                                        "awaitingConfirmation"
+                                                                                    )
+                                                                                    : getStatusText(
+                                                                                        booking.status
+                                                                                    )}
+                                                                            </strong>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div
+                                                                        className={`bookings-progress-item ${
+                                                                            bookingHasCheckedIn
+                                                                                ? "is-complete"
+                                                                                : ""
+                                                                        }`}
+                                                                    >
+                                                                <span className="bookings-progress-dot">
+                                                                    {bookingHasCheckedIn ? (
+                                                                        <Check size={14} />
+                                                                    ) : (
+                                                                        <Circle size={11} />
+                                                                    )}
+                                                                </span>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {getTranslation(
+                                                                                    language,
+                                                                                    "checkIn"
+                                                                                )}
+                                                                            </strong>
+                                                                            <span>
+                                                                        {formatDate(
+                                                                            booking.checkIn
+                                                                        )}
+                                                                    </span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div
+                                                                        className={`bookings-progress-item ${
+                                                                            bookingHasCheckedOut
+                                                                                ? "is-complete"
+                                                                                : ""
+                                                                        }`}
+                                                                    >
+                                                                <span className="bookings-progress-dot">
+                                                                    {bookingHasCheckedOut ? (
+                                                                        <Check size={14} />
+                                                                    ) : (
+                                                                        <Circle size={11} />
+                                                                    )}
+                                                                </span>
+                                                                        <div>
+                                                                            <strong>
+                                                                                {getTranslation(
+                                                                                    language,
+                                                                                    "checkOut"
+                                                                                )}
+                                                                            </strong>
+                                                                            <span>
+                                                                        {formatDate(
+                                                                            booking.checkOut
+                                                                        )}
+                                                                    </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+
+                                                        </aside>
                                                     </div>
-                                                </div>
-                                            );
-                                        }
-                                    )}
+                                                );
+                                            }
+                                        )}
+
+                                    </div>
+
 
                                 </div>
                             )}

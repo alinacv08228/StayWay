@@ -4131,7 +4131,6 @@ h1.stays-title-animation {
 }
 .booking-info {
     margin-top: 25px;
-    border-top: 1px solid #eeeaf7;
 }
 
 .booking-info-row {
@@ -5853,7 +5852,7 @@ html[data-theme="dark"] .home-stays-section {
 }
 
 html[data-theme="dark"] .home-cta {
-    background: #0f172a !important;
+    background: #101a2d !important;
 }
 
 /* HOME TEXT */
@@ -6040,7 +6039,7 @@ html[data-theme="dark"] .home-stays-section {
 }
 
 html[data-theme="dark"] .home-cta {
-    background: #0f172a !important;
+    background: #101a2d !important;
 }
 
 /* Home headings */
@@ -6188,7 +6187,7 @@ html[data-theme="dark"] .home-section-heading a {
 /* HOME CTA */
 
 html[data-theme="dark"] .home-cta {
-    background: #0f172a !important;
+    background: #101a2d !important;
 }
 
 /* =========================================================
@@ -7488,9 +7487,9 @@ html[data-theme="dark"] .error-reset-button:hover {
     }
 }
 
-    /* =========================================
-       HEADER NAV - BUTTONS
-       ========================================= */
+/* =========================================
+   HEADER NAV - BUTTONS
+   ========================================= */
 
 .nav .logout-button,
 .nav .theme-button,
@@ -15592,7 +15591,7 @@ html[data-theme="dark"] .home-stays-section {
 }
 
 html[data-theme="dark"] .home-cta {
-    background: #0d1729 !important;
+    background: #101a2d !important;
 }
 
 html[data-theme="dark"] .home-hero h1,
@@ -15722,12 +15721,7 @@ html:not([data-theme="dark"]) .home-stays-section {
 }
 
 html:not([data-theme="dark"]) .home-cta {
-    background:
-            linear-gradient(
-                    180deg,
-                    #eee8ff 0%,
-                    #f4efff 100%
-            ) !important;
+    background: #f7f4ff !important;
     border-top: none;
 }
 
@@ -15738,7 +15732,7 @@ html[data-theme="dark"] .home-stays-section {
 }
 
 html[data-theme="dark"] .home-cta {
-    background: #0d1729 !important;
+    background: #101a2d !important;
 }
 
 
@@ -16888,4 +16882,603 @@ html[data-theme="dark"] .guest-summary {
 
 html[data-theme="dark"] .guest-capacity {
     color: #aab4c5 !important;
+}
+
+/* =========================================================
+   MY BOOKINGS - STAY LAYOUT + TRIP SIDEBAR
+   ========================================================= */
+
+.bookings-stay-layout {
+    display: block;
+    width: 100%;
+}
+
+.bookings-stay-layout .bookings-list {
+    display: grid;
+    gap: 28px;
+    min-width: 0;
+    max-width: none;
+    margin-top: 0;
+}
+
+.booking-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 28px;
+    align-items: start;
+}
+
+.booking-pair .booking-card {
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+}
+
+.booking-card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eeeaf7;
+}
+
+.booking-card-heading-copy {
+    min-width: 0;
+}
+
+.booking-card-heading-copy > span {
+    display: block;
+    margin-bottom: 9px;
+    color: #6c5ce7;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.booking-card-heading-copy h2 {
+    margin: 0;
+    color: #27232f;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -0.7px;
+}
+
+.booking-card-heading-copy p {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin: 10px 0 0;
+    padding: 8px 13px;
+    border: 1px solid #e5ddff;
+    border-radius: 999px;
+    background: #f0ebff;
+    color: #6c5ce7;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.booking-card-property-image {
+    width: 190px;
+    height: 118px;
+    flex-shrink: 0;
+    display: block;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid #e8e3ef;
+    background: #f5f2fb;
+}
+
+.bookings-trip-sidebar {
+    position: static;
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
+.bookings-next-trip-card,
+.bookings-progress-card,
+.bookings-journey-card {
+    overflow: hidden;
+    border: 1px solid #e4dff0;
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 12px 34px rgba(78, 64, 125, 0.07);
+}
+
+.bookings-sidebar-heading {
+    padding: 18px 20px 14px;
+    color: #6c5ce7;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.bookings-next-trip-image-wrap,
+.bookings-next-trip-image-placeholder {
+    width: calc(100% - 24px);
+    height: 205px;
+    margin: 0 12px;
+    overflow: hidden;
+    border-radius: 17px;
+    background: #f0ecff;
+}
+
+.bookings-next-trip-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+}
+
+.bookings-next-trip-card:hover .bookings-next-trip-image {
+    transform: scale(1.035);
+}
+
+.bookings-next-trip-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c5ce7;
+}
+
+.bookings-next-trip-body {
+    padding: 20px;
+}
+
+.bookings-next-trip-body h3 {
+    margin: 0;
+    color: #27232f;
+    font-size: 22px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+}
+
+.bookings-next-trip-room {
+    margin: 7px 0 0;
+    color: #6c5ce7;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.bookings-next-trip-location {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 10px 0 0;
+    color: #7c7687;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.bookings-next-trip-location svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #8b7cf6;
+}
+
+.bookings-next-trip-dates {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    margin-top: 18px;
+    padding: 14px;
+    border: 1px solid #ded6f4;
+    border-radius: 14px;
+    background: #f3efff;
+}
+
+.bookings-next-trip-dates > div {
+    min-width: 0;
+}
+
+.bookings-next-trip-dates span {
+    display: block;
+    margin-bottom: 4px;
+    color: #8a8492;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.bookings-next-trip-dates strong {
+    display: block;
+    color: #302d3a;
+    font-size: 12px;
+}
+
+.bookings-next-trip-dates > svg {
+    color: #9a92aa;
+}
+
+.bookings-next-trip-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 14px;
+    color: #777184;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.bookings-trip-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 15px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.bookings-trip-status.status-pending {
+    background: #fff0c9;
+    color: #a66a00;
+}
+
+.bookings-trip-status.status-confirmed {
+    background: #eaf7ee;
+    color: #218739;
+}
+
+.bookings-trip-status.status-cancelled {
+    background: #fff0f2;
+    color: #b04b62;
+}
+
+.bookings-progress-card {
+    padding: 0 20px 20px;
+}
+
+.bookings-progress-card .bookings-sidebar-heading {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.bookings-progress-list {
+    display: grid;
+}
+
+.bookings-progress-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 58px;
+}
+
+.bookings-progress-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: -2px;
+    width: 2px;
+    border-radius: 999px;
+    background: #e7e2ef;
+}
+
+.bookings-progress-dot {
+    position: relative;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ded8e9;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #aaa3b2;
+}
+
+.bookings-progress-item > div {
+    padding: 6px 0 12px;
+}
+
+.bookings-progress-item strong {
+    display: block;
+    color: #4d4858;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.bookings-progress-item > div span {
+    display: block;
+    margin-top: 4px;
+    color: #908999;
+    font-size: 11px;
+}
+
+.bookings-progress-item.is-complete .bookings-progress-dot {
+    border-color: #cfc5ff;
+    background: #6c5ce7;
+    color: #ffffff;
+}
+
+.bookings-progress-item.is-complete:not(:last-child)::after {
+    background: #cfc5ff;
+}
+
+.bookings-progress-item.is-current .bookings-progress-dot {
+    border-color: #f0cf86;
+    background: #fff6df;
+    color: #c78208;
+}
+
+.bookings-progress-item.is-current strong {
+    color: #8b6215;
+}
+
+.bookings-progress-item.is-cancelled .bookings-progress-dot {
+    border-color: #efc7d0;
+    background: #fff0f2;
+    color: #b04b62;
+}
+
+.bookings-progress-item.is-cancelled strong {
+    color: #b04b62;
+}
+
+.bookings-journey-card {
+    position: relative;
+    padding: 22px;
+    border-color: rgba(108, 92, 231, 0.35);
+    background:
+            radial-gradient(
+                    circle at 100% 0%,
+                    rgba(255, 255, 255, 0.18),
+                    transparent 35%
+            ),
+            #6c5ce7;
+    color: #ffffff;
+    box-shadow: 0 18px 38px rgba(108, 92, 231, 0.19);
+}
+
+.bookings-journey-eyebrow {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.bookings-journey-card h3 {
+    margin: 9px 0 18px;
+    max-width: 250px;
+    color: #ffffff;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+}
+
+.bookings-journey-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+    border-radius: 11px;
+    background: #ffffff;
+    color: #5a49d5;
+    font-size: 12px;
+    font-weight: 800;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bookings-journey-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(42, 29, 91, 0.18);
+}
+
+/* DARK MODE */
+html[data-theme="dark"] .bookings-next-trip-card,
+html[data-theme="dark"] .bookings-progress-card {
+    background: #20283a !important;
+    border-color: #3a4358 !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .bookings-next-trip-body h3,
+html[data-theme="dark"] .bookings-progress-item strong,
+html[data-theme="dark"] .booking-card-title-copy h2 {
+    color: #f5f3fa !important;
+}
+
+html[data-theme="dark"] .bookings-next-trip-room {
+    color: #a99cff !important;
+}
+
+html[data-theme="dark"] .booking-card-heading-copy p {
+    background: #302a55 !important;
+    border-color: #514786 !important;
+    color: #b9adff !important;
+}
+
+html[data-theme="dark"] .bookings-next-trip-location,
+html[data-theme="dark"] .bookings-next-trip-meta,
+html[data-theme="dark"] .bookings-progress-item > div span {
+    color: #aab1c1 !important;
+}
+
+html[data-theme="dark"] .bookings-next-trip-dates {
+    background: #2b354b !important;
+    border-color: #46526b !important;
+}
+
+html[data-theme="dark"] .bookings-next-trip-dates strong {
+    color: #f5f3fa !important;
+}
+
+html[data-theme="dark"] .bookings-next-trip-dates span {
+    color: #98a0b1 !important;
+}
+
+html[data-theme="dark"] .bookings-progress-dot {
+    background: #252d40;
+    border-color: #465067;
+}
+
+html[data-theme="dark"] .bookings-progress-item:not(:last-child)::after {
+    background: #414b60;
+}
+
+html[data-theme="dark"] .booking-card-title-row {
+    border-bottom-color: #344055;
+}
+
+html[data-theme="dark"] .booking-card-room-image {
+    border-color: #3a4358;
+    background: #252d40;
+}
+
+@media (max-width: 1000px) {
+    .booking-pair {
+        grid-template-columns: 1fr;
+    }
+
+    .bookings-trip-sidebar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+    }
+
+}
+
+@media (max-width: 700px) {
+    .bookings-trip-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .bookings-next-trip-image-wrap,
+    .bookings-next-trip-image-placeholder {
+        height: 220px;
+    }
+}
+
+@media (max-width: 700px) {
+    .booking-card-title-row {
+        align-items: flex-start;
+        gap: 18px;
+    }
+
+    .booking-card-heading-copy h2 {
+        font-size: 24px;
+    }
+
+    .booking-card-property-image {
+        width: 150px;
+        height: 96px;
+    }
+}
+
+@media (max-width: 520px) {
+    .booking-card-title-row {
+        flex-direction: column;
+    }
+
+    .booking-card-property-image {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+/* =========================================================
+   MY BOOKINGS - FINAL VISIBILITY FIXES
+========================================================= */
+
+/* Search placeholder must stay readable in light mode. */
+.bookings-root .bookings-filters input::placeholder {
+    color: #8a8497 !important;
+    opacity: 1 !important;
+}
+
+/* Keep entered search text readable as well. */
+.bookings-root .bookings-filters input {
+    color: #302d3a !important;
+}
+
+/* Pending booking panel - light mode. */
+.bookings-root .booking-pending-panel {
+    background: #fffaf0 !important;
+    border-color: #f1dfb4 !important;
+}
+
+.bookings-root .booking-pending-panel strong {
+    color: #4b402e !important;
+}
+
+.bookings-root .booking-pending-message {
+    color: #8a7650 !important;
+}
+
+.bookings-root .booking-pending-badge {
+    background: #fff0c9 !important;
+    color: #a66a00 !important;
+}
+
+/* Dark mode: remove the bright cream/white panel and preserve contrast. */
+html[data-theme="dark"] .bookings-root .booking-pending-panel {
+    background: #2a2a25 !important;
+    border-color: #5a4d31 !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-pending-panel strong {
+    color: #f2d79c !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-pending-message {
+    color: #d3bf91 !important;
+}
+
+html[data-theme="dark"] .bookings-root .booking-pending-badge {
+    background: #4a3a1f !important;
+    color: #ffd47a !important;
+}
+
+/* Dark-mode search/filter controls: dark surfaces, readable text. */
+html[data-theme="dark"] .bookings-root .bookings-filters > div {
+    background: #1b283d !important;
+    border-color: #3a4860 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-filters input,
+html[data-theme="dark"] .bookings-root .bookings-filters select {
+    color: #eef2f8 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-filters input::placeholder {
+    color: #9aa6b9 !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-clear-button {
+    background: #202d42 !important;
+    border-color: #3a4860 !important;
+    color: #cbd3df !important;
+}
+
+html[data-theme="dark"] .bookings-root .bookings-clear-button:disabled {
+    background: #1a2537 !important;
+    border-color: #303d52 !important;
+    color: #778399 !important;
+}
+
+
+
+/* =========================================================
+   HOME CTA - DARK BACKGROUND UNIFIED WITH FEATURED STAYS
+========================================================= */
+html[data-theme="dark"] .home-stays,
+html[data-theme="dark"] .home-stays-section,
+html[data-theme="dark"] .home-cta {
+    background: #101a2d !important;
 }
