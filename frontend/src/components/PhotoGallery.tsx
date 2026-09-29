@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState,
+} from "react";
+
+import { createPortal } from "react-dom";
 
 import { useSettings } from "../context/SettingsContext";
 import { getStayUiTranslation } from "../data/translations";
@@ -15,25 +20,141 @@ export default function PhotoGallery({
                                          photos,
                                      }: PhotoGalleryProps) {
     const { language } = useSettings();
-    const [isOpen, setIsOpen] = useState(false);
 
-    const validPhotos = photos.filter(Boolean);
+    const [isOpen, setIsOpen] =
+        useState(false);
+
+    const [selectedIndex, setSelectedIndex] =
+        useState(0);
+
+    const [mounted, setMounted] =
+        useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    /*
+     * photos[0] = hotel
+     * photos[1] = room 1
+     * photos[2] = room 2
+     * photos[3] = room 3
+     * photos[4] = room 4
+     */
+
+    const hotelPhoto =
+        photos[0]?.trim() || "";
+
+    const roomPhotos = photos
+        .slice(1)
+        .filter(
+            (photo): photo is string =>
+                Boolean(photo?.trim())
+        );
+
+    /*
+     * Preview:
+     *
+     * hotel
+     * room 1
+     * room 2
+     * room 3
+     * room 4
+     *
+     * Dacă o cameră lipsește,
+     * se repetă poza hotelului.
+     */
 
     const galleryPhotos = [
-        validPhotos[0],
-        validPhotos[1] ?? validPhotos[0],
-        validPhotos[2] ?? validPhotos[0],
-        validPhotos[3] ?? validPhotos[0],
+        hotelPhoto,
+        roomPhotos[0] ?? hotelPhoto,
+        roomPhotos[1] ?? hotelPhoto,
+        roomPhotos[2] ?? hotelPhoto,
+        roomPhotos[3] ?? hotelPhoto,
     ];
+
+    /*
+     * În viewer apar numai pozele reale.
+     */
+
+    const validPhotos = [
+        hotelPhoto,
+        ...roomPhotos,
+    ].filter(Boolean);
+
+    const openGallery = (
+        index: number
+    ) => {
+        if (validPhotos.length === 0) {
+            return;
+        }
+
+        const safeIndex =
+            Math.min(
+                index,
+                validPhotos.length - 1
+            );
+
+        setSelectedIndex(safeIndex);
+        setIsOpen(true);
+    };
+
+    const showPrevious = () => {
+        setSelectedIndex(
+            (current) =>
+                current === 0
+                    ? validPhotos.length - 1
+                    : current - 1
+        );
+    };
+
+    const showNext = () => {
+        setSelectedIndex(
+            (current) =>
+                current ===
+                validPhotos.length - 1
+                    ? 0
+                    : current + 1
+        );
+    };
 
     useEffect(() => {
         if (!isOpen) {
             return;
         }
 
-        const handleKeyDown = (event: KeyboardEvent) => {
+        const handleKeyDown = (
+            event: KeyboardEvent
+        ) => {
             if (event.key === "Escape") {
                 setIsOpen(false);
+            }
+
+            if (
+                event.key ===
+                "ArrowLeft"
+            ) {
+                setSelectedIndex(
+                    (current) =>
+                        current === 0
+                            ? validPhotos.length -
+                            1
+                            : current - 1
+                );
+            }
+
+            if (
+                event.key ===
+                "ArrowRight"
+            ) {
+                setSelectedIndex(
+                    (current) =>
+                        current ===
+                        validPhotos.length -
+                        1
+                            ? 0
+                            : current + 1
+                );
             }
         };
 
@@ -42,30 +163,181 @@ export default function PhotoGallery({
             handleKeyDown
         );
 
+        document.body.style.overflow =
+            "hidden";
+
         return () => {
             document.removeEventListener(
                 "keydown",
                 handleKeyDown
             );
-        };
-    }, [isOpen]);
 
-    if (validPhotos.length === 0) {
+            document.body.style.overflow =
+                "";
+        };
+    }, [
+        isOpen,
+        validPhotos.length,
+    ]);
+
+    if (!hotelPhoto) {
         return null;
     }
+
+    const modal =
+        mounted &&
+        isOpen &&
+        validPhotos.length > 0
+            ? createPortal(
+                <div
+                    className="photo-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={getStayUiTranslation(
+                        language,
+                        "allPhotos"
+                    )}
+                >
+                    <div className="photo-modal-content photo-gallery-viewer">
+                        {/* HEADER */}
+
+                        <div className="photo-modal-header">
+                            <h2>
+                                {getStayUiTranslation(
+                                    language,
+                                    "allPhotos"
+                                )}
+                            </h2>
+
+                            <div className="photo-modal-header-actions">
+                                  <span className="photo-gallery-counter">
+                                      {selectedIndex +
+                                          1}{" "}
+                                      /{" "}
+                                      {
+                                          validPhotos.length
+                                      }
+                                  </span>
+
+                                <button
+                                    type="button"
+                                    className="photo-modal-close"
+                                    onClick={() =>
+                                        setIsOpen(
+                                            false
+                                        )
+                                    }
+                                    aria-label={getStayUiTranslation(
+                                        language,
+                                        "close"
+                                    )}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* MAIN PHOTO */}
+
+                        <div className="photo-gallery-stage">
+                            {validPhotos.length >
+                                1 && (
+                                    <button
+                                        type="button"
+                                        className="photo-gallery-arrow photo-gallery-arrow-left"
+                                        onClick={
+                                            showPrevious
+                                        }
+                                        aria-label="Previous photo"
+                                    >
+                                        ‹
+                                    </button>
+                                )}
+
+                            <img
+                                className="photo-gallery-main-image"
+                                src={
+                                    validPhotos[
+                                        selectedIndex
+                                        ]
+                                }
+                                alt={`${hotelName} ${
+                                    selectedIndex +
+                                    1
+                                }`}
+                            />
+
+                            {validPhotos.length >
+                                1 && (
+                                    <button
+                                        type="button"
+                                        className="photo-gallery-arrow photo-gallery-arrow-right"
+                                        onClick={
+                                            showNext
+                                        }
+                                        aria-label="Next photo"
+                                    >
+                                        ›
+                                    </button>
+                                )}
+                        </div>
+
+                        {/* THUMBNAILS */}
+
+                        {validPhotos.length >
+                            1 && (
+                                <div className="photo-gallery-thumbnails">
+                                    {validPhotos.map(
+                                        (
+                                            photo,
+                                            index
+                                        ) => (
+                                            <button
+                                                type="button"
+                                                key={`${photo}-${index}`}
+                                                className={
+                                                    index ===
+                                                    selectedIndex
+                                                        ? "photo-gallery-thumbnail active"
+                                                        : "photo-gallery-thumbnail"
+                                                }
+                                                onClick={() =>
+                                                    setSelectedIndex(
+                                                        index
+                                                    )
+                                                }
+                                                aria-label={`Photo ${
+                                                    index +
+                                                    1
+                                                }`}
+                                            >
+                                                <img
+                                                    src={
+                                                        photo
+                                                    }
+                                                    alt=""
+                                                />
+                                            </button>
+                                        )
+                                    )}
+                                </div>
+                            )}
+                    </div>
+                </div>,
+                document.body
+            )
+            : null;
 
     return (
         <>
             <div className="stay-gallery">
+                {/* HOTEL */}
+
                 <button
                     type="button"
                     className="gallery-main gallery-clickable"
-                    onClick={() => setIsOpen(true)}
-                    aria-label={
-                        getStayUiTranslation(
-                            language,
-                            "allPhotos"
-                        )
+                    onClick={() =>
+                        openGallery(0)
                     }
                 >
                     <img
@@ -74,50 +346,86 @@ export default function PhotoGallery({
                     />
                 </button>
 
+                {/* ROOM 1 + ROOM 2 */}
+
                 <div className="gallery-small">
                     <button
                         type="button"
                         className="gallery-clickable"
-                        onClick={() => setIsOpen(true)}
+                        onClick={() =>
+                            openGallery(
+                                roomPhotos[0]
+                                    ? 1
+                                    : 0
+                            )
+                        }
                     >
                         <img
-                            src={galleryPhotos[1]}
-                            alt={`${hotelName} view`}
+                            src={
+                                galleryPhotos[1]
+                            }
+                            alt={`${hotelName} room 1`}
                         />
                     </button>
 
                     <button
                         type="button"
                         className="gallery-clickable"
-                        onClick={() => setIsOpen(true)}
+                        onClick={() =>
+                            openGallery(
+                                roomPhotos[1]
+                                    ? 2
+                                    : 0
+                            )
+                        }
                     >
                         <img
-                            src={galleryPhotos[2]}
-                            alt={`${hotelName} interior`}
+                            src={
+                                galleryPhotos[2]
+                            }
+                            alt={`${hotelName} room 2`}
                         />
                     </button>
                 </div>
 
+                {/* ROOM 3 + ROOM 4 */}
+
                 <div className="gallery-small">
                     <button
                         type="button"
                         className="gallery-clickable"
-                        onClick={() => setIsOpen(true)}
+                        onClick={() =>
+                            openGallery(
+                                roomPhotos[2]
+                                    ? 3
+                                    : 0
+                            )
+                        }
                     >
                         <img
-                            src={galleryPhotos[3]}
-                            alt={`${hotelName} room`}
+                            src={
+                                galleryPhotos[3]
+                            }
+                            alt={`${hotelName} room 3`}
                         />
                     </button>
 
                     <button
                         type="button"
                         className="gallery-more"
-                        onClick={() => setIsOpen(true)}
+                        onClick={() =>
+                            openGallery(
+                                roomPhotos[3]
+                                    ? 4
+                                    : 0
+                            )
+                        }
                     >
                         <img
-                            src={galleryPhotos[0]}
-                            alt={`${hotelName} hotel`}
+                            src={
+                                galleryPhotos[4]
+                            }
+                            alt={`${hotelName} room 4`}
                         />
 
                         <span>
@@ -130,64 +438,7 @@ export default function PhotoGallery({
                 </div>
             </div>
 
-            {isOpen && (
-                <div
-                    className="photo-modal"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label={getStayUiTranslation(
-                        language,
-                        "allPhotos"
-                    )}
-                    onMouseDown={(event) => {
-                        if (
-                            event.target ===
-                            event.currentTarget
-                        ) {
-                            setIsOpen(false);
-                        }
-                    }}
-                >
-                    <div className="photo-modal-content">
-                        <div className="photo-modal-header">
-                            <h2>
-                                {getStayUiTranslation(
-                                    language,
-                                    "allPhotos"
-                                )}
-                            </h2>
-
-                            <button
-                                type="button"
-                                className="photo-modal-close"
-                                onClick={() =>
-                                    setIsOpen(false)
-                                }
-                                aria-label={getStayUiTranslation(
-                                    language,
-                                    "close"
-                                )}
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        <div className="photo-modal-grid">
-                            {validPhotos.map(
-                                (photo, index) => (
-                                    <img
-                                        key={`${photo}-${index}`}
-                                        src={photo}
-                                        alt={`${hotelName} ${
-                                            index + 1
-                                        }`}
-                                    />
-                                )
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+            {modal}
         </>
     );
 }

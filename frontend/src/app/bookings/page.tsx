@@ -1637,14 +1637,15 @@ function BookingsContent() {
                 return;
             }
 
+            /*
+             * The backend already limits transfer bookings by the
+             * authenticated user's JWT. Administrators receive all
+             * bookings, while regular users receive only their own.
+             * The passenger email is contact information and must not
+             * be used to determine booking ownership.
+             */
             const visibleTransferBookings =
-                currentUser.role === "admin"
-                    ? allTransferBookings
-                    : allTransferBookings.filter(
-                        (booking) =>
-                            booking.email ===
-                            currentUser.email
-                    );
+                allTransferBookings;
 
             setAllProperties(loadedProperties);
             setAllRooms(loadedRooms);

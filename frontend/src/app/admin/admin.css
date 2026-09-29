@@ -858,3 +858,6 @@ html[data-theme="dark"] .admin-page .driver-schedule-return-label {
     color: #a998ff !important;
 }
 
+.admin-property-form {
+    scroll-margin-top: 110px;
+}

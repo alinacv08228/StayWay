@@ -14,7 +14,9 @@ import { useUser } from "../../context/UserContext";
 
 import { useSettings } from "../../context/SettingsContext";
 
-import api from "../../lib/api";
+import api, {
+    isUnauthorizedApiError,
+} from "../../lib/api";
 
 import {
     getDestinationUiTranslation,
@@ -714,6 +716,9 @@ export default function AdminPage() {
 
     const [isPropertyFormOpen, setIsPropertyFormOpen] =
         useState(false);
+
+    const propertyFormRef =
+        useRef<HTMLFormElement | null>(null);
 
     const [editingPropertyId, setEditingPropertyId] =
         useState<number | null>(null);
@@ -1765,10 +1770,14 @@ export default function AdminPage() {
                     loadedBookings
                 );
             } catch (error) {
-                console.error(
-                    "Could not load stay bookings from the backend.",
-                    error
-                );
+                if (
+                    !isUnauthorizedApiError(error)
+                ) {
+                    console.error(
+                        "Could not load stay bookings from the backend.",
+                        error
+                    );
+                }
 
                 setAllBookings([]);
             }
@@ -2466,9 +2475,14 @@ export default function AdminPage() {
 
         setPropertyError("");
 
-        setIsPropertyFormOpen(
-            true
-        );
+        setIsPropertyFormOpen(true);
+
+        window.setTimeout(() => {
+            propertyFormRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 80);
     };
 
     // =========================================
@@ -3681,6 +3695,7 @@ export default function AdminPage() {
 
                                 {isPropertyFormOpen && (
                                     <form
+                                        ref={propertyFormRef}
                                         className="admin-property-form"
                                         onSubmit={
                                             handlePropertySubmit

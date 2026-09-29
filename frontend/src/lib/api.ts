@@ -12,6 +12,11 @@ const TOKEN_EXPIRATION_KEY =
 const AUTH_INVALID_EVENT =
     "stayway-auth-invalid";
 
+type JwtPayload = {
+    exp?: number;
+    [key: string]: unknown;
+};
+
 function clearStoredAuthentication() {
     if (
         typeof window ===
@@ -33,6 +38,116 @@ function clearStoredAuthentication() {
     );
 }
 
+function notifyInvalidAuthentication() {
+    if (
+        typeof window ===
+        "undefined"
+    ) {
+        return;
+    }
+
+    window.dispatchEvent(
+        new Event(
+            AUTH_INVALID_EVENT
+        )
+    );
+}
+
+function decodeToken(
+    token: string
+): JwtPayload | null {
+    try {
+        const parts =
+            token.split(".");
+
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        const base64Url =
+            parts[1];
+
+        const base64 =
+            base64Url
+                .replace(/-/g, "+")
+                .replace(/_/g, "/")
+                .padEnd(
+                    Math.ceil(
+                        base64Url.length / 4
+                    ) * 4,
+                    "="
+                );
+
+        const binary =
+            atob(base64);
+
+        const bytes =
+            Uint8Array.from(
+                binary,
+                (character) =>
+                    character.charCodeAt(0)
+            );
+
+        const json =
+            new TextDecoder()
+                .decode(bytes);
+
+        return JSON.parse(
+            json
+        ) as JwtPayload;
+    } catch {
+        return null;
+    }
+}
+
+function getValidStoredToken():
+    string | null {
+    if (
+        typeof window ===
+        "undefined"
+    ) {
+        return null;
+    }
+
+    const token =
+        localStorage.getItem(
+            TOKEN_KEY
+        );
+
+    if (!token) {
+        return null;
+    }
+
+    const payload =
+        decodeToken(token);
+
+    if (
+        !payload ||
+        typeof payload.exp !==
+        "number"
+    ) {
+        clearStoredAuthentication();
+        notifyInvalidAuthentication();
+
+        return null;
+    }
+
+    const expirationTime =
+        payload.exp * 1000;
+
+    if (
+        expirationTime <=
+        Date.now()
+    ) {
+        clearStoredAuthentication();
+        notifyInvalidAuthentication();
+
+        return null;
+    }
+
+    return token;
+}
+
 const api =
     axios.create({
         baseURL:
@@ -49,18 +164,20 @@ const api =
 api.interceptors.request.use(
     (config) => {
         if (
-            typeof window !==
+            typeof window ===
             "undefined"
         ) {
-            const token =
-                localStorage.getItem(
-                    TOKEN_KEY
-                );
+            return config;
+        }
 
-            if (token) {
-                config.headers.Authorization =
-                    `Bearer ${token}`;
-            }
+        const token =
+            getValidStoredToken();
+
+        if (token) {
+            config.headers.Authorization =
+                `Bearer ${token}`;
+        } else {
+            delete config.headers.Authorization;
         }
 
         return config;
@@ -68,26 +185,50 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-    (response) => response,
+    (response) =>
+        response,
 
     (error) => {
         if (
             typeof window !==
-                "undefined" &&
+            "undefined" &&
             axios.isAxiosError(error) &&
-            error.response?.status === 401
+            error.response?.status ===
+            401
         ) {
-            clearStoredAuthentication();
+            /*
+             * Un 401 de la login nu înseamnă că
+             * sesiunea existentă a expirat.
+             *
+             * Curățăm autentificarea numai dacă
+             * exista deja un token salvat.
+             */
 
-            window.dispatchEvent(
-                new Event(
-                    AUTH_INVALID_EVENT
-                )
-            );
+            const hadStoredToken =
+                Boolean(
+                    localStorage.getItem(
+                        TOKEN_KEY
+                    )
+                );
+
+            if (hadStoredToken) {
+                clearStoredAuthentication();
+
+                notifyInvalidAuthentication();
+            }
         }
 
         return Promise.reject(error);
     }
 );
+
+export function isUnauthorizedApiError(
+    error: unknown
+): boolean {
+    return (
+        axios.isAxiosError(error) &&
+        error.response?.status === 401
+    );
+}
 
 export default api;
